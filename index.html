@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>水豚旅行 · 首页</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="home">
+  <main class="page-shell stack">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="./assets/hero-capybara.png" alt="水豚旅行头像" />
+        </span>
+        <span class="brand-copy">
+          <strong>水豚旅行</strong>
+          <small>Capybara Trip</small>
+        </span>
+      </div>
+      <nav class="nav-actions">
+        <a class="btn secondary" href="./create.html">发起行程</a>
+        <a class="btn secondary" href="./manage.html">行程管理</a>
+        <a class="btn ghost" href="./about.html">产品介绍</a>
+      </nav>
+    </header>
+
+    <section class="card hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Warm Finance For Trips</span>
+        <h1>拒绝熟人旅行内耗，让水豚替你把账算明白。</h1>
+        <div class="hero-actions">
+          <a class="btn primary" href="./create.html">现在就建一局</a>
+          <a class="btn secondary" href="./archive.html">查看行程存档</a>
+        </div>
+        <div class="clock">
+          <span>🕒</span>
+          <span id="world_clock">--</span>
+        </div>
+      </div>
+
+      <div class="card hero-visual">
+        <div class="hero-visual-image">
+          <img src="./assets/hero-capybara.png" alt="戴草帽拖着行李箱的水豚" />
+        </div>
+        <div class="capybara-note">
+          <strong>今天不聊感情，只聊账本和出发。</strong>
+          <p class="meta-text">朋友谈感情，水豚来讨债。谁垫付、谁分摊、谁该补钱，一眼看清。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-grid">
+      <article class="feature-item">
+        <span class="badge">两种模式</span>
+        <h2 class="section-title">大家长 / AA</h2>
+        <p class="meta-text">支持“一个人统一管钱”和“多人各自付款”两套结算逻辑。</p>
+      </article>
+      <article class="feature-item">
+        <span class="badge">预算可视化</span>
+        <h2 class="section-title">预警更直接</h2>
+        <p class="meta-text">支出进度条、剩余预算、追加预算入口都集中展示。</p>
+      </article>
+      <article class="feature-item">
+        <span class="badge">旅行复盘</span>
+        <h2 class="section-title">结算页更完整</h2>
+        <p class="meta-text">分类占比、转账路径、催款文案和支出拆解都能直接看。</p>
+      </article>
+      <article class="feature-item">
+        <span class="badge">防止纠结</span>
+        <h2 class="section-title">决策助手</h2>
+        <p class="meta-text">把“吃什么”“怎么去”这种内耗问题交给水豚拍板。</p>
+      </article>
+    </section>
+
+    <section class="page-grid">
+      <article class="page-item">
+        <span class="eyebrow">Create</span>
+        <h2 class="section-title">创建页面</h2>
+        <p class="meta-text">设置行程代号、成员、模式、预算和管理员。</p>
+        <a class="btn primary" href="./create.html">打开</a>
+      </article>
+      <article class="page-item">
+        <span class="eyebrow">Manage</span>
+        <h2 class="section-title">管理与详情</h2>
+        <p class="meta-text">浏览存档，进入单个行程继续记账和追加预算。</p>
+        <a class="btn secondary" href="./manage.html">查看</a>
+      </article>
+      <article class="page-item">
+        <span class="eyebrow">Review</span>
+        <h2 class="section-title">结算与归档</h2>
+        <p class="meta-text">结束行程后直接查看分类统计和最终结算结果。</p>
+        <a class="btn secondary" href="./review.html">进入</a>
+      </article>
+    </section>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>

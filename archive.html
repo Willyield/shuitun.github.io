@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>水豚旅行 · 行程存档</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="archive">
+  <main class="page-shell stack">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="./assets/hero-capybara.png" alt="水豚旅行头像" />
+        </span>
+        <span class="brand-copy">
+          <strong>行程存档</strong>
+          <small>Archive</small>
+        </span>
+      </div>
+      <nav class="nav-actions">
+        <a class="btn ghost" href="./index.html">返回首页</a>
+        <a class="btn primary" href="./create.html">发起新行程</a>
+      </nav>
+    </header>
+
+    <section class="card soft">
+      <span class="eyebrow">Archive View</span>
+      <h1 class="page-title">旧版多存档能力保留下来了，现在统一进同一个暖色壳子里。</h1>
+      <p class="section-copy">继续管理、直接看结算、删除旧记录，都在这里完成。</p>
+    </section>
+
+    <section class="card">
+      <div class="trip-head">
+        <div>
+          <span class="eyebrow">Saved Trips</span>
+          <h2 class="section-title">全部行程</h2>
+        </div>
+        <a class="btn secondary" href="./manage.html">切到管理视图</a>
+      </div>
+      <div id="archive_list" class="trip-list"></div>
+    </section>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>

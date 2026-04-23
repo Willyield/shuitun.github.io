@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>水豚旅行 · 创建行程</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="create">
+  <main class="page-shell stack">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">
+          <img src="./assets/hero-capybara.png" alt="水豚旅行头像" />
+        </span>
+        <span class="brand-copy">
+          <strong>创建行程</strong>
+          <small>Create Trip</small>
+        </span>
+      </div>
+      <nav class="nav-actions">
+        <a class="btn ghost" href="./index.html">返回首页</a>
+        <a class="btn secondary" href="./archive.html">查看存档</a>
+      </nav>
+    </header>
+
+    <section class="detail-grid">
+      <article class="card soft">
+        <span class="eyebrow">Capybara Setup</span>
+        <h1 class="page-title">建立一局不吵架的旅行账本</h1>
+        <p class="section-copy">在这里确定行程代号、成员名单、预算方案和记账模式。</p>
+
+        <form id="create_form" class="field-list">
+          <div class="field">
+            <label for="trip_name">行程代号</label>
+            <input class="input" id="trip_name" name="trip_name" type="text" maxlength="24" placeholder="例如：水豚西湖讨债局" />
+          </div>
+
+          <div class="field">
+            <span class="field-title">记账模式</span>
+            <div class="mode-switch" id="mode_switch">
+              <button class="mode-option active" type="button" data-mode="parent">大家长模式</button>
+              <button class="mode-option" type="button" data-mode="shared">多人付款模式</button>
+            </div>
+            <p class="hint" id="mode_hint">一个人统一管钱，其他人的分摊和补差额由系统计算。</p>
+          </div>
+
+          <div class="field">
+            <div class="split-actions">
+              <span class="field-title">成员设置</span>
+              <button class="btn secondary" id="add_person_btn" type="button">添加成员</button>
+            </div>
+            <div id="people_fields" class="field-list"></div>
+          </div>
+
+          <div class="field" id="manager_field">
+            <label for="manager_select">管理员</label>
+            <select class="select" id="manager_select" name="manager_select"></select>
+            <p class="hint">管理员负责统一垫付和最终退款/收款。</p>
+          </div>
+
+          <div class="field">
+            <label for="budget_input" id="budget_label">每人预算</label>
+            <input class="input" id="budget_input" name="budget_input" type="number" min="0" step="0.01" placeholder="输入预算金额" />
+            <p class="hint" id="budget_hint">系统会自动按人数换算总预算。</p>
+          </div>
+
+          <button class="btn primary" type="submit">保存并进入记账页</button>
+          <div id="create_message" class="message" aria-live="polite"></div>
+        </form>
+      </article>
+
+    </section>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>
