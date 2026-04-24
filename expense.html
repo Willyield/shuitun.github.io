@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>记一笔 | 水豚旅行</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-page="expense">
+  <main class="page-shell stack">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="水豚旅行首页">
+        <span class="brand-mark">
+          <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
+        </span>
+        <span class="brand-copy">
+          <strong id="expense_title">记一笔</strong>
+          <small>Record Expense</small>
+        </span>
+      </a>
+      <nav class="nav-actions" aria-label="页面导航">
+        <a class="btn ghost" id="expense_back_link" href="./manage.html">返回行程</a>
+      </nav>
+    </header>
+
+    <section class="panel record-panel">
+      <span class="eyebrow">第二步</span>
+      <h1 class="page-title">记一笔支出</h1>
+      <p class="section-copy" id="expense_trip_meta">适合记录住宿、门票、聚餐、交通这类共同支出。</p>
+
+      <form id="expense_form" class="field-list">
+        <div class="field">
+          <label for="expense_amount">金额</label>
+          <input class="input" id="expense_amount" type="number" min="0" step="0.01" placeholder="输入本笔花费" />
+        </div>
+
+        <div class="field">
+          <span class="field-title">分类</span>
+          <div id="category_group" class="chip-group"></div>
+        </div>
+
+        <div class="field" id="custom_category_field" hidden>
+          <label for="custom_category_input">其他分类名称</label>
+          <input class="input" id="custom_category_input" type="text" maxlength="16" placeholder="例如：停车费、伴手礼" />
+        </div>
+
+        <div class="field" id="payer_field" hidden>
+          <label for="payer_input">付款人</label>
+          <input class="input" id="payer_input" type="text" maxlength="16" placeholder="输入付款人名字" />
+        </div>
+
+        <div class="field">
+          <span class="field-title">参与人</span>
+          <div id="participant_boxes" class="checkbox-grid"></div>
+        </div>
+
+        <div class="field">
+          <label for="expense_note">用途备注</label>
+          <input class="input" id="expense_note" type="text" maxlength="30" placeholder="例如：晚餐、门票、打车" />
+        </div>
+
+        <section class="decision-card" aria-label="水豚拍板">
+          <span class="eyebrow">选择困难时</span>
+          <h2 class="section-title">水豚拍板</h2>
+          <div id="decision_tags" class="chip-group"></div>
+          <div class="field">
+            <label for="decision_prompt">把纠结的问题写下来</label>
+            <textarea class="textarea" id="decision_prompt" placeholder="例如：今晚吃火锅还是烧烤？"></textarea>
+          </div>
+          <button class="btn dark full-width" id="decision_button" type="button">给个建议</button>
+          <div class="expense-item" id="decision_reply">点一个快捷问题，或直接输入你们的纠结。</div>
+        </section>
+
+        <div class="field">
+          <label for="expense_time">时间</label>
+          <input class="input" id="expense_time" type="datetime-local" />
+        </div>
+
+        <button class="btn primary full-width" type="submit">保存这一笔</button>
+        <div id="detail_message" class="message" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>

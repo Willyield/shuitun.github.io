@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>记一笔 | 水豚旅行</title>
+  <title>行程详情 | 水豚旅行</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="detail">
@@ -18,12 +18,14 @@
           <small>Trip Detail</small>
         </span>
       </a>
-      <nav class="nav-actions" aria-label="页面导航">
-        <button class="btn primary" id="quick_add_expense" type="button">记一笔</button>
-        <a class="btn secondary" id="review_link" href="./review.html">查看结算</a>
-        <a class="btn ghost" href="./manage.html">返回管理</a>
-      </nav>
     </header>
+
+    <nav class="detail-action-grid" aria-label="行程操作">
+      <a class="btn primary" id="expense_link" href="./expense.html">记一笔</a>
+      <a class="btn secondary" id="review_link" href="./review.html">查看结算</a>
+      <a class="btn secondary" id="budget_link" href="./budget.html">增加预算</a>
+      <a class="btn ghost" href="./manage.html">返回管理</a>
+    </nav>
 
     <section class="page-intro">
       <div>
@@ -58,81 +60,6 @@
     </section>
 
     <section class="detail-grid">
-      <article class="panel" id="expense_panel">
-        <span class="eyebrow">第二步</span>
-        <h2 class="section-title">记一笔支出</h2>
-        <p class="hint">适合记录住宿、门票、聚餐、交通这类共同支出。</p>
-        <form id="expense_form" class="field-list">
-          <div class="field">
-            <label for="expense_amount">金额</label>
-            <input class="input" id="expense_amount" type="number" min="0" step="0.01" placeholder="输入本笔花费" />
-          </div>
-
-          <div class="field">
-            <span class="field-title">分类</span>
-            <div id="category_group" class="chip-group"></div>
-          </div>
-
-          <div class="field" id="custom_category_field" hidden>
-            <label for="custom_category_input">其他分类名称</label>
-            <input class="input" id="custom_category_input" type="text" maxlength="16" placeholder="例如：停车费、伴手礼" />
-          </div>
-
-          <div class="field" id="payer_field" hidden>
-            <label for="payer_input">付款人</label>
-            <input class="input" id="payer_input" type="text" maxlength="16" placeholder="输入付款人名字" />
-          </div>
-
-          <div class="field">
-            <span class="field-title">参与人</span>
-            <div id="participant_boxes" class="checkbox-grid"></div>
-          </div>
-
-          <div class="field-inline">
-            <div class="field">
-              <label for="expense_note">用途备注</label>
-              <input class="input" id="expense_note" type="text" maxlength="30" placeholder="例如：晚餐、门票、打车" />
-            </div>
-            <div class="field">
-              <label for="expense_time">时间</label>
-              <input class="input" id="expense_time" type="datetime-local" />
-            </div>
-          </div>
-
-          <button class="btn primary full-width" type="submit">保存这一笔</button>
-          <div id="detail_message" class="message" aria-live="polite"></div>
-        </form>
-      </article>
-
-      <article class="panel">
-        <span class="eyebrow">预算</span>
-        <h2 class="section-title">追加预算</h2>
-        <form id="budget_form" class="field-list">
-          <div class="field">
-            <label for="budget_append_input">追加金额</label>
-            <input class="input" id="budget_append_input" type="number" min="0" step="0.01" placeholder="输入要补充的金额" />
-          </div>
-          <p class="hint" id="budget_append_hint">追加后会同步刷新当前预算进度。</p>
-          <button class="btn secondary full-width" type="submit">追加预算</button>
-        </form>
-
-        <div class="subgrid">
-          <span class="eyebrow">选择困难时</span>
-          <h2 class="section-title">水豚拍板</h2>
-          <div id="decision_tags" class="chip-group"></div>
-          <form id="decision_form" class="field-list">
-            <div class="field">
-              <label for="decision_prompt">把纠结的问题写下来</label>
-              <textarea class="textarea" id="decision_prompt" placeholder="例如：今晚吃火锅还是烧烤？"></textarea>
-            </div>
-            <button class="btn dark full-width" type="submit">给个建议</button>
-          </form>
-          <div class="expense-item" id="decision_reply">点一个快捷问题，或直接输入你们的纠结。</div>
-        </div>
-      </article>
-    </section>
-
-    <section class="detail-grid">
       <article class="panel">
         <div class="trip-head">
           <div>
@@ -142,6 +69,7 @@
           <span class="badge" id="expense_count_badge">0 笔</span>
         </div>
         <div id="expense_list" class="expense-list"></div>
+        <div id="detail_message" class="message" aria-live="polite"></div>
       </article>
 
       <article class="panel">

@@ -655,6 +655,8 @@ function renderDetailOverview(trip) {
   const progressBar = document.getElementById("budget_progress_bar");
   const progressText = document.getElementById("budget_progress_text");
   const reviewLink = document.getElementById("review_link");
+  const expenseLink = document.getElementById("expense_link");
+  const budgetLink = document.getElementById("budget_link");
   if (!title || !heading || !meta || !badge || !metrics || !progressBar || !progressText || !reviewLink) return;
 
   const progress = getBudgetProgress(trip);
@@ -672,6 +674,8 @@ function renderDetailOverview(trip) {
   progressBar.classList.toggle("alert", progress >= LOW_BALANCE_RATIO);
   progressText.textContent = getProgressText(trip);
   reviewLink.href = `./review.html?id=${encodeURIComponent(trip.id)}`;
+  if (expenseLink) expenseLink.href = `./expense.html?id=${encodeURIComponent(trip.id)}`;
+  if (budgetLink) budgetLink.href = `./budget.html?id=${encodeURIComponent(trip.id)}`;
 
   const warning = document.getElementById("budget_warning");
   const warningText = document.getElementById("budget_warning_text");
@@ -714,9 +718,9 @@ function renderDetailSnapshot(options = {}) {
     return;
   }
   renderDetailOverview(trip);
-  renderCategoryButtons();
-  renderPayerOptions(trip);
-  if (options.resetParticipants) renderParticipantBoxes(trip);
+  if (document.getElementById("category_group")) renderCategoryButtons();
+  if (document.getElementById("payer_field")) renderPayerOptions(trip);
+  if (options.resetParticipants && document.getElementById("participant_boxes")) renderParticipantBoxes(trip);
   renderExpenseList(trip);
   renderLedgerView(trip);
 }
@@ -737,49 +741,7 @@ function initDetailPage() {
   detailState.selectedCategory = EXPENSE_CATEGORIES[0];
   detailState.selectedPayer = "";
 
-  const expenseForm = document.getElementById("expense_form");
-  const budgetForm = document.getElementById("budget_form");
-  const categoryGroup = document.getElementById("category_group");
-  const payerInput = document.getElementById("payer_input");
-  const quickAdd = document.getElementById("quick_add_expense");
-  const expensePanel = document.getElementById("expense_panel");
   const expenseList = document.getElementById("expense_list");
-  const decisionTags = document.getElementById("decision_tags");
-  const decisionForm = document.getElementById("decision_form");
-  const decisionPrompt = document.getElementById("decision_prompt");
-  const decisionReply = document.getElementById("decision_reply");
-  const appendHint = document.getElementById("budget_append_hint");
-
-  if (appendHint) {
-    appendHint.textContent = trip.mode === "shared"
-      ? "多人付款模式会增加总预算，并刷新人均参考值。"
-      : "大家长模式会重新平均到每个人的预算。";
-  }
-
-  quickAdd?.addEventListener("click", () => {
-    expensePanel?.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.setTimeout(() => document.getElementById("expense_amount")?.focus(), 280);
-  });
-
-  if (decisionTags) {
-    decisionTags.innerHTML = DECISION_TAGS.map((tag) => `<button class="chip" type="button" data-prompt="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join("");
-    decisionTags.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-prompt]");
-      if (button && decisionPrompt) decisionPrompt.value = button.dataset.prompt || "";
-    });
-  }
-
-  categoryGroup?.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-category]");
-    if (!button) return;
-    detailState.selectedCategory = button.dataset.category || EXPENSE_CATEGORIES[0];
-    renderCategoryButtons();
-    if (detailState.selectedCategory === "其他") document.getElementById("custom_category_input")?.focus();
-  });
-
-  payerInput?.addEventListener("input", () => {
-    detailState.selectedPayer = payerInput.value.trim();
-  });
 
   expenseList?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action='delete-expense']");
@@ -792,6 +754,73 @@ function initDetailPage() {
     deleteExpense(detailState.tripId, button.dataset.id);
     setMessage(document.getElementById("detail_message"), "这笔支出已删除。", "success");
     renderDetailSnapshot({ resetParticipants: false });
+  });
+
+  renderDetailSnapshot({ resetParticipants: false });
+}
+
+function bindDecisionHelper() {
+  const decisionTags = document.getElementById("decision_tags");
+  const decisionButton = document.getElementById("decision_button");
+  const decisionPrompt = document.getElementById("decision_prompt");
+  const decisionReply = document.getElementById("decision_reply");
+
+  if (decisionTags) {
+    decisionTags.innerHTML = DECISION_TAGS.map((tag) => `<button class="chip" type="button" data-prompt="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join("");
+    decisionTags.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-prompt]");
+      if (button && decisionPrompt) decisionPrompt.value = button.dataset.prompt || "";
+    });
+  }
+
+  decisionButton?.addEventListener("click", () => {
+    if (!decisionPrompt || !decisionReply) return;
+    const prompt = decisionPrompt.value.trim();
+    if (!prompt) {
+      decisionReply.textContent = "先把问题写下来。";
+      return;
+    }
+    if (detailState.decisionTimer) window.clearTimeout(detailState.decisionTimer);
+    decisionReply.textContent = "正在想一个不内耗的答案...";
+    detailState.decisionTimer = window.setTimeout(() => {
+      const reply = DECISION_REPLIES[Math.floor(Math.random() * DECISION_REPLIES.length)];
+      decisionReply.textContent = `${reply} 问题：${prompt}`;
+    }, 420);
+  });
+}
+
+function initExpensePage() {
+  const tripId = parseQueryId();
+  const trip = getRecordById(tripId);
+  if (!trip) {
+    renderPageNotFound("没有找到这趟行程。", "请从已有行程页面重新进入。");
+    return;
+  }
+  detailState.tripId = tripId;
+  detailState.selectedCategory = EXPENSE_CATEGORIES[0];
+  detailState.selectedPayer = "";
+
+  const title = document.getElementById("expense_title");
+  const meta = document.getElementById("expense_trip_meta");
+  const backLink = document.getElementById("expense_back_link");
+  const expenseForm = document.getElementById("expense_form");
+  const categoryGroup = document.getElementById("category_group");
+  const payerInput = document.getElementById("payer_input");
+
+  if (title) title.textContent = getTripTitle(trip);
+  if (meta) meta.textContent = `${tripModeLabel(trip.mode)} · 成员：${trip.people.join("、") || "-"}${trip.mode === "parent" ? ` · 大家长：${trip.manager || "-"}` : ""}`;
+  if (backLink) backLink.href = `./detail.html?id=${encodeURIComponent(trip.id)}`;
+
+  categoryGroup?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-category]");
+    if (!button) return;
+    detailState.selectedCategory = button.dataset.category || EXPENSE_CATEGORIES[0];
+    renderCategoryButtons();
+    if (detailState.selectedCategory === "其他") document.getElementById("custom_category_input")?.focus();
+  });
+
+  payerInput?.addEventListener("input", () => {
+    detailState.selectedPayer = payerInput.value.trim();
   });
 
   expenseForm?.addEventListener("submit", (event) => {
@@ -830,8 +859,35 @@ function initDetailPage() {
 
     setMessage(message, "支出已记录，可以继续记下一笔。", "success");
     resetDetailForm(getRecordById(detailState.tripId));
-    renderDetailSnapshot({ resetParticipants: false });
+    window.setTimeout(() => document.getElementById("expense_amount")?.focus(), 80);
   });
+
+  renderCategoryButtons();
+  renderPayerOptions(trip);
+  renderParticipantBoxes(trip);
+  bindDecisionHelper();
+}
+
+function initBudgetPage() {
+  const tripId = parseQueryId();
+  const trip = getRecordById(tripId);
+  if (!trip) {
+    renderPageNotFound("没有找到这趟行程。", "请从已有行程页面重新进入。");
+    return;
+  }
+  detailState.tripId = tripId;
+
+  const title = document.getElementById("budget_title");
+  const backLink = document.getElementById("budget_back_link");
+  const appendHint = document.getElementById("budget_append_hint");
+  const budgetForm = document.getElementById("budget_form");
+  if (title) title.textContent = getTripTitle(trip);
+  if (backLink) backLink.href = `./detail.html?id=${encodeURIComponent(trip.id)}`;
+  if (appendHint) {
+    appendHint.textContent = trip.mode === "shared"
+      ? "多人付款模式会增加总预算，并刷新人均参考值。"
+      : "大家长模式会重新平均到每个人的预算。";
+  }
 
   budgetForm?.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -849,26 +905,8 @@ function initDetailPage() {
     });
     if (input) input.value = "";
     setMessage(message, "预算已追加。", "success");
-    renderDetailSnapshot({ resetParticipants: false });
+    if (appendHint) appendHint.textContent = `当前总预算已更新为 ${formatCurrency(getRecordById(detailState.tripId)?.totalBudget || 0)}。`;
   });
-
-  decisionForm?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!decisionPrompt || !decisionReply) return;
-    const prompt = decisionPrompt.value.trim();
-    if (!prompt) {
-      decisionReply.textContent = "先把问题写下来。";
-      return;
-    }
-    if (detailState.decisionTimer) window.clearTimeout(detailState.decisionTimer);
-    decisionReply.textContent = "正在想一个不内耗的答案...";
-    detailState.decisionTimer = window.setTimeout(() => {
-      const reply = DECISION_REPLIES[Math.floor(Math.random() * DECISION_REPLIES.length)];
-      decisionReply.textContent = `${reply} 问题：${prompt}`;
-    }, 420);
-  });
-
-  renderDetailSnapshot({ resetParticipants: true });
 }
 
 function renderCategoryShareList(trip) {
@@ -1026,6 +1064,8 @@ function initPage() {
   if (page === "manage") bindTripList("manage_list", "manage");
   if (page === "archive") bindTripList("archive_list", "archive");
   if (page === "detail") initDetailPage();
+  if (page === "expense") initExpensePage();
+  if (page === "budget") initBudgetPage();
   if (page === "summary" || page === "review") initSummaryPage();
 }
 
