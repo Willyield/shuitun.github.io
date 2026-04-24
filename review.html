@@ -3,57 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>水豚旅行 · 复盘结算</title>
+  <title>结算 | 水豚旅行</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="review">
   <main class="page-shell stack">
     <header class="topbar">
-      <div class="brand">
+      <a class="brand" href="./index.html" aria-label="水豚旅行首页">
         <span class="brand-mark">
           <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
         </span>
         <span class="brand-copy">
-          <strong id="summary_title">复盘结算</strong>
+          <strong id="summary_title">结算</strong>
           <small>Trip Review</small>
         </span>
-      </div>
-      <nav class="nav-actions">
-        <a class="btn ghost" id="summary_back_detail" href="./detail.html">返回详情</a>
-        <a class="btn secondary" href="./archive.html">查看存档</a>
+      </a>
+      <nav class="nav-actions" aria-label="页面导航">
+        <a class="btn primary" id="summary_back_detail" href="./detail.html">继续记账</a>
+        <a class="btn secondary" href="./manage.html">查看已有行程</a>
       </nav>
     </header>
 
-    <section class="card soft">
-      <span class="eyebrow">Trip Review</span>
-      <h1 class="page-title" id="summary_heading">正在加载...</h1>
-      <p class="section-copy" id="summary_info">请稍候。</p>
-      <div class="metrics-grid" id="summary_metrics"></div>
+    <section class="page-intro">
+      <div>
+        <span class="eyebrow">第三步</span>
+        <h1 class="page-title" id="summary_heading">正在加载...</h1>
+        <p class="section-copy" id="summary_info">请稍等。</p>
+      </div>
     </section>
 
+    <section class="metrics-grid" id="summary_metrics"></section>
+
     <section class="review-grid">
-      <article class="card">
-        <span class="eyebrow">Category Share</span>
-        <h2 class="section-title">各分类支出占比</h2>
+      <article class="panel">
+        <span class="eyebrow">分类占比</span>
+        <h2 class="section-title">钱主要花在哪</h2>
         <div id="category_share_list" class="settlement-list"></div>
       </article>
 
-      <article class="card dark">
-        <span class="eyebrow">Poster Line</span>
-        <h2 class="section-title">催款大字报</h2>
+      <article class="panel dark-panel">
+        <span class="eyebrow">提醒文案</span>
+        <h2 class="section-title">可以直接发群里</h2>
         <p class="poster-line" id="review_poster_line">正在生成文案...</p>
       </article>
     </section>
 
-    <section class="card">
-      <span class="eyebrow">Settlement</span>
-      <h2 class="section-title">最终结算</h2>
+    <section class="panel">
+      <span class="eyebrow">最终结算</span>
+      <h2 class="section-title">谁该付给谁</h2>
       <div id="settlement_view" class="settlement-list"></div>
     </section>
 
-    <section class="card">
-      <span class="eyebrow">Expense Breakdown</span>
-      <h2 class="section-title">支出拆解</h2>
+    <section class="panel">
+      <span class="eyebrow">支出拆解</span>
+      <h2 class="section-title">每笔支出明细</h2>
       <div id="spend_list" class="expense-list"></div>
     </section>
   </main>

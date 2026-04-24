@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>水豚旅行 · 行程详情</title>
+  <title>记一笔 | 水豚旅行</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="detail">
   <main class="page-shell stack">
     <header class="topbar">
-      <div class="brand">
+      <a class="brand" href="./index.html" aria-label="水豚旅行首页">
         <span class="brand-mark">
           <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
         </span>
@@ -17,24 +17,26 @@
           <strong id="detail_title">行程详情</strong>
           <small>Trip Detail</small>
         </span>
-      </div>
-      <nav class="nav-actions">
+      </a>
+      <nav class="nav-actions" aria-label="页面导航">
+        <button class="btn primary" id="quick_add_expense" type="button">记一笔</button>
+        <a class="btn secondary" id="review_link" href="./review.html">查看结算</a>
         <a class="btn ghost" href="./manage.html">返回管理</a>
-        <a class="btn secondary" id="review_link" href="./summary.html">查看结算</a>
       </nav>
     </header>
 
-    <section class="card soft">
-      <span class="eyebrow">Trip Snapshot</span>
-      <div class="trip-head">
-        <div>
-          <h1 class="page-title" id="detail_heading">正在加载...</h1>
-          <p class="section-copy" id="detail_meta">请稍候。</p>
-        </div>
-        <span class="badge" id="detail_mode_badge">--</span>
+    <section class="page-intro">
+      <div>
+        <span class="eyebrow">当前行程</span>
+        <h1 class="page-title" id="detail_heading">正在加载...</h1>
+        <p class="section-copy" id="detail_meta">请稍等。</p>
       </div>
+      <span class="badge" id="detail_mode_badge">--</span>
+    </section>
 
-      <div class="metrics-grid" id="detail_metrics"></div>
+    <section class="metrics-grid" id="detail_metrics"></section>
+
+    <section class="budget-strip">
       <div class="progress">
         <div class="progress-bar" id="budget_progress_bar"></div>
       </div>
@@ -44,11 +46,11 @@
       </div>
     </section>
 
-    <section class="card warning" id="budget_warning" hidden>
+    <section class="panel warning" id="budget_warning" hidden>
       <div class="trip-head">
         <div>
-          <span class="eyebrow">Budget Alert</span>
-          <h2 class="section-title">预算快见底了，接下来的饭可能只能吃土。</h2>
+          <span class="eyebrow">预算提醒</span>
+          <h2 class="section-title">预算快见底了</h2>
         </div>
         <span class="badge alert" id="budget_warning_badge">预警</span>
       </div>
@@ -56,9 +58,10 @@
     </section>
 
     <section class="detail-grid">
-      <article class="card">
-        <span class="eyebrow">Ledger</span>
+      <article class="panel" id="expense_panel">
+        <span class="eyebrow">第二步</span>
         <h2 class="section-title">记一笔支出</h2>
+        <p class="hint">适合记录住宿、门票、聚餐、交通这类共同支出。</p>
         <form id="expense_form" class="field-list">
           <div class="field">
             <label for="expense_amount">金额</label>
@@ -68,6 +71,11 @@
           <div class="field">
             <span class="field-title">分类</span>
             <div id="category_group" class="chip-group"></div>
+          </div>
+
+          <div class="field" id="custom_category_field" hidden>
+            <label for="custom_category_input">其他分类名称</label>
+            <input class="input" id="custom_category_input" type="text" maxlength="16" placeholder="例如：停车费、伴手礼" />
           </div>
 
           <div class="field" id="payer_field" hidden>
@@ -83,7 +91,7 @@
           <div class="field-inline">
             <div class="field">
               <label for="expense_note">用途备注</label>
-              <input class="input" id="expense_note" type="text" maxlength="30" placeholder="例如：午饭、门票、打车" />
+              <input class="input" id="expense_note" type="text" maxlength="30" placeholder="例如：晚餐、门票、打车" />
             </div>
             <div class="field">
               <label for="expense_time">时间</label>
@@ -91,44 +99,44 @@
             </div>
           </div>
 
-          <button class="btn primary" type="submit">记一笔</button>
+          <button class="btn primary full-width" type="submit">保存这一笔</button>
           <div id="detail_message" class="message" aria-live="polite"></div>
         </form>
       </article>
 
-      <article class="card">
-        <span class="eyebrow">Budget Patch</span>
+      <article class="panel">
+        <span class="eyebrow">预算</span>
         <h2 class="section-title">追加预算</h2>
         <form id="budget_form" class="field-list">
           <div class="field">
             <label for="budget_append_input">追加金额</label>
             <input class="input" id="budget_append_input" type="number" min="0" step="0.01" placeholder="输入要补充的金额" />
           </div>
-          <p class="hint" id="budget_append_hint">大家长模式会自动平摊到每个人预算，多人付款模式会增加总预算。</p>
-          <button class="btn secondary" type="submit">追加预算</button>
+          <p class="hint" id="budget_append_hint">追加后会同步刷新当前预算进度。</p>
+          <button class="btn secondary full-width" type="submit">追加预算</button>
         </form>
 
         <div class="subgrid">
-          <span class="eyebrow">Decision Helper</span>
-          <h2 class="section-title">水豚拍板器</h2>
+          <span class="eyebrow">选择困难时</span>
+          <h2 class="section-title">水豚拍板</h2>
           <div id="decision_tags" class="chip-group"></div>
           <form id="decision_form" class="field-list">
             <div class="field">
-              <label for="decision_prompt">把你们的纠结写给水豚</label>
+              <label for="decision_prompt">把纠结的问题写下来</label>
               <textarea class="textarea" id="decision_prompt" placeholder="例如：今晚吃火锅还是烧烤？"></textarea>
             </div>
-            <button class="btn dark" type="submit">让水豚拍板</button>
+            <button class="btn dark full-width" type="submit">给个建议</button>
           </form>
-          <div class="expense-item" id="decision_reply">点一个快捷标签，或者直接输入你们的纠结。</div>
+          <div class="expense-item" id="decision_reply">点一个快捷问题，或直接输入你们的纠结。</div>
         </div>
       </article>
     </section>
 
     <section class="detail-grid">
-      <article class="card">
+      <article class="panel">
         <div class="trip-head">
           <div>
-            <span class="eyebrow">Recent</span>
+            <span class="eyebrow">已记录</span>
             <h2 class="section-title">最近支出</h2>
           </div>
           <span class="badge" id="expense_count_badge">0 笔</span>
@@ -136,13 +144,13 @@
         <div id="expense_list" class="expense-list"></div>
       </article>
 
-      <article class="card">
+      <article class="panel">
         <div class="trip-head">
           <div>
-            <span class="eyebrow">Current Balance</span>
+            <span class="eyebrow">实时结果</span>
             <h2 class="section-title">当前分摊结果</h2>
           </div>
-          <span class="badge dark">实时更新</span>
+          <span class="badge dark">自动更新</span>
         </div>
         <div id="ledger_view" class="ledger-list"></div>
       </article>

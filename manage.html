@@ -3,37 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>水豚旅行 · 行程管理</title>
+  <title>已有行程 | 水豚旅行</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="manage">
   <main class="page-shell stack">
     <header class="topbar">
-      <div class="brand">
+      <a class="brand" href="./index.html" aria-label="水豚旅行首页">
         <span class="brand-mark">
           <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
         </span>
         <span class="brand-copy">
-          <strong>行程管理</strong>
+          <strong>已有行程</strong>
           <small>Manage Trips</small>
         </span>
-      </div>
-      <nav class="nav-actions">
+      </a>
+      <nav class="nav-actions" aria-label="页面导航">
         <a class="btn ghost" href="./index.html">返回首页</a>
-        <a class="btn primary" href="./create.html">新建行程</a>
+        <a class="btn primary" href="./create.html">创建行程</a>
       </nav>
     </header>
 
-    <section class="card">
-      <div class="trip-head">
-        <div>
-          <span class="eyebrow">Trip List</span>
-          <h2 class="section-title">当前存档</h2>
-        </div>
-        <a class="btn secondary" href="./archive.html">切到存档视图</a>
-      </div>
-      <div id="manage_list" class="trip-list"></div>
+    <section class="page-intro">
+      <span class="eyebrow">继续使用</span>
+      <h1 class="page-title">选择一趟行程继续记账或查看结算。</h1>
     </section>
+
+    <section id="manage_list" class="trip-list"></section>
   </main>
   <script src="./script.js"></script>
 </body>

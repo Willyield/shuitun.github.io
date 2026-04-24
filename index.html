@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>水豚旅行 · 首页</title>
+  <title>水豚旅行 | 多人旅行记账与分摊</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="home">
   <main class="page-shell stack">
     <header class="topbar">
-      <div class="brand">
+      <a class="brand" href="./index.html" aria-label="水豚旅行首页">
         <span class="brand-mark">
           <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
         </span>
@@ -17,80 +17,80 @@
           <strong>水豚旅行</strong>
           <small>Capybara Trip</small>
         </span>
-      </div>
-      <nav class="nav-actions">
-        <a class="btn secondary" href="./create.html">发起行程</a>
-        <a class="btn secondary" href="./manage.html">行程管理</a>
-        <a class="btn ghost" href="./about.html">产品介绍</a>
+      </a>
+      <nav class="nav-actions" aria-label="主要导航">
+        <a class="btn primary" href="./create.html">创建行程</a>
+        <a class="btn secondary" href="./manage.html">查看已有行程</a>
       </nav>
     </header>
 
-    <section class="card hero">
+    <section class="hero clean-hero">
       <div class="hero-copy">
-        <span class="eyebrow">Warm Finance For Trips</span>
-        <h1>拒绝熟人旅行内耗，让水豚替你把账算明白。</h1>
+        <span class="eyebrow">多人旅行记账与分摊工具</span>
+        <h1>把住宿、门票、聚餐这些大额共同支出算清楚。</h1>
+        <p class="section-copy">适合朋友出游、团建和家庭旅行。谁付款、谁参与、最后谁该补钱，一页看明白。</p>
         <div class="hero-actions">
-          <a class="btn primary" href="./create.html">现在就建一局</a>
-          <a class="btn secondary" href="./archive.html">查看行程存档</a>
+          <a class="btn primary" href="./create.html">创建行程</a>
+          <a class="btn secondary" href="./manage.html">查看已有行程</a>
         </div>
-        <div class="clock">
-          <span>🕒</span>
-          <span id="world_clock">--</span>
+        <div class="quick-facts" aria-label="适合记录的支出">
+          <span>住宿</span>
+          <span>门票</span>
+          <span>聚餐</span>
+          <span>交通</span>
         </div>
       </div>
-
-      <div class="card hero-visual">
+      <div class="hero-visual">
         <div class="hero-visual-image">
           <img src="./assets/hero-capybara.svg" alt="戴草帽拖着行李箱的水豚" />
         </div>
-        <div class="capybara-note">
-          <strong>今天不聊感情，只聊账本和出发。</strong>
-          <p class="meta-text">朋友谈感情，水豚来讨债。谁垫付、谁分摊、谁该补钱，一眼看清。</p>
-        </div>
+      </div>
+    </section>
+
+    <section class="guide-strip" aria-labelledby="guide_title">
+      <div>
+        <span class="eyebrow">30 秒上手</span>
+        <h2 class="section-title" id="guide_title">只需要三步</h2>
+      </div>
+      <div class="guide-steps">
+        <article class="guide-step">
+          <span class="step-number">1</span>
+          <strong>创建行程</strong>
+          <p class="meta-text">填成员、预算和记账模式。</p>
+        </article>
+        <article class="guide-step">
+          <span class="step-number">2</span>
+          <strong>记一笔</strong>
+          <p class="meta-text">输入金额、分类、付款人和参与人。</p>
+        </article>
+        <article class="guide-step">
+          <span class="step-number">3</span>
+          <strong>看结算</strong>
+          <p class="meta-text">自动算出退款、补款或转账路径。</p>
+        </article>
       </div>
     </section>
 
     <section class="feature-grid">
       <article class="feature-item">
-        <span class="badge">两种模式</span>
-        <h2 class="section-title">大家长 / AA</h2>
-        <p class="meta-text">支持“一个人统一管钱”和“多人各自付款”两套结算逻辑。</p>
+        <span class="badge">大家长模式</span>
+        <h2 class="section-title">一个人统一管钱</h2>
+        <p class="meta-text">适合先收预算、统一垫付，最后看谁该退、谁该补。</p>
       </article>
       <article class="feature-item">
-        <span class="badge">预算可视化</span>
-        <h2 class="section-title">预警更直接</h2>
-        <p class="meta-text">支出进度条、剩余预算、追加预算入口都集中展示。</p>
+        <span class="badge">多人付款模式</span>
+        <h2 class="section-title">谁付款就记谁</h2>
+        <p class="meta-text">适合大家轮流付款，最后直接生成转账路径。</p>
       </article>
       <article class="feature-item">
-        <span class="badge">旅行复盘</span>
-        <h2 class="section-title">结算页更完整</h2>
-        <p class="meta-text">分类占比、转账路径、催款文案和支出拆解都能直接看。</p>
+        <span class="badge">大额优先</span>
+        <h2 class="section-title">不用记碎账</h2>
+        <p class="meta-text">重点记录住宿、门票、聚餐等容易算不清的大额支出。</p>
       </article>
       <article class="feature-item">
-        <span class="badge">防止纠结</span>
-        <h2 class="section-title">决策助手</h2>
-        <p class="meta-text">把“吃什么”“怎么去”这种内耗问题交给水豚拍板。</p>
-      </article>
-    </section>
-
-    <section class="page-grid">
-      <article class="page-item">
-        <span class="eyebrow">Create</span>
-        <h2 class="section-title">创建页面</h2>
-        <p class="meta-text">设置行程代号、成员、模式、预算和管理员。</p>
-        <a class="btn primary" href="./create.html">打开</a>
-      </article>
-      <article class="page-item">
-        <span class="eyebrow">Manage</span>
-        <h2 class="section-title">管理与详情</h2>
-        <p class="meta-text">浏览存档，进入单个行程继续记账和追加预算。</p>
-        <a class="btn secondary" href="./manage.html">查看</a>
-      </article>
-      <article class="page-item">
-        <span class="eyebrow">Review</span>
-        <h2 class="section-title">结算与归档</h2>
-        <p class="meta-text">结束行程后直接查看分类统计和最终结算结果。</p>
-        <a class="btn secondary" href="./review.html">进入</a>
+        <span class="badge">可复盘</span>
+        <h2 class="section-title">分类占比清楚</h2>
+        <p class="meta-text">结算页会展示分类占比、支出拆解和最终结算结果。</p>
       </article>
     </section>
   </main>
