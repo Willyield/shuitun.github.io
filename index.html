@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body data-page="home">
-  <main class="page-shell mobile-home travel-board stack">
+  <main class="page-shell mobile-home stack">
     <header class="topbar home-topbar">
       <a class="brand" href="./index.html" aria-label="水豚旅行首页">
         <span class="brand-mark">
@@ -18,84 +18,64 @@
           <small>Capybara Trip</small>
         </span>
       </a>
-      <span class="home-mini-badge">多人旅行记账与分摊</span>
     </header>
 
-    <section class="travel-board-panel" aria-label="旅行记账工具面板">
-      <section class="travel-color-grid" aria-label="共同支出类型">
-        <article class="color-card coral">
-          <span class="feature-icon">🏨</span>
-          <strong>住宿</strong>
-        </article>
-        <article class="color-card amber">
-          <span class="feature-icon">🎫</span>
-          <strong>门票</strong>
-        </article>
-        <article class="color-card blue">
-          <span class="feature-icon">🍲</span>
-          <strong>聚餐</strong>
-        </article>
-        <article class="color-card violet">
-          <span class="feature-icon">🚗</span>
-          <strong>交通</strong>
-        </article>
-        <article class="color-card teal">
-          <span class="feature-icon">🧾</span>
-          <strong>结算</strong>
-        </article>
+    <section class="home-composer" aria-label="水豚旅行介绍">
+      <div class="home-intro">
+        <span class="eyebrow">多人旅行记账与分摊工具</span>
+        <h1>把旅行里最容易说不清的账，温柔地算清楚。</h1>
+        <p>重点记录住宿、门票、聚餐、交通等共同大额支出。谁付款、谁参与、最后谁该补钱，一页看明白。</p>
+      </div>
+
+      <section class="guide-flow" aria-labelledby="guide_title">
+        <div class="guide-flow-head">
+          <span class="eyebrow">30 秒上手</span>
+          <h2 id="guide_title">只需要三步</h2>
+        </div>
+        <div class="arrow-steps">
+          <article>
+            <span>第一步</span>
+            <strong>创建行程</strong>
+          </article>
+          <span class="step-arrow" aria-hidden="true">→</span>
+          <article>
+            <span>第二步</span>
+            <strong>记一笔</strong>
+          </article>
+          <span class="step-arrow" aria-hidden="true">→</span>
+          <article>
+            <span>第三步</span>
+            <strong>看结算</strong>
+          </article>
+        </div>
       </section>
 
-      <section class="travel-icon-grid" aria-label="主要功能入口">
-        <a class="tool-entry" href="./create.html">
-          <span class="tool-icon orange">＋</span>
+      <section class="home-action-row" aria-label="主要操作">
+        <a class="action-tile primary" href="./create.html">
+          <span>开始</span>
           <strong>创建行程</strong>
         </a>
-        <a class="tool-entry" href="./manage.html">
-          <span class="tool-icon gold">📒</span>
+        <a class="action-tile secondary" href="./manage.html">
+          <span>继续</span>
           <strong>查看已有行程</strong>
         </a>
-        <button class="tool-entry" type="button" onclick="window.alert('先选择一个已有行程，再进入「记一笔」。')">
-          <span class="tool-icon sky">✎</span>
-          <strong>记一笔</strong>
-        </button>
-        <button class="tool-entry" type="button" onclick="window.alert('先选择一个已有行程，再进入「增加预算」。')">
-          <span class="tool-icon purple">¥</span>
-          <strong>增加预算</strong>
-        </button>
-        <button class="tool-entry" type="button" onclick="window.alert('先选择一个已有行程，再查看结算。')">
-          <span class="tool-icon green">✓</span>
-          <strong>查看结算</strong>
-        </button>
       </section>
 
-      <section class="coverage-strip" aria-label="覆盖场景">
-        <span>🏨</span>
-        <span>🎫</span>
-        <span>🍲</span>
-        <span>🚗</span>
-        <strong>住宿 / 门票 / 聚餐 / 交通 + 共同支出</strong>
-      </section>
-
-      <section class="bottom-tool-grid" aria-label="产品优势">
+      <section class="home-advantage-row" aria-label="产品优势">
         <article>
-          <strong>大额优先</strong>
-          <span>不用记碎账</span>
+          <span>大额优先</span>
+          <strong>不用记碎账</strong>
+          <p>只记真正影响结算的大项。</p>
         </article>
         <article>
-          <strong>分类占比</strong>
-          <span>钱花在哪</span>
+          <span>可复盘</span>
+          <strong>分类占比清楚</strong>
+          <p>看清钱主要花在哪。</p>
         </article>
         <article>
-          <strong>转账路径</strong>
-          <span>谁该付谁</span>
-        </article>
-        <article>
-          <strong>水豚拍板</strong>
-          <span>少点纠结</span>
-        </article>
-        <article>
-          <strong>适合场景</strong>
-          <span>朋友/团建/家庭</span>
+          <span>适合场景</span>
+          <strong>朋友旅行、团建、家庭出游</strong>
+          <p>多人共同支出更容易说清。</p>
         </article>
       </section>
     </section>
