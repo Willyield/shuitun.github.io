@@ -389,7 +389,10 @@ function initCreatePage() {
   const peopleFields = document.getElementById("people_fields");
   const addPersonButton = document.getElementById("add_person_btn");
   const modeSwitch = document.getElementById("mode_switch");
-  if (!form || !peopleFields || !addPersonButton || !modeSwitch) return;
+  if (!form || !peopleFields || !addPersonButton) return;
+
+  const defaultMode = document.body?.dataset?.defaultMode;
+  createState.mode = defaultMode === "shared" ? "shared" : "parent";
 
   renderCreatePeople();
   renderCreateMode();
@@ -417,12 +420,14 @@ function initCreatePage() {
     renderCreatePeople();
   });
 
-  modeSwitch.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-mode]");
-    if (!button) return;
-    createState.mode = button.dataset.mode === "shared" ? "shared" : "parent";
-    renderCreateMode();
-  });
+  if (modeSwitch) {
+    modeSwitch.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-mode]");
+      if (!button) return;
+      createState.mode = button.dataset.mode === "shared" ? "shared" : "parent";
+      renderCreateMode();
+    });
+  }
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();

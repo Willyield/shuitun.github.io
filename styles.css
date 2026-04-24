@@ -619,8 +619,126 @@ img {
   text-align: center;
 }
 
+.home-hero {
+  display: grid;
+  gap: 18px;
+  min-height: 0;
+  padding: 18px 0 4px;
+}
+
+.home-hero .hero-copy {
+  max-width: 780px;
+}
+
+.home-hero h1 {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.14;
+}
+
+.guide-panel {
+  display: grid;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.94);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.guide-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.home-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  max-width: 560px;
+}
+
+.home-actions .btn {
+  min-height: 66px;
+  border-radius: 999px;
+  font-size: 22px;
+}
+
+.home-actions .btn.secondary {
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.advantage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.advantage-card {
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  align-content: start;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.9);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.advantage-card .section-title {
+  font-size: 30px;
+}
+
+.mode-choice-list {
+  display: grid;
+  gap: 18px;
+}
+
+.mode-choice-card {
+  display: grid;
+  gap: 16px;
+  min-height: 220px;
+  align-content: start;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.mode-choice-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(47, 125, 107, 0.36);
+  box-shadow: 0 18px 38px rgba(52, 41, 31, 0.1);
+}
+
+.mode-choice-card .section-title {
+  font-size: 30px;
+}
+
+.compact-intro {
+  padding-bottom: 10px;
+}
+
+.single-form {
+  grid-template-columns: minmax(0, 720px);
+}
+
+.soft-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(223, 241, 235, 0.45);
+  padding: 20px;
+}
+
 @media (max-width: 920px) {
   .hero,
+  .advantage-grid,
   .guide-strip,
   .feature-grid,
   .about-grid,
@@ -632,6 +750,7 @@ img {
   }
 
   .guide-steps,
+  .home-actions,
   .metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -678,6 +797,10 @@ img {
     font-size: 36px;
   }
 
+  .home-hero h1 {
+    font-size: 34px;
+  }
+
   .page-title {
     font-size: 30px;
   }
@@ -687,6 +810,8 @@ img {
   }
 
   .guide-steps,
+  .home-actions,
+  .advantage-grid,
   .metrics-grid,
   .field-inline,
   .checkbox-grid {
@@ -698,6 +823,10 @@ img {
   }
 
   .panel,
+  .guide-panel,
+  .advantage-card,
+  .mode-choice-card,
+  .soft-note,
   .side-note,
   .trip-card,
   .feature-item,
@@ -711,6 +840,25 @@ img {
   .guide-strip {
     padding: 16px;
     border-radius: 16px;
+  }
+
+  .home-actions .btn {
+    min-height: 58px;
+    font-size: 20px;
+  }
+
+  .advantage-card,
+  .mode-choice-card {
+    min-height: 190px;
+  }
+
+  .advantage-card .section-title,
+  .mode-choice-card .section-title {
+    font-size: 28px;
+  }
+
+  .soft-note {
+    display: grid;
   }
 
   .people-row {

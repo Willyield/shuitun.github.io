@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>创建行程 | 水豚旅行</title>
+  <title>选择记账模式 | 水豚旅行</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body data-page="create">
+<body data-page="choose">
   <main class="page-shell stack">
     <header class="topbar">
       <a class="brand" href="./index.html" aria-label="水豚旅行首页">
@@ -14,69 +14,34 @@
           <img src="./assets/hero-capybara.svg" alt="水豚旅行头像" />
         </span>
         <span class="brand-copy">
-          <strong>创建行程</strong>
-          <small>Create Trip</small>
+          <strong>选择模式</strong>
+          <small>Choose Mode</small>
         </span>
       </a>
       <nav class="nav-actions" aria-label="页面导航">
         <a class="btn ghost" href="./index.html">返回首页</a>
-        <a class="btn secondary" href="./manage.html">查看已有行程</a>
       </nav>
     </header>
 
-    <section class="page-intro">
-      <span class="eyebrow">第一步</span>
-      <h1 class="page-title">先把这趟旅行的成员和预算定下来。</h1>
-      <p class="section-copy">创建完成后会直接进入记账页，可以马上记录第一笔支出。</p>
+    <section class="page-intro compact-intro">
+      <div>
+        <span class="eyebrow">创建行程前</span>
+        <h1 class="page-title">先选择这趟旅行怎么记账。</h1>
+      </div>
     </section>
 
-    <section class="form-layout">
-      <article class="panel">
-        <form id="create_form" class="field-list">
-          <div class="field">
-            <label for="trip_name">行程名称</label>
-            <input class="input" id="trip_name" name="trip_name" type="text" maxlength="24" placeholder="例如：五一杭州旅行" />
-          </div>
+    <section class="mode-choice-list" aria-label="选择记账模式">
+      <a class="mode-choice-card" href="./create-parent.html">
+        <span class="badge">大家长模式</span>
+        <h2 class="section-title">一个人统一管钱</h2>
+        <p class="meta-text">适合先收预算、统一垫付，最后看谁该退、谁该补。</p>
+      </a>
 
-          <div class="field">
-            <span class="field-title">记账模式</span>
-            <div class="mode-switch" id="mode_switch">
-              <button class="mode-option active" type="button" data-mode="parent">大家长模式</button>
-              <button class="mode-option" type="button" data-mode="shared">多人付款模式</button>
-            </div>
-            <p class="hint" id="mode_hint">一个人统一管钱，其他人的分摊和补差额由系统计算。</p>
-          </div>
-
-          <div class="field">
-            <div class="split-actions">
-              <span class="field-title">成员</span>
-              <button class="btn secondary" id="add_person_btn" type="button">添加成员</button>
-            </div>
-            <div id="people_fields" class="field-list"></div>
-          </div>
-
-          <div class="field" id="manager_field">
-            <label for="manager_select">大家长</label>
-            <select class="select" id="manager_select" name="manager_select"></select>
-            <p class="hint">大家长负责统一垫付、退款或收款。</p>
-          </div>
-
-          <div class="field">
-            <label for="budget_input" id="budget_label">每人预算</label>
-            <input class="input" id="budget_input" name="budget_input" type="number" min="0" step="0.01" placeholder="输入金额" />
-            <p class="hint" id="budget_hint">系统会按成员数自动换算总预算。</p>
-          </div>
-
-          <button class="btn primary full-width" type="submit">保存并进入记账页</button>
-          <div id="create_message" class="message" aria-live="polite"></div>
-        </form>
-      </article>
-
-      <aside class="side-note">
-        <span class="eyebrow">怎么选模式</span>
-        <h2 class="section-title">先看钱是谁付的。</h2>
-        <p class="meta-text">如果一个人统一收钱、统一垫付，选大家长模式；如果大家都会付款，选多人付款模式。</p>
-      </aside>
+      <a class="mode-choice-card" href="./create-shared.html">
+        <span class="badge">多人付款模式</span>
+        <h2 class="section-title">谁付款就记谁</h2>
+        <p class="meta-text">适合大家轮流付款，最后直接生成转账路径。</p>
+      </a>
     </section>
   </main>
   <script src="./script.js"></script>
