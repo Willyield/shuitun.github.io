@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-motion";
 import {
   ArrowLeft,
   Calculator,
@@ -108,6 +109,43 @@ function classNames(...values) {
   return values.filter(Boolean).join(" ");
 }
 
+function parseCurrencyValue(value) {
+  if (typeof value === "number") return value;
+  const parsed = Number(String(value ?? "").replace(/[^\d.-]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isCurrencyValue(value) {
+  return typeof value === "number" || String(value ?? "").includes("¥");
+}
+
+function AnimatedMoneyText({ value, className }) {
+  const target = parseCurrencyValue(value);
+  const motionValue = useMotionValue(target);
+  const springValue = useSpring(motionValue, { stiffness: 180, damping: 26, mass: 0.8 });
+  const [display, setDisplay] = useState(formatCurrency(target));
+
+  useEffect(() => {
+    motionValue.set(target);
+  }, [motionValue, target]);
+
+  useMotionValueEvent(springValue, "change", (latest) => {
+    setDisplay(formatCurrency(latest));
+  });
+
+  return <motion.span className={classNames("tabular-money", className)}>{display}</motion.span>;
+}
+
+function MoneyText({ value, animate = false, className }) {
+  const baseClass = classNames("font-extrabold tracking-tight tabular-money", className);
+  if (animate && isCurrencyValue(value)) return <AnimatedMoneyText value={value} className={baseClass} />;
+  return <span className={baseClass}>{value}</span>;
+}
+
+function EmptyWatermark() {
+  return <img className="pointer-events-none absolute -right-5 -bottom-7 z-0 h-32 w-32 opacity-10" src={heroCapybara} alt="" aria-hidden="true" />;
+}
+
 function ButtonLink({ to = "home", params, variant = "ghost", icon: Icon, children, className }) {
   return (
     <a className={classNames(buttonClass(variant), className)} href={hrefTo(to, params)}>
@@ -127,10 +165,10 @@ function Button({ variant = "ghost", icon: Icon, children, className, ...props }
 }
 
 function buttonClass(variant) {
-  const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50";
+  const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
   const variants = {
     primary: "bg-accent text-white shadow-float hover:bg-accentDark",
-    secondary: "border border-line bg-paper text-ink shadow-soft hover:bg-card",
+    secondary: "border border-white/60 bg-paper text-ink shadow-capybara-warm ring-1 ring-white/60 hover:bg-card",
     ghost: "border border-line bg-white/50 text-ink hover:bg-paper",
     dark: "bg-ink text-white hover:bg-[#352111]",
     danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
@@ -140,7 +178,7 @@ function buttonClass(variant) {
 
 function Shell({ children, wide = false }) {
   return (
-    <main className={classNames("mx-auto min-h-screen pb-10 pt-5", wide ? "max-w-5xl" : "max-w-[520px]")}>
+    <main className={classNames("mx-auto min-h-screen pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[520px]")}>
       <div className="space-y-5">{children}</div>
     </main>
   );
@@ -150,7 +188,7 @@ function Topbar({ title = "水豚旅行", subtitle = "Capybara Trip", children }
   return (
     <header className="flex items-center justify-between gap-3">
       <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-line bg-paper shadow-soft">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-3xl border border-white/60 bg-paper shadow-capybara-warm ring-1 ring-white/60">
           <img className="h-9 w-9" src={heroCapybara} alt="水豚旅行头像" />
         </span>
         <span className="min-w-0">
@@ -179,14 +217,17 @@ function Badge({ children, tone = "default" }) {
 }
 
 function Panel({ children, className }) {
-  return <section className={classNames("rounded-[24px] border border-line bg-paper/90 p-5 shadow-soft", className)}>{children}</section>;
+  return <section className={classNames("rounded-3xl border border-white/60 bg-paper/90 p-5 shadow-capybara-warm ring-1 ring-white/60", className)}>{children}</section>;
 }
 
 function Metric({ label, value }) {
+  const isMoney = isCurrencyValue(value);
   return (
-    <div className="rounded-[20px] border border-line bg-white/65 p-4">
-      <span className="text-xs font-bold text-muted">{label}</span>
-      <strong className="mt-1 block break-words text-xl font-extrabold text-ink">{value}</strong>
+    <div className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
+      <span className="text-xs font-extrabold tracking-wide text-stone-400">{label}</span>
+      <strong className="mt-1 block break-words text-xl text-ink">
+        {isMoney ? <MoneyText value={value} animate className="block" /> : value}
+      </strong>
     </div>
   );
 }
@@ -229,7 +270,7 @@ function HomePage() {
           <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch">
             {["创建行程", "记一笔", "看结算"].map((item, index) => (
               <div className="contents" key={item}>
-                <article className="rounded-2xl bg-card p-3 text-center">
+                <article className="rounded-3xl border border-white/60 bg-card p-3 text-center shadow-capybara-warm ring-1 ring-white/60">
                   <span className="block text-xs font-bold text-muted">第{index + 1}步</span>
                   <strong className="mt-1 block text-sm font-extrabold">{item}</strong>
                 </article>
@@ -240,10 +281,10 @@ function HomePage() {
         </section>
 
         <section className="mt-12 grid grid-cols-2 gap-3">
-          <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 flex-col items-start rounded-[22px]">
+          <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 flex-col items-start rounded-3xl">
             创建行程
           </ButtonLink>
-          <ButtonLink to="manage" variant="secondary" icon={Wallet} className="min-h-20 flex-col items-start rounded-[22px]">
+          <ButtonLink to="manage" variant="secondary" icon={Wallet} className="min-h-20 flex-col items-start rounded-3xl">
             查看已有行程
           </ButtonLink>
         </section>
@@ -285,7 +326,7 @@ function CreateChoicePage() {
 
 function ModeCard({ to, badge, title, copy }) {
   return (
-    <a className="block rounded-[24px] border border-line bg-paper/90 p-6 shadow-soft transition hover:-translate-y-0.5" href={hrefTo(to)}>
+    <a className="block rounded-3xl border border-white/60 bg-paper/90 p-6 shadow-capybara-warm ring-1 ring-white/60 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
       <Badge>{badge}</Badge>
       <h2 className="mt-4 text-2xl font-extrabold">{title}</h2>
       <p className="mt-2 text-sm leading-7 text-muted">{copy}</p>
@@ -425,10 +466,13 @@ function TripListPage({ type = "manage" }) {
           {trips.map((trip) => <TripCard trip={trip} onDelete={removeTrip} key={trip.id} />)}
         </section>
       ) : (
-        <Panel className="space-y-4 text-center">
-          <Badge>还没有行程</Badge>
-          <h2 className="text-2xl font-extrabold">先创建一趟旅行，再回来继续记账和结算。</h2>
-          <ButtonLink to="create" variant="primary" icon={Plus}>创建行程</ButtonLink>
+        <Panel className="relative overflow-hidden space-y-4 text-center">
+          <EmptyWatermark />
+          <div className="relative z-10 space-y-4">
+            <Badge>还没有行程</Badge>
+            <h2 className="text-2xl font-extrabold">先创建一趟旅行，再回来继续记账和结算。</h2>
+            <ButtonLink to="create" variant="primary" icon={Plus}>创建行程</ButtonLink>
+          </div>
         </Panel>
       )}
     </Shell>
@@ -455,7 +499,7 @@ function TripCard({ trip, onDelete }) {
       </div>
       <ProgressBar width={width} alert={isAlert} />
       <div className="flex justify-between text-sm font-bold text-muted">
-        <span>剩余预算 {formatCurrency(getRemainingBudget(trip))}</span>
+        <span>剩余预算 <MoneyText value={formatCurrency(getRemainingBudget(trip))} /></span>
         <strong className="text-ink">{getProgressText(trip)}</strong>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -483,11 +527,14 @@ function NotFoundPage({ title = "没有找到这趟行程。", copy = "请从已
   return (
     <Shell>
       <Topbar title="水豚旅行" />
-      <Panel className="space-y-4 text-center">
-        <Badge tone="alert">无法打开</Badge>
-        <h1 className="text-2xl font-extrabold">{title}</h1>
-        <p className="text-sm leading-7 text-muted">{copy}</p>
-        <ButtonLink to="manage" variant="primary" icon={Wallet}>查看已有行程</ButtonLink>
+      <Panel className="relative overflow-hidden space-y-4 text-center">
+        <EmptyWatermark />
+        <div className="relative z-10 space-y-4">
+          <Badge tone="alert">无法打开</Badge>
+          <h1 className="text-2xl font-extrabold">{title}</h1>
+          <p className="text-sm leading-7 text-muted">{copy}</p>
+          <ButtonLink to="manage" variant="primary" icon={Wallet}>查看已有行程</ButtonLink>
+        </div>
       </Panel>
     </Shell>
   );
@@ -553,7 +600,11 @@ function DetailPage({ id }) {
             <Badge tone="alert">{progress > 1 ? "已超预算" : "预算告急"}</Badge>
           </div>
           <p className="mt-2 text-sm leading-7 text-red-700">
-            {progress > 1 ? `当前已经超出预算 ${formatCurrency(Math.abs(remaining))}，建议追加预算或进入结算。` : `当前已使用 ${Math.round(progress * 100)}% 预算，仅剩 ${formatCurrency(remaining)}。`}
+            {progress > 1 ? (
+              <>当前已经超出预算 <MoneyText value={formatCurrency(Math.abs(remaining))} />，建议追加预算或进入结算。</>
+            ) : (
+              <>当前已使用 {Math.round(progress * 100)}% 预算，仅剩 <MoneyText value={formatCurrency(remaining)} />。</>
+            )}
           </p>
         </Panel>
       ) : null}
@@ -584,12 +635,17 @@ function SectionHead({ eyebrow, title, badge }) {
 
 function ExpenseList({ trip, onDelete }) {
   if (!trip.expenses.length) {
-    return <div className="rounded-2xl bg-card p-4 text-sm font-bold text-muted">还没有支出记录，先去记一笔。</div>;
+    return (
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-bold text-muted shadow-capybara-warm ring-1 ring-white/60">
+        <EmptyWatermark />
+        <span className="relative z-10">还没有支出记录，先去记一笔。</span>
+      </div>
+    );
   }
   return (
     <div className="space-y-3">
       {trip.expenses.map((expense, index) => (
-        <article className="rounded-[20px] border border-line bg-white/70 p-4" key={expense.id}>
+        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={expense.id}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <strong className="block break-words text-base font-extrabold">#{index + 1} · {expense.note || displayCategory(expense)}</strong>
@@ -600,7 +656,7 @@ function ExpenseList({ trip, onDelete }) {
           <div className="mt-3 space-y-1 text-sm font-bold leading-6 text-muted">
             <p>付款人：{expense.payer || trip.manager || "-"}</p>
             <p>参与人：{expense.participants.join("、") || "-"}</p>
-            <p>金额：{formatCurrency(expense.amount)}</p>
+            <p>金额：<MoneyText value={formatCurrency(expense.amount)} /></p>
           </div>
           {onDelete ? <Button variant="danger" icon={Trash2} className="mt-3 w-full" onClick={() => onDelete(expense.id)}>删除这笔</Button> : null}
         </article>
@@ -616,11 +672,16 @@ function LedgerView({ trip }) {
     return (
       <div className="space-y-3">
         {rows.length ? rows.map(([name, amount]) => (
-          <article className="rounded-2xl bg-card p-4" key={name}>
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
             <strong className="block text-base font-extrabold">{name}</strong>
-            <p className="mt-1 text-sm font-bold text-muted">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}{formatCurrency(amount)}</p>
+            <p className="mt-1 text-sm font-bold text-muted">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
-        )) : <div className="rounded-2xl bg-card p-4 text-sm font-bold text-muted">暂无净额数据。</div>}
+        )) : (
+          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-bold text-muted shadow-capybara-warm ring-1 ring-white/60">
+            <EmptyWatermark />
+            <span className="relative z-10">暂无净额数据。</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -631,14 +692,14 @@ function LedgerView({ trip }) {
         const spent = ledger[name] || 0;
         const balance = round2((trip.per || 0) - spent);
         return (
-          <article className="rounded-2xl bg-card p-4" key={name}>
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
             <div className="flex items-center justify-between gap-3">
               <strong className="text-base font-extrabold">{name}</strong>
               <Badge tone={balance < 0 ? "alert" : "default"}>{balance < 0 ? "已超支" : "未超支"}</Badge>
             </div>
-            <p className="mt-2 text-sm font-bold text-muted">已分摊：{formatCurrency(spent)}</p>
-            <p className="text-sm font-bold text-muted">人均预算：{formatCurrency(trip.per)}</p>
-            <p className="mt-2 text-2xl font-extrabold">{formatCurrency(balance)}</p>
+            <p className="mt-2 text-sm font-bold text-muted">已分摊：<MoneyText value={formatCurrency(spent)} /></p>
+            <p className="text-sm font-bold text-muted">人均预算：<MoneyText value={formatCurrency(trip.per)} /></p>
+            <p className="mt-2 text-2xl"><MoneyText value={formatCurrency(balance)} animate /></p>
           </article>
         );
       })}
@@ -751,7 +812,7 @@ function ExpensePage({ id }) {
           <Field label="参与人">
             <div className="grid grid-cols-2 gap-2">
               {trip.people.map((name) => (
-                <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-white/70 text-muted")} key={name}>
+                <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-white/70 text-muted")} key={name}>
                   <input className="h-4 w-4 accent-accent" type="checkbox" checked={participants.includes(name)} onChange={() => toggleParticipant(name)} />
                   <span className="truncate">{name}</span>
                 </label>
@@ -775,21 +836,21 @@ function ExpensePage({ id }) {
 
 function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
   return (
-    <section className="space-y-4 rounded-[22px] bg-ink p-4 text-white">
+    <section className="space-y-4 rounded-3xl bg-ink p-4 text-white shadow-capybara-warm">
       <div>
         <span className="text-xs font-extrabold uppercase tracking-[0.18em] text-card">选择困难时</span>
         <h2 className="mt-2 text-2xl font-extrabold">水豚拍板</h2>
       </div>
       <div className="flex flex-wrap gap-2">
         {DECISION_TAGS.map((tag) => (
-          <button className="rounded-full bg-white/12 px-3 py-2 text-xs font-extrabold text-white" type="button" key={tag} onClick={() => setPrompt(tag)}>
+          <button className="rounded-full bg-white/12 px-3 py-2 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
             {tag}
           </button>
         ))}
       </div>
       <textarea className="min-h-24 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold outline-none placeholder:text-white/50 focus:ring-4 focus:ring-white/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：今晚吃火锅还是烧烤？" />
       <Button variant="secondary" className="w-full" icon={Sparkles} onClick={onAsk}>给个建议</Button>
-      <div className="rounded-2xl bg-white/10 p-4 text-sm font-bold leading-7 text-white/85">{reply}</div>
+      <div className="rounded-3xl bg-white/10 p-4 text-sm font-bold leading-7 text-white/85">{reply}</div>
     </section>
   );
 }
@@ -916,9 +977,9 @@ function TripSummaryView({ trip, onClose }) {
   }, []);
 
   return (
-    <section className="fixed inset-0 z-50 bg-[#FDFBF7] text-ink">
+    <motion.section className="fixed inset-0 z-50 bg-[#FDFBF7] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
       <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-center border-b border-line/60 bg-[#FDFBF7]/95 px-5 backdrop-blur">
-        <button className="absolute left-5 inline-flex min-h-10 items-center gap-2 rounded-2xl px-2 text-sm font-extrabold text-ink active:scale-[0.98]" type="button" onClick={onClose}>
+        <button className="absolute left-5 inline-flex min-h-10 items-center gap-2 rounded-2xl px-2 text-sm font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose}>
           <ArrowLeft size={18} />
           <span>返回</span>
         </button>
@@ -927,18 +988,18 @@ function TripSummaryView({ trip, onClose }) {
 
       <div className="h-full overflow-y-auto px-5 pb-10 pt-24">
         <div className="mx-auto max-w-[520px] space-y-5">
-          <article className="animate-fade-in rounded-3xl border border-line/60 bg-white p-6 shadow-sm">
+          <article className="animate-fade-in rounded-3xl border border-white/60 bg-white p-6 shadow-capybara-warm ring-1 ring-white/60">
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <span className="text-xs font-extrabold text-muted">总耗时</span>
+                <span className="text-xs font-extrabold tracking-wide text-stone-400">总耗时</span>
                 <strong className="mt-2 block text-2xl font-extrabold">{durationText}</strong>
               </div>
               <div className="text-right">
-                <span className="text-xs font-extrabold text-muted">总花费</span>
-                <strong className="mt-2 block text-3xl font-extrabold">{formatCurrency(trip.currentSpent)}</strong>
+                <span className="text-xs font-extrabold tracking-wide text-stone-400">总花费</span>
+                <strong className="mt-2 block text-3xl"><MoneyText value={formatCurrency(trip.currentSpent)} animate /></strong>
               </div>
-              <div className="col-span-2 rounded-2xl bg-card/65 p-4">
-                <span className="text-xs font-extrabold text-muted">核心足迹</span>
+              <div className="col-span-2 rounded-3xl bg-card/65 p-4">
+                <span className="text-xs font-extrabold tracking-wide text-stone-400">核心足迹</span>
                 <p className="mt-2 text-sm font-extrabold leading-7 text-gray-700">📍 {footprints.join(" ➔ ")}</p>
               </div>
             </div>
@@ -950,15 +1011,16 @@ function TripSummaryView({ trip, onClose }) {
           </section>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function Timeline({ expenses }) {
   if (!expenses.length) {
     return (
-      <div className="animate-fade-in rounded-3xl border border-line/60 bg-white p-5 text-sm font-bold leading-7 text-muted shadow-sm">
-        还没有可生成回忆的核心支出。
+      <div className="relative overflow-hidden animate-fade-in rounded-3xl border border-white/60 bg-white p-5 text-sm font-bold leading-7 text-muted shadow-capybara-warm ring-1 ring-white/60">
+        <EmptyWatermark />
+        <span className="relative z-10">还没有可生成回忆的核心支出。</span>
       </div>
     );
   }
@@ -969,10 +1031,10 @@ function Timeline({ expenses }) {
       {expenses.map((expense, index) => (
         <article className="relative animate-fade-in pl-12" style={{ animationDelay: `${index * 55}ms` }} key={expense.id}>
           <span className="absolute left-[11px] top-5 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-amber-500 shadow-sm" aria-hidden="true" />
-          <div className="rounded-3xl border border-line/60 bg-white/80 p-5 shadow-sm">
-            <p className="text-xs font-extrabold text-muted">{getTimelineTime(expense)}</p>
+          <div className="rounded-3xl border border-white/60 bg-white/80 p-5 shadow-capybara-warm ring-1 ring-white/60">
+            <p className="text-xs font-extrabold tracking-wide text-stone-400">{getTimelineTime(expense)}</p>
             <h3 className="mt-1 text-lg font-extrabold">{getExpenseLabel(expense)}</h3>
-            <p className="mt-2 text-sm font-bold text-muted">花费: {formatCurrency(expense.amount)}</p>
+            <p className="mt-2 text-sm font-bold text-muted">花费: <MoneyText value={formatCurrency(expense.amount)} /></p>
           </div>
         </article>
       ))}
@@ -1004,7 +1066,7 @@ function ReviewPage({ id, summary = false }) {
         <Metric label="预算结余" value={formatCurrency(remaining)} />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition active:scale-[0.98]" type="button" onClick={() => setShowTripSummary(true)}>
+        <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
           <span>🌟 生成专属旅行回忆</span>
         </button>
         <ButtonLink to="detail" params={{ id: trip.id }} variant="primary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
@@ -1034,14 +1096,21 @@ function ReviewPage({ id, summary = false }) {
 
 function CategoryShareList({ trip }) {
   const totals = getCategoryTotals(trip);
-  if (!totals.length) return <div className="rounded-2xl bg-card p-4 text-sm font-bold text-muted">还没有支出记录，暂无分类占比。</div>;
+  if (!totals.length) {
+    return (
+      <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-bold text-muted shadow-capybara-warm ring-1 ring-white/60">
+        <EmptyWatermark />
+        <span className="relative z-10">还没有支出记录，暂无分类占比。</span>
+      </div>
+    );
+  }
   return (
     <div className="space-y-3">
       {totals.map((item) => (
-        <article className="rounded-2xl bg-card p-4" key={item.category}>
+        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={item.category}>
           <div className="flex items-center justify-between gap-3 text-sm font-extrabold">
             <strong>{item.category}</strong>
-            <span>{formatCurrency(item.amount)} · {item.percent}%</span>
+            <span><MoneyText value={formatCurrency(item.amount)} /> · {item.percent}%</span>
           </div>
           <div className="mt-3"><ProgressBar width={`${item.percent}%`} /></div>
         </article>
@@ -1059,22 +1128,27 @@ function ParentSettlement({ trip, result }) {
       .filter((item) => item.amount > 0);
   return (
     <div className="space-y-3">
-      <article className="rounded-2xl bg-card p-4">
+      <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "超支补款" : "预算返还"}</Badge>
             <h3 className="mt-3 text-xl font-extrabold">{result.mode === "extra" ? "需要补款" : "需要退款"}</h3>
           </div>
-          <strong className="text-xl font-extrabold">{formatCurrency(result.mode === "extra" ? result.diff : result.totalBudget - result.totalExpense)}</strong>
+          <strong className="text-xl"><MoneyText value={formatCurrency(result.mode === "extra" ? result.diff : result.totalBudget - result.totalExpense)} animate /></strong>
         </div>
-        <p className="mt-2 text-sm font-bold text-muted">总预算 {formatCurrency(result.totalBudget)}，总支出 {formatCurrency(result.totalExpense)}。</p>
+        <p className="mt-2 text-sm font-bold text-muted">总预算 <MoneyText value={formatCurrency(result.totalBudget)} />，总支出 <MoneyText value={formatCurrency(result.totalExpense)} />。</p>
       </article>
       {transferRows.length ? transferRows.map((row) => (
-        <article className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 p-4 text-sm font-extrabold" key={row.label}>
+        <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-extrabold shadow-capybara-warm ring-1 ring-white/60" key={row.label}>
           <span>{row.label}</span>
-          <strong>{formatCurrency(row.amount)}</strong>
+          <strong><MoneyText value={formatCurrency(row.amount)} /></strong>
         </article>
-      )) : <div className="rounded-2xl bg-card p-4 text-sm font-bold text-muted">目前没有需要执行的退款或补款动作。</div>}
+      )) : (
+        <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-bold text-muted shadow-capybara-warm ring-1 ring-white/60">
+          <EmptyWatermark />
+          <span className="relative z-10">目前没有需要执行的退款或补款动作。</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -1083,26 +1157,31 @@ function SharedSettlement({ result }) {
   const netRows = Object.entries(result.net || {});
   return (
     <div className="space-y-3">
-      <article className="rounded-2xl bg-card p-4">
+      <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
         <Badge>多人付款结算</Badge>
         <h3 className="mt-3 text-xl font-extrabold">按路径转账即可平账</h3>
-        <p className="mt-2 text-sm font-bold text-muted">总支出 {formatCurrency(result.totalExpense)}，系统已按付款人和参与人计算净额。</p>
+        <p className="mt-2 text-sm font-bold text-muted">总支出 <MoneyText value={formatCurrency(result.totalExpense)} />，系统已按付款人和参与人计算净额。</p>
       </article>
       <div className="grid grid-cols-2 gap-2">
         {netRows.map(([name, amount]) => (
-          <article className="rounded-2xl bg-white/70 p-4" key={name}>
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
             <strong className="block text-sm font-extrabold">{name}</strong>
-            <p className="mt-1 text-xs font-bold text-muted">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}{formatCurrency(amount)}</p>
+            <p className="mt-1 text-xs font-bold text-muted">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         ))}
       </div>
       <div className="space-y-2">
         {result.transfers.length ? result.transfers.map((transfer) => (
-          <article className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 p-4 text-sm font-extrabold" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+          <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-extrabold shadow-capybara-warm ring-1 ring-white/60" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
             <span>{transfer.from} → {transfer.to}</span>
-            <strong>{formatCurrency(transfer.amount)}</strong>
+            <strong><MoneyText value={formatCurrency(transfer.amount)} /></strong>
           </article>
-        )) : <div className="rounded-2xl bg-card p-4 text-sm font-bold text-muted">这趟行程已经平账，不需要额外转账。</div>}
+        )) : (
+          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 text-sm font-bold text-muted shadow-capybara-warm ring-1 ring-white/60">
+            <EmptyWatermark />
+            <span className="relative z-10">这趟行程已经平账，不需要额外转账。</span>
+          </div>
+        )}
       </div>
     </div>
   );

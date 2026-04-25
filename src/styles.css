@@ -36,6 +36,10 @@ textarea {
   font: inherit;
 }
 
+.tabular-money {
+  font-variant-numeric: tabular-nums;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
