@@ -1,3 +1,6 @@
 SPEC.md
 DEPLOY_SPEC.md
 ITERATION_SPEC.md
+node_modules/
+dist/
+.vite/
