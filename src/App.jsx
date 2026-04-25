@@ -210,36 +210,36 @@ function HomePage() {
         <ButtonLink to="about" variant="ghost" icon={Sparkles}>介绍</ButtonLink>
       </Topbar>
 
-      <section className="space-y-10">
-        <div className="space-y-4 pt-4">
+      <section>
+        <div className="pt-8">
           <Eyebrow>多人旅行记账与分摊工具</Eyebrow>
-          <h1 className="text-[34px] font-extrabold leading-tight text-ink sm:text-[42px]">
+          <h1 className="mt-4 text-[34px] font-extrabold leading-tight text-ink sm:text-[42px]">
             把旅行里最容易说不清的账，温柔地算清楚。
           </h1>
-          <p className="text-[15px] leading-8 text-muted">
+          <p className="mt-5 text-[15px] leading-[1.8] text-muted">
             重点记录住宿、门票、聚餐、交通等共同大额支出。谁付款、谁参与、最后谁该补钱，一页看明白。
           </p>
         </div>
 
-        <Panel className="space-y-4 bg-white/55">
+        <section className="mt-12 space-y-5" aria-labelledby="home_steps_title">
           <div>
             <Eyebrow>30 秒上手</Eyebrow>
-            <h2 className="mt-2 text-2xl font-extrabold">只需要三步</h2>
+            <h2 id="home_steps_title" className="mt-2 text-2xl font-extrabold">只需要三步</h2>
           </div>
-          <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch gap-2">
+          <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch">
             {["创建行程", "记一笔", "看结算"].map((item, index) => (
               <div className="contents" key={item}>
                 <article className="rounded-2xl bg-card p-3 text-center">
                   <span className="block text-xs font-bold text-muted">第{index + 1}步</span>
                   <strong className="mt-1 block text-sm font-extrabold">{item}</strong>
                 </article>
-                {index < 2 ? <span className="self-center text-lg font-extrabold text-accent">→</span> : null}
+                {index < 2 ? <span className="mx-2 self-center text-lg font-extrabold text-accent sm:mx-3">→</span> : null}
               </div>
             ))}
           </div>
-        </Panel>
+        </section>
 
-        <section className="grid grid-cols-2 gap-3">
+        <section className="mt-12 grid grid-cols-2 gap-3">
           <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 flex-col items-start rounded-[22px]">
             创建行程
           </ButtonLink>
@@ -248,13 +248,13 @@ function HomePage() {
           </ButtonLink>
         </section>
 
-        <section className="space-y-4">
+        <section className="mt-12 flex flex-col gap-5">
           {[
             ["不用记碎账", "只记真正影响结算的大项。"],
             ["分类占比清楚", "看清钱主要花在哪。"],
-            ["朋友旅行、团建、家庭出游", "多人共同支出更容易说清。"]
+            ["适合场景", "朋友旅行、团建、家庭出游，多人共同支出更容易说清。"]
           ].map(([title, copy]) => (
-            <Panel className="p-6" key={title}>
+            <Panel className="w-full p-6" key={title}>
               <h2 className="text-2xl font-extrabold">{title}</h2>
               <p className="mt-2 text-sm leading-7 text-muted">{copy}</p>
             </Panel>
@@ -1009,5 +1009,5 @@ export default function App() {
     summary: <ReviewPage id={id} summary />,
     about: <AboutPage />
   };
-  return <div className="px-4 sm:px-6">{pages[route.name] || <HomePage />}</div>;
+  return <div className="px-5 sm:px-6">{pages[route.name] || <HomePage />}</div>;
 }
