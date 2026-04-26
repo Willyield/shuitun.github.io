@@ -253,12 +253,13 @@ function HomePage() {
 
       <section>
         <div className="pt-8">
-          <Eyebrow>多人旅行记账与分摊工具</Eyebrow>
-          <h1 className="mt-4 text-[34px] font-extrabold leading-tight text-ink sm:text-[42px]">
-            把旅行里最容易说不清的账，温柔地算清楚。
+          <Eyebrow>告别“谈钱内耗”的多人账本</Eyebrow>
+          <h1 className="mt-4 text-[34px] font-extrabold leading-tight tracking-tighter text-ink sm:text-[42px]">
+            把旅行里最难开口的账，<br />
+            温柔地算清楚。
           </h1>
-          <p className="mt-5 text-[15px] leading-[1.8] text-muted">
-            重点记录住宿、门票、聚餐、交通等共同大额支出。谁付款、谁参与、最后谁该补钱，一页看明白。
+          <p className="mt-5 text-[15px] leading-relaxed text-stone-500">
+            别让算账的尴尬毁了沿途的风景。你只管享受当下，复杂的垫付与分摊交由系统默默推演。行程结束一键生成体面的结算单，不伤和气，只留回忆。
           </p>
         </div>
 
@@ -281,8 +282,8 @@ function HomePage() {
         </section>
 
         <section className="mt-12 grid grid-cols-2 gap-3">
-          <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 flex-col items-start rounded-3xl">
-            创建行程
+          <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 w-full flex-col items-start rounded-3xl bg-amber-500 hover:bg-amber-600">
+            开启无压旅行
           </ButtonLink>
           <ButtonLink to="manage" variant="secondary" icon={Wallet} className="min-h-20 flex-col items-start rounded-3xl">
             查看已有行程
