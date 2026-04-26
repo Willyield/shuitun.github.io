@@ -7,7 +7,7 @@ export default {
         shell: "#FFF8ED",
         paper: "#FFFDF8",
         card: "#F9EBDD",
-        ink: "#4B2F1A",
+        ink: "#292524",
         muted: "#876C58",
         line: "rgba(75, 47, 26, 0.14)",
         accent: "#D97736",
@@ -25,7 +25,7 @@ export default {
         "4xl": "32px"
       },
       fontFamily: {
-        sans: ['"Nunito"', '"SF Pro Rounded"', '"PingFang SC"', '"Microsoft YaHei"', "sans-serif"]
+        sans: ['"PingFang SC"', '"MiSans"', '"OPPO Sans"', '"Helvetica Neue"', "sans-serif"]
       },
       keyframes: {
         "fade-in": {

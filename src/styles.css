@@ -22,11 +22,12 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  font-family: "PingFang SC", "MiSans", "OPPO Sans", "Helvetica Neue", sans-serif;
   background:
     radial-gradient(circle at top left, rgba(255, 217, 168, 0.72), transparent 30%),
     radial-gradient(circle at top right, rgba(217, 238, 242, 0.72), transparent 28%),
     linear-gradient(180deg, #fffdf8 0%, #fff8ed 48%, #f8e6d5 100%);
-  color: #4b2f1a;
+  color: #292524;
 }
 
 button,
@@ -38,6 +39,37 @@ textarea {
 
 .tabular-money {
   font-variant-numeric: tabular-nums;
+}
+
+@layer utilities {
+  .type-h1 {
+    @apply text-4xl font-extrabold leading-tight tracking-tighter text-stone-800;
+  }
+
+  .type-h2 {
+    @apply text-2xl font-bold tracking-tight text-stone-800;
+  }
+
+  .type-h3 {
+    @apply text-lg font-semibold text-stone-700;
+  }
+
+  .type-body {
+    @apply text-[15px] font-normal leading-relaxed text-stone-500;
+  }
+
+  .type-caption {
+    @apply text-xs font-medium uppercase tracking-widest text-stone-400;
+  }
+
+  .type-kicker {
+    @apply text-xs font-medium uppercase tracking-widest text-accent;
+  }
+
+  .type-ledger {
+    @apply font-extrabold tracking-tight;
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 ::-webkit-scrollbar {
