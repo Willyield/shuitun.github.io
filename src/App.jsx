@@ -224,12 +224,12 @@ function Panel({ children, className }) {
   return <section className={classNames("rounded-3xl border border-white/60 bg-paper/90 p-5 shadow-capybara-warm ring-1 ring-white/60", className)}>{children}</section>;
 }
 
-function Metric({ label, value }) {
+function Metric({ label, value, valueClassName }) {
   const isMoney = isCurrencyValue(value);
   return (
     <div className="flex min-w-0 flex-1 flex-col items-start justify-center rounded-3xl border border-white/60 bg-white/70 px-2 py-4 shadow-capybara-warm ring-1 ring-white/60">
       <span className="text-xs font-medium tracking-wide text-stone-500">{label}</span>
-      <strong className="mt-1 min-w-0 text-base font-extrabold tracking-tighter text-ink tabular-nums sm:text-lg">
+      <strong className={classNames("mt-1 min-w-0 text-xl font-black leading-none tracking-tighter tabular-nums sm:text-2xl", valueClassName || "text-ink")}>
         {isMoney ? <MoneyText value={value} animate className="block" /> : <span className="block">{value}</span>}
       </strong>
     </div>
@@ -584,7 +584,7 @@ function DetailPage({ id }) {
       <div className="flex flex-row justify-between gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
-        <Metric label="剩余预算" value={formatCurrency(remaining)} />
+        <Metric label="剩余预算" value={formatCurrency(remaining)} valueClassName={remaining < 0 ? "text-rose-600" : ""} />
       </div>
       <Panel className="space-y-3">
         <ProgressBar width={`${Math.min(Math.max(progress, 0), 1) * 100}%`} alert={isAlert} />
@@ -739,6 +739,7 @@ function ExpensePage({ id }) {
   const [note, setNote] = useState("");
   const [time, setTime] = useState("");
   const [message, setMessage] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [decisionPrompt, setDecisionPrompt] = useState("");
   const [decisionReply, setDecisionReply] = useState("点一个快捷问题，或直接输入你们的纠结。");
 
@@ -784,7 +785,7 @@ function ExpensePage({ id }) {
       setTime("");
       setMessage({ type: "success", text: "转账已记录，最终结算会自动抵扣。" });
       setVersion((current) => current + 1);
-      navigate("detail", { id: trip.id });
+      setShowSuccessModal(true);
       return;
     }
 
@@ -814,7 +815,7 @@ function ExpensePage({ id }) {
     if (isShared) setPayer(trip.people[0] || "");
     setMessage({ type: "success", text: "支出已记录，可以继续记下一笔。" });
     setVersion((current) => current + 1);
-    navigate("detail", { id: trip.id });
+    setShowSuccessModal(true);
   }
 
   function askDecision() {
@@ -827,6 +828,7 @@ function ExpensePage({ id }) {
   }
 
   return (
+    <>
     <Shell>
       <header className="flex items-center justify-between gap-3">
         <a className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-line bg-white/50 px-3 py-2 text-sm font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" href={hrefTo("detail", { id: trip.id })} aria-label="返回行程详情">
@@ -920,6 +922,31 @@ function ExpensePage({ id }) {
         </form>
       </Panel>
     </Shell>
+    {showSuccessModal ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="expense-success-title">
+        <motion.div
+          className="w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-soft"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-50 text-4xl">✅</div>
+          <h2 id="expense-success-title" className="mt-5 type-h2">记账成功！</h2>
+          <p className="mt-2 type-body">已同步至当前行程</p>
+          <Button
+            variant="primary"
+            className="mt-6 w-full"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("detail", { id: trip.id });
+            }}
+          >
+            确定
+          </Button>
+        </motion.div>
+      </div>
+    ) : null}
+    </>
   );
 }
 
@@ -1281,7 +1308,7 @@ function ReviewPage({ id, summary = false }) {
       <div className="flex flex-row justify-between gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
-        <Metric label="预算结余" value={formatCurrency(remaining)} />
+        <Metric label="预算结余" value={formatCurrency(remaining)} valueClassName={remaining < 0 ? "text-rose-600" : ""} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
