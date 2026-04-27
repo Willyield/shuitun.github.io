@@ -212,7 +212,7 @@ function Eyebrow({ children }) {
 function Badge({ children, tone = "default" }) {
   return (
     <span className={classNames(
-      "inline-flex items-center justify-center rounded-full px-3 py-1 type-caption",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2 py-1 text-xs font-medium uppercase tracking-widest",
       tone === "alert" ? "bg-red-100 text-red-700" : tone === "dark" ? "bg-ink text-white" : "bg-card text-ink"
     )}>
       {children}
@@ -227,10 +227,10 @@ function Panel({ children, className }) {
 function Metric({ label, value }) {
   const isMoney = isCurrencyValue(value);
   return (
-    <div className="flex flex-row items-baseline justify-between gap-2 rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
-      <span className="type-caption">{label}</span>
-      <strong className="min-w-0 break-words text-right text-xl text-ink">
-        {isMoney ? <MoneyText value={value} animate className="block" /> : value}
+    <div className="flex min-w-0 flex-1 flex-row items-baseline justify-between gap-2 rounded-3xl border border-white/60 bg-white/70 px-3 py-4 shadow-capybara-warm ring-1 ring-white/60">
+      <span className="type-caption shrink-0 whitespace-nowrap">{label}</span>
+      <strong className="min-w-0 text-right text-lg tracking-tighter text-ink sm:text-xl">
+        {isMoney ? <MoneyText value={value} animate className="block whitespace-nowrap" /> : <span className="block whitespace-nowrap">{value}</span>}
       </strong>
     </div>
   );
@@ -490,7 +490,7 @@ function TripCard({ trip, onDelete }) {
         </div>
         <Badge tone={isAlert ? "alert" : "default"}>{isAlert ? "预算告急" : "状态正常"}</Badge>
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-row justify-between gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
         <Metric label="记录数" value={`${trip.expenses.length} 笔`} />
@@ -581,7 +581,7 @@ function DetailPage({ id }) {
           <Badge>{tripModeLabel(trip.mode)}</Badge>
         </div>
       </section>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-row justify-between gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
         <Metric label="剩余预算" value={formatCurrency(remaining)} />
@@ -912,21 +912,21 @@ function ExpensePage({ id }) {
 
 function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
   return (
-    <section className="space-y-4 rounded-3xl bg-ink p-4 text-white shadow-capybara-warm">
+    <section className="space-y-3 rounded-3xl bg-ink p-3 text-white shadow-capybara-warm">
       <div>
         <span className="type-kicker text-card">选择困难时</span>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">水豚拍板</h2>
+        <h2 className="mt-1 text-xl font-bold tracking-tight text-white">水豚拍板</h2>
       </div>
       <div className="flex flex-wrap gap-2">
         {DECISION_TAGS.map((tag) => (
-          <button className="rounded-full bg-white/12 px-3 py-2 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
+          <button className="rounded-full bg-white/12 px-2 py-1.5 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
             {tag}
           </button>
         ))}
       </div>
-        <textarea className="min-h-24 w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-[15px] font-normal leading-relaxed outline-none placeholder:text-white/50 focus:ring-4 focus:ring-white/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：今晚吃火锅还是烧烤？" />
-      <Button variant="secondary" className="w-full" icon={Sparkles} onClick={onAsk}>给个建议</Button>
-        <div className="rounded-3xl bg-white/10 p-4 text-[15px] font-normal leading-relaxed text-white/85">{reply}</div>
+      <textarea rows={2} className="w-full rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-normal leading-relaxed outline-none placeholder:text-white/50 focus:ring-4 focus:ring-white/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：今晚吃火锅还是烧烤？" />
+      <Button variant="secondary" className="min-h-9 w-full py-2 text-xs" icon={Sparkles} onClick={onAsk}>给个建议</Button>
+      <div className="rounded-2xl bg-white/10 p-3 text-sm font-normal leading-relaxed text-white/85">{reply}</div>
     </section>
   );
 }
@@ -1100,12 +1100,13 @@ function TripSummaryView({ trip, onClose }) {
 
   return (
     <motion.section className="fixed inset-0 z-50 bg-[#FDFBF7] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
-      <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-center border-b border-line/60 bg-[#FDFBF7]/95 px-5 backdrop-blur">
-        <button className="absolute left-5 inline-flex min-h-10 items-center gap-2 rounded-2xl px-2 type-caption text-ink transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose}>
+      <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-between border-b border-line/60 bg-[#FDFBF7]/95 px-5 backdrop-blur">
+        <button className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-2xl px-2 type-caption text-ink transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose} aria-label="返回上一页">
           <ArrowLeft size={18} />
           <span>返回</span>
         </button>
-        <h1 className="max-w-[58%] truncate text-base font-extrabold text-ink">{getTripTitle(trip)}复盘</h1>
+        <h1 className="min-w-0 flex-1 truncate px-3 text-center text-base font-extrabold text-ink">{getTripTitle(trip)}复盘</h1>
+        <span className="h-10 w-[58px] shrink-0" aria-hidden="true" />
       </header>
 
       <div className="h-full overflow-y-auto px-5 pb-10 pt-24">
@@ -1264,7 +1265,7 @@ function ReviewPage({ id, summary = false }) {
           {tripModeLabel(trip.mode)} · 成员：{trip.people.join("、") || "-"}{trip.mode === "parent" ? ` · 大家长：${trip.manager || "-"}` : ""}
         </p>
       </section>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-row justify-between gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
         <Metric label="预算结余" value={formatCurrency(remaining)} />
