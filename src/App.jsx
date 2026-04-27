@@ -517,46 +517,6 @@ function ProgressBar({ width, alert }) {
   );
 }
 
-function shortModeLabel(mode) {
-  return mode === "shared" ? "多人付款" : "大家长";
-}
-
-function BudgetOverview({ trip, remaining, progress, compact = false }) {
-  const percent = Math.min(Math.max(progress, 0), 1) * 100;
-  const isOverBudget = remaining < 0;
-  return (
-    <Panel className={classNames("space-y-4 bg-white/70 backdrop-blur", compact ? "p-4" : "p-5")}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <Eyebrow>预算概览</Eyebrow>
-          <p className="mt-2 type-caption normal-case">{isOverBudget ? "已超支" : "剩余预算"}</p>
-          <p className={classNames("mt-1 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-600" : "text-ink")}>
-            <MoneyText value={formatCurrency(remaining)} animate />
-          </p>
-        </div>
-        <Badge tone={isOverBudget ? "alert" : "default"}>{getProgressText(trip)}</Badge>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-white/60 bg-white/60 p-3">
-          <p className="type-caption normal-case">总预算</p>
-          <p className="mt-1 text-lg leading-none"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
-        </div>
-        <div className="rounded-2xl border border-white/60 bg-white/60 p-3">
-          <p className="type-caption normal-case">总支出</p>
-          <p className="mt-1 text-lg leading-none"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <ProgressBar width={`${percent}%`} alert={isOverBudget || progress >= LOW_BALANCE_RATIO} />
-        <div className="flex justify-between type-caption normal-case">
-          <span>预算使用进度</span>
-          <strong>{Math.round(progress * 100)}%</strong>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
 function useTrip(id, version = 0) {
   return useMemo(() => getRecordById(id), [id, version]);
 }
@@ -602,23 +562,37 @@ function DetailPage({ id }) {
 
   return (
     <Shell>
-      <Topbar title="旅行中" subtitle={getTripTitle(trip)} />
-      <section className="rounded-3xl border border-white/60 bg-white/50 p-4 backdrop-blur">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge>{shortModeLabel(trip.mode)}</Badge>
-          <span className="type-body text-sm">{trip.people.join("、") || "-"}</span>
-        </div>
-        {trip.mode === "parent" ? <p className="mt-2 type-caption normal-case">大家长：{trip.manager || "-"}</p> : null}
+      <Topbar title={getTripTitle(trip)} subtitle="Trip Detail" />
+      <section className="grid grid-cols-2 gap-2">
+        <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus}>记一笔</ButtonLink>
+        <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator}>查看结算</ButtonLink>
+        <ButtonLink to="budget" params={{ id: trip.id }} variant="secondary" icon={Wallet}>增加预算</ButtonLink>
+        <ButtonLink to="manage" variant="ghost" icon={ArrowLeft}>返回管理</ButtonLink>
       </section>
-      <BudgetOverview trip={trip} remaining={remaining} progress={progress} />
-      <section className="space-y-3">
-        <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus} className="w-full rounded-3xl bg-amber-500 py-5 text-lg shadow-lg shadow-orange-500/25 hover:bg-amber-600">记一笔</ButtonLink>
-        <div className="grid grid-cols-3 gap-2">
-          <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-10 px-2 py-2 text-xs">结算</ButtonLink>
-          <ButtonLink to="budget" params={{ id: trip.id }} variant="secondary" icon={Wallet} className="min-h-10 px-2 py-2 text-xs">预算</ButtonLink>
-          <ButtonLink to="manage" variant="ghost" icon={ArrowLeft} className="min-h-10 px-2 py-2 text-xs">管理</ButtonLink>
+      <section className="space-y-2">
+        <Eyebrow>当前行程</Eyebrow>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+        <h1 className="type-h1">{getTripTitle(trip)}</h1>
+        <p className="mt-2 type-body">
+              {tripModeLabel(trip.mode)} · 成员：{trip.people.join("、") || "-"}{trip.mode === "parent" ? ` · 大家长：${trip.manager || "-"}` : ""}
+            </p>
+          </div>
+          <Badge>{tripModeLabel(trip.mode)}</Badge>
         </div>
       </section>
+      <div className="flex flex-row justify-between gap-2">
+        <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
+        <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
+        <Metric label="剩余预算" value={formatCurrency(remaining)} valueClassName={remaining < 0 ? "text-rose-600" : ""} />
+      </div>
+      <Panel className="space-y-3">
+        <ProgressBar width={`${Math.min(Math.max(progress, 0), 1) * 100}%`} alert={isAlert} />
+        <div className="flex justify-between type-caption normal-case">
+          <span>预算使用进度</span>
+          <strong>{getProgressText(trip)}</strong>
+        </div>
+      </Panel>
       {isAlert ? (
         <Panel className="border-red-200 bg-red-50">
           <div className="flex items-start justify-between gap-3">
@@ -672,50 +646,36 @@ function ExpenseList({ trip, onDelete }) {
     );
   }
   return (
-    <div className="relative space-y-3">
-      <div className="absolute left-4 top-2 h-[calc(100%-16px)] w-px bg-line" aria-hidden="true" />
+    <div className="space-y-3">
       {trip.expenses.map((expense, index) => {
         const isTransfer = isTransferEntry(expense);
-        const label = isTransfer ? `${expense.from || "-"} → ${expense.to || "-"}` : (expense.note || displayCategory(expense));
         return (
-          <article className="relative pl-9" key={expense.id}>
-            <span className={classNames("absolute left-[9px] top-5 h-3 w-3 rounded-full border-2 border-[#FFF8ED]", isTransfer ? "bg-sky-400" : "bg-amber-500")} aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
-              <div className="absolute left-0 top-0 h-full w-1 bg-accent/50" aria-hidden="true" />
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="type-caption normal-case">#{index + 1} · {formatDateTime(expense.time || expense.id)}</p>
-                  <strong className="mt-1 block break-words type-h3 text-base">{label}</strong>
-                </div>
-                <div className="flex shrink-0 items-start gap-2">
-                  <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
-                  {onDelete ? (
-                    <button className="grid h-8 w-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition-all duration-200 active:scale-[0.97]" type="button" aria-label="删除这笔" onClick={() => onDelete(expense.id)}>
-                      <Trash2 size={15} />
-                    </button>
-                  ) : null}
-                </div>
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={expense.id}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <strong className="block break-words type-h3 text-base">
+                  #{index + 1} · {isTransfer ? `${expense.from || "-"} 转给 ${expense.to || "-"}` : (expense.note || displayCategory(expense))}
+                </strong>
+                <p className="mt-1 type-caption normal-case">{formatDateTime(expense.time || expense.id)}</p>
               </div>
-              <div className="mt-4 border-t border-line/60 pt-3">
-                <div className="flex items-end justify-between gap-3">
-                  <div className="min-w-0 space-y-1 type-body text-sm">
-                    {isTransfer ? (
-                      <>
-                        <p>付款人：{expense.from || "-"}</p>
-                        <p>收款人：{expense.to || "-"}</p>
-                        {expense.note ? <p>备注：{expense.note}</p> : null}
-                      </>
-                    ) : (
-                      <>
-                        <p>付款人：{expense.payer || trip.manager || "-"}</p>
-                        <p className="truncate">参与人：{expense.participants.join("、") || "-"}</p>
-                      </>
-                    )}
-                  </div>
-                  <strong className="shrink-0 text-xl leading-none"><MoneyText value={formatCurrency(expense.amount)} /></strong>
-                </div>
-              </div>
+              <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
             </div>
+            <div className="mt-3 space-y-1 type-body">
+              {isTransfer ? (
+                <>
+                  <p>付款人：{expense.from || "-"}</p>
+                  <p>收款人：{expense.to || "-"}</p>
+                  {expense.note ? <p>备注：{expense.note}</p> : null}
+                </>
+              ) : (
+                <>
+                  <p>付款人：{expense.payer || trip.manager || "-"}</p>
+                  <p>参与人：{expense.participants.join("、") || "-"}</p>
+                </>
+              )}
+              <p>金额：<MoneyText value={formatCurrency(expense.amount)} /></p>
+            </div>
+            {onDelete ? <Button variant="danger" icon={Trash2} className="mt-3 w-full" onClick={() => onDelete(expense.id)}>删除这笔</Button> : null}
           </article>
         );
       })}
@@ -1341,12 +1301,21 @@ function ReviewPage({ id, summary = false }) {
       <section className="space-y-2">
         <Eyebrow>{summary ? "结算总结" : "第三步"}</Eyebrow>
         <h1 className="type-h1">{getTripTitle(trip)}</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge>{shortModeLabel(trip.mode)}</Badge>
-          <span className="type-body text-sm">成员：{trip.people.join("、") || "-"}</span>
-        </div>
+        <p className="type-body">
+          {tripModeLabel(trip.mode)} · 成员：{trip.people.join("、") || "-"}{trip.mode === "parent" ? ` · 大家长：${trip.manager || "-"}` : ""}
+        </p>
       </section>
-      <BudgetOverview trip={trip} remaining={remaining} progress={getBudgetProgress(trip)} compact />
+      <div className="flex flex-row justify-between gap-2">
+        <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
+        <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
+        <Metric label="预算结余" value={formatCurrency(remaining)} valueClassName={remaining < 0 ? "text-rose-600" : ""} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
+          <span>🌟 生成专属旅行回忆</span>
+        </button>
+        <ButtonLink to="detail" params={{ id: trip.id }} variant="primary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
+      </div>
       <Panel className="space-y-4">
         <SectionHead eyebrow="分类占比" title="钱主要花在哪" />
         <CategoryShareList trip={trip} />
@@ -1356,12 +1325,6 @@ function ReviewPage({ id, summary = false }) {
         {trip.mode === "shared" && sharedResult ? <SharedSettlement result={sharedResult} /> : null}
         {trip.mode === "parent" && parentResult ? <ParentSettlement trip={trip} result={parentResult} /> : null}
       </Panel>
-      <div className="grid grid-cols-2 gap-3">
-        <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
-          <span>🌟 生成这趟旅行回忆</span>
-        </button>
-        <ButtonLink to="detail" params={{ id: trip.id }} variant="secondary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
-      </div>
       <Panel className="space-y-4">
         <SectionHead eyebrow="支出拆解" title="每笔支出明细" />
         <ExpenseList trip={trip} />
@@ -1400,35 +1363,28 @@ function ParentSettlement({ trip, result }) {
   const transferRows = result.transfers || [];
   const remainingTotal = round2(transferRows.reduce((sum, item) => sum + item.amount, 0));
   return (
-    <div className="space-y-4">
-      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
+    <div className="space-y-3">
+      <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "超支补款" : "预算返还"}</Badge>
-            <h3 className="mt-3 type-h3">当前分摊结果</h3>
+            <h3 className="mt-3 type-h3">{remainingTotal > 0 ? "剩余转账" : "已抵扣完成"}</h3>
           </div>
-          <strong className="text-2xl leading-none"><MoneyText value={formatCurrency(remainingTotal)} animate /></strong>
+          <strong className="text-xl"><MoneyText value={formatCurrency(remainingTotal)} animate /></strong>
         </div>
         <p className="mt-2 type-body">总预算 <MoneyText value={formatCurrency(result.totalBudget)} />，总支出 <MoneyText value={formatCurrency(result.totalExpense)} />。</p>
       </article>
-      <div className="space-y-3">
-        {transferRows.length ? transferRows.map((row) => (
-          <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${row.from}-${row.to}-${row.amount}`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="type-caption normal-case">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{row.from} <span className="text-accent">→</span> {row.to}</h3>
-              </div>
-              <strong className="shrink-0 text-2xl leading-none"><MoneyText value={formatCurrency(row.amount)} /></strong>
-            </div>
-          </article>
-        )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
-            <EmptyWatermark />
-            <span className="relative z-10">当前已平账，无需额外转账。</span>
-          </div>
-        )}
-      </div>
+      {transferRows.length ? transferRows.map((row) => (
+        <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60" key={`${row.from}-${row.to}-${row.amount}`}>
+          <span>{row.from} → {row.to}</span>
+          <strong><MoneyText value={formatCurrency(row.amount)} /></strong>
+        </article>
+      )) : (
+        <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60">
+          <EmptyWatermark />
+          <span className="relative z-10">目前没有需要执行的退款或补款动作。</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -1436,41 +1392,30 @@ function ParentSettlement({ trip, result }) {
 function SharedSettlement({ result }) {
   const netRows = Object.entries(result.net || {});
   return (
-    <div className="space-y-4">
-      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <Badge>多人付款</Badge>
-            <h3 className="mt-3 type-h3">当前分摊结果</h3>
-          </div>
-          <strong className="text-2xl leading-none"><MoneyText value={formatCurrency(result.totalExpense)} /></strong>
-        </div>
-        <p className="mt-2 type-body">系统已按付款人、参与人和中途转账计算净额。</p>
+    <div className="space-y-3">
+      <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
+        <Badge>多人付款结算</Badge>
+        <h3 className="mt-3 type-h3">按路径转账即可平账</h3>
+        <p className="mt-2 type-body">总支出 <MoneyText value={formatCurrency(result.totalExpense)} />，系统已按付款人和参与人计算净额。</p>
       </article>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {netRows.map(([name, amount]) => (
-          <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-capybara-warm ring-1 ring-white/60" key={name}>
-            <strong className="block truncate text-sm font-extrabold text-ink">{name}</strong>
-            <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"}</p>
-            <p className={classNames("mt-1 text-sm leading-none", amount < 0 ? "text-rose-600" : "text-ink")}>{amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
+            <strong className="block type-h3 text-base">{name}</strong>
+            <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         ))}
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {result.transfers.length ? result.transfers.map((transfer) => (
-          <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="type-caption normal-case">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{transfer.from} <span className="text-accent">→</span> {transfer.to}</h3>
-              </div>
-              <strong className="shrink-0 text-2xl leading-none"><MoneyText value={formatCurrency(transfer.amount)} /></strong>
-            </div>
+          <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+            <span>{transfer.from} → {transfer.to}</span>
+            <strong><MoneyText value={formatCurrency(transfer.amount)} /></strong>
           </article>
         )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60">
             <EmptyWatermark />
-            <span className="relative z-10">当前已平账，无需额外转账。</span>
+            <span className="relative z-10">这趟行程已经平账，不需要额外转账。</span>
           </div>
         )}
       </div>
