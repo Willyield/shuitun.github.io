@@ -227,10 +227,10 @@ function Panel({ children, className }) {
 function Metric({ label, value }) {
   const isMoney = isCurrencyValue(value);
   return (
-    <div className="flex min-w-0 flex-1 flex-row items-baseline justify-between gap-2 rounded-3xl border border-white/60 bg-white/70 px-3 py-4 shadow-capybara-warm ring-1 ring-white/60">
-      <span className="type-caption shrink-0 whitespace-nowrap">{label}</span>
-      <strong className="min-w-0 text-right text-lg tracking-tighter text-ink sm:text-xl">
-        {isMoney ? <MoneyText value={value} animate className="block whitespace-nowrap" /> : <span className="block whitespace-nowrap">{value}</span>}
+    <div className="flex min-w-0 flex-1 flex-col items-start justify-center rounded-3xl border border-white/60 bg-white/70 px-2 py-4 shadow-capybara-warm ring-1 ring-white/60">
+      <span className="text-xs font-medium tracking-wide text-stone-500">{label}</span>
+      <strong className="mt-1 min-w-0 text-base font-extrabold tracking-tighter text-ink tabular-nums sm:text-lg">
+        {isMoney ? <MoneyText value={value} animate className="block" /> : <span className="block">{value}</span>}
       </strong>
     </div>
   );
@@ -784,6 +784,7 @@ function ExpensePage({ id }) {
       setTime("");
       setMessage({ type: "success", text: "转账已记录，最终结算会自动抵扣。" });
       setVersion((current) => current + 1);
+      navigate("detail", { id: trip.id });
       return;
     }
 
@@ -813,6 +814,7 @@ function ExpensePage({ id }) {
     if (isShared) setPayer(trip.people[0] || "");
     setMessage({ type: "success", text: "支出已记录，可以继续记下一笔。" });
     setVersion((current) => current + 1);
+    navigate("detail", { id: trip.id });
   }
 
   function askDecision() {
