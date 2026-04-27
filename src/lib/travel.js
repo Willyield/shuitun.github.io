@@ -71,7 +71,27 @@ export function displayCategory(expense) {
   return expense?.category === "其他" && customCategory ? customCategory : expense?.category || "其他";
 }
 
+export function isTransferEntry(entry) {
+  return entry?.type === "transfer";
+}
+
+export function isExpenseEntry(entry) {
+  return !isTransferEntry(entry);
+}
+
 export function sanitizeExpense(rawExpense) {
+  if (rawExpense?.type === "transfer") {
+    return {
+      id: String(rawExpense?.id || createId()),
+      type: "transfer",
+      amount: toPositiveNumber(rawExpense?.amount),
+      from: String(rawExpense?.from || rawExpense?.payer || "").trim(),
+      to: String(rawExpense?.to || "").trim(),
+      note: String(rawExpense?.note || "").trim(),
+      time: String(rawExpense?.time || "").trim()
+    };
+  }
+
   const participants = Array.isArray(rawExpense?.participants)
     ? rawExpense.participants.map((name) => String(name || "").trim()).filter(Boolean)
     : [];
@@ -84,6 +104,7 @@ export function sanitizeExpense(rawExpense) {
 
   return {
     id: String(rawExpense?.id || createId()),
+    type: "expense",
     amount: toPositiveNumber(rawExpense?.amount),
     category,
     customCategory: category === "其他" ? customCategory.slice(0, 16) : "",
@@ -92,6 +113,18 @@ export function sanitizeExpense(rawExpense) {
     participants,
     time: String(rawExpense?.time || "").trim()
   };
+}
+
+export function getExpenseEntries(trip) {
+  return (trip?.expenses || []).filter(isExpenseEntry);
+}
+
+export function getTransferEntries(trip) {
+  return (trip?.expenses || []).filter(isTransferEntry);
+}
+
+export function getTripTotalSpent(trip) {
+  return round2(getExpenseEntries(trip).reduce((sum, item) => sum + item.amount, 0));
 }
 
 export function sanitizeTrip(rawTrip) {
@@ -124,7 +157,7 @@ export function sanitizeTrip(rawTrip) {
     manager,
     per,
     totalBudget,
-    currentSpent: round2(expenses.reduce((sum, item) => sum + item.amount, 0)),
+    currentSpent: getTripTotalSpent({ expenses }),
     expenses,
     createdAt: String(rawTrip?.createdAt || new Date().toISOString())
   };
@@ -185,7 +218,7 @@ export function deleteExpense(tripId, expenseId) {
 export function calcLedger(trip) {
   const ledger = {};
   for (const name of trip.people) ledger[name] = 0;
-  for (const expense of trip.expenses) {
+  for (const expense of getExpenseEntries(trip)) {
     const participants = (expense.participants || []).filter((name) => trip.people.includes(name));
     if (!participants.length || expense.amount <= 0) continue;
     const split = round2(expense.amount / participants.length);
@@ -194,22 +227,59 @@ export function calcLedger(trip) {
   return ledger;
 }
 
+function applyTransfersToNet(trip, net) {
+  for (const transfer of getTransferEntries(trip)) {
+    const from = String(transfer.from || "").trim();
+    const to = String(transfer.to || "").trim();
+    const amountCents = toCents(transfer.amount);
+    if (!from || !to || from === to || amountCents <= 0) continue;
+    if (!(from in net)) net[from] = 0;
+    if (!(to in net)) net[to] = 0;
+    net[from] += amountCents;
+    net[to] -= amountCents;
+  }
+}
+
 export function settle(trip) {
   const ledger = calcLedger(trip);
-  const totalExpense = round2(trip.expenses.reduce((sum, item) => sum + item.amount, 0));
+  const totalExpense = getTripTotalSpent(trip);
   const totalBudget = round2(trip.per * trip.people.length);
   const balances = {};
   for (const name of trip.people) balances[name] = round2((trip.per || 0) - (ledger[name] || 0));
+  const netCents = Object.fromEntries((trip.people || []).map((name) => [name, 0]));
   if (totalExpense <= totalBudget) {
-    return { mode: "refund", totalExpense, totalBudget, diff: round2(totalBudget - totalExpense), balances };
+    for (const name of trip.people) {
+      if (name === trip.manager) continue;
+      const cents = toCents(Math.max(0, balances[name] || 0));
+      netCents[name] = (netCents[name] || 0) + cents;
+      netCents[trip.manager] = (netCents[trip.manager] || 0) - cents;
+    }
+    applyTransfersToNet(trip, netCents);
+    return {
+      mode: "refund",
+      totalExpense,
+      totalBudget,
+      diff: round2(totalBudget - totalExpense),
+      balances,
+      transfers: buildTransfersFromNet(Object.fromEntries(Object.entries(netCents).map(([name, cents]) => [name, fromCents(cents)])))
+    };
   }
+  const extraPerPerson = trip.people.length ? round2((totalExpense - totalBudget) / trip.people.length) : 0;
+  for (const name of trip.people) {
+    if (name === trip.manager) continue;
+    const cents = toCents(extraPerPerson);
+    netCents[name] = (netCents[name] || 0) - cents;
+    netCents[trip.manager] = (netCents[trip.manager] || 0) + cents;
+  }
+  applyTransfersToNet(trip, netCents);
   return {
     mode: "extra",
     totalExpense,
     totalBudget,
     diff: round2(totalExpense - totalBudget),
-    extraPerPerson: trip.people.length ? round2((totalExpense - totalBudget) / trip.people.length) : 0,
-    balances
+    extraPerPerson,
+    balances,
+    transfers: buildTransfersFromNet(Object.fromEntries(Object.entries(netCents).map(([name, cents]) => [name, fromCents(cents)])))
   };
 }
 
@@ -221,30 +291,11 @@ function fromCents(value) {
   return round2(Number(value || 0) / 100);
 }
 
-function splitAmountCents(totalCents, count) {
-  if (!count || count < 1) return [];
-  const base = Math.floor(totalCents / count);
-  const remainder = totalCents - base * count;
-  return Array.from({ length: count }, (_, index) => base + (index < remainder ? 1 : 0));
-}
-
-export function settleShared(trip) {
-  const balances = Object.fromEntries((trip.people || []).map((name) => [name, 0]));
-  for (const expense of trip.expenses || []) {
-    const payer = String(expense.payer || "").trim();
-    const participants = (expense.participants || []).filter((name) => trip.people.includes(name));
-    const amountCents = toCents(expense.amount);
-    if (!payer || amountCents <= 0 || !participants.length) continue;
-    if (!(payer in balances)) balances[payer] = 0;
-    balances[payer] += amountCents;
-    splitAmountCents(amountCents, participants.length).forEach((share, index) => {
-      balances[participants[index]] = (balances[participants[index]] || 0) - share;
-    });
-  }
-
+export function buildTransfersFromNet(net) {
   const creditors = [];
   const debtors = [];
-  for (const [name, cents] of Object.entries(balances)) {
+  for (const [name, amount] of Object.entries(net || {})) {
+    const cents = toCents(amount);
     if (cents > 0) creditors.push({ name, cents });
     if (cents < 0) debtors.push({ name, cents: Math.abs(cents) });
   }
@@ -262,24 +313,49 @@ export function settleShared(trip) {
     if (creditor.cents === 0) creditorIndex += 1;
     if (debtor.cents === 0) debtorIndex += 1;
   }
+  return transfers;
+}
+
+function splitAmountCents(totalCents, count) {
+  if (!count || count < 1) return [];
+  const base = Math.floor(totalCents / count);
+  const remainder = totalCents - base * count;
+  return Array.from({ length: count }, (_, index) => base + (index < remainder ? 1 : 0));
+}
+
+export function settleShared(trip) {
+  const balances = Object.fromEntries((trip.people || []).map((name) => [name, 0]));
+  for (const expense of getExpenseEntries(trip)) {
+    const payer = String(expense.payer || "").trim();
+    const participants = (expense.participants || []).filter((name) => trip.people.includes(name));
+    const amountCents = toCents(expense.amount);
+    if (!payer || amountCents <= 0 || !participants.length) continue;
+    if (!(payer in balances)) balances[payer] = 0;
+    balances[payer] += amountCents;
+    splitAmountCents(amountCents, participants.length).forEach((share, index) => {
+      balances[participants[index]] = (balances[participants[index]] || 0) - share;
+    });
+  }
+  applyTransfersToNet(trip, balances);
 
   return {
-    totalExpense: round2(trip.expenses.reduce((sum, item) => sum + item.amount, 0)),
+    totalExpense: getTripTotalSpent(trip),
     net: Object.fromEntries(Object.entries(balances).map(([name, cents]) => [name, fromCents(cents)])),
-    transfers
+    transfers: buildTransfersFromNet(Object.fromEntries(Object.entries(balances).map(([name, cents]) => [name, fromCents(cents)])))
   };
 }
 
 export function getCategoryTotals(trip) {
   const totals = new Map();
-  for (const expense of trip.expenses || []) {
+  for (const expense of getExpenseEntries(trip)) {
     const label = displayCategory(expense);
     totals.set(label, round2((totals.get(label) || 0) + expense.amount));
   }
+  const currentSpent = getTripTotalSpent(trip);
   return Array.from(totals, ([category, amount]) => ({
     category,
     amount,
-    percent: trip.currentSpent > 0 ? Math.round((amount / trip.currentSpent) * 100) : 0
+    percent: currentSpent > 0 ? Math.round((amount / currentSpent) * 100) : 0
   })).sort((left, right) => right.amount - left.amount);
 }
 

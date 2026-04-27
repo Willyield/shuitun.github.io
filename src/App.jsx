@@ -8,7 +8,6 @@ import {
   ReceiptText,
   Sparkles,
   Trash2,
-  Users,
   Wallet
 } from "lucide-react";
 import heroCapybara from "../assets/hero-capybara.svg";
@@ -18,7 +17,6 @@ import {
   EXPENSE_CATEGORIES,
   LOW_BALANCE_RATIO,
   MAX_PEOPLE,
-  buildReviewPosterLine,
   calcLedger,
   createId,
   deleteExpense,
@@ -28,10 +26,14 @@ import {
   formatDateTime,
   getBudgetProgress,
   getCategoryTotals,
+  getExpenseEntries,
   getProgressText,
   getRecordById,
   getRemainingBudget,
+  getTransferEntries,
   getTripTitle,
+  getTripTotalSpent,
+  isTransferEntry,
   loadTrips,
   round2,
   sanitizeExpense,
@@ -58,6 +60,8 @@ const pageTitles = {
   summary: "结算总结 | 水豚旅行",
   about: "产品介绍 | 水豚旅行"
 };
+
+const LAST_ACTIVE_TRIP_KEY = "lastActiveTripId";
 
 function parseRoute() {
   const hash = window.location.hash.startsWith("#/") ? window.location.hash.slice(1) : "";
@@ -188,7 +192,7 @@ function Topbar({ title = "水豚旅行", subtitle = "Capybara Trip", children }
   return (
     <header className="flex items-center justify-between gap-3">
       <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-3xl border border-white/60 bg-paper shadow-capybara-warm ring-1 ring-white/60">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/45">
           <img className="h-9 w-9" src={heroCapybara} alt="水豚旅行头像" />
         </span>
         <span className="min-w-0">
@@ -223,9 +227,9 @@ function Panel({ children, className }) {
 function Metric({ label, value }) {
   const isMoney = isCurrencyValue(value);
   return (
-    <div className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
+    <div className="flex flex-row items-baseline justify-between gap-2 rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
       <span className="type-caption">{label}</span>
-      <strong className="mt-1 block break-words text-xl text-ink">
+      <strong className="min-w-0 break-words text-right text-xl text-ink">
         {isMoney ? <MoneyText value={value} animate className="block" /> : value}
       </strong>
     </div>
@@ -245,61 +249,53 @@ function Message({ message }) {
 }
 
 function HomePage() {
+  useEffect(() => {
+    const lastActiveTripId = localStorage.getItem(LAST_ACTIVE_TRIP_KEY);
+    if (!lastActiveTripId) return;
+    if (getRecordById(lastActiveTripId)) {
+      navigate("detail", { id: lastActiveTripId });
+      return;
+    }
+    localStorage.removeItem(LAST_ACTIVE_TRIP_KEY);
+  }, []);
+
   return (
     <Shell>
       <Topbar>
         <ButtonLink to="about" variant="ghost" icon={Sparkles}>介绍</ButtonLink>
       </Topbar>
 
-      <section>
-        <div className="pt-8">
+      <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
+        <div>
           <Eyebrow>告别“谈钱内耗”的多人账本</Eyebrow>
-          <h1 className="mt-4 type-h1 sm:text-[42px]">
+          <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tighter text-stone-800">
             把旅行里最难开口的账，<br />
             温柔地算清楚。
           </h1>
-          <p className="mt-5 type-body">
-            别让算账的尴尬毁了沿途的风景。你只管享受当下，复杂的垫付与分摊交由系统默默推演。行程结束一键生成体面的结算单，不伤和气，只留回忆。
+          <p className="mt-4 type-body">
+            记录共同支出、中途还款，最后一键算清谁该转给谁。
           </p>
         </div>
 
-        <section className="mt-12 space-y-5" aria-labelledby="home_steps_title">
-          <div>
-            <Eyebrow>30 秒上手</Eyebrow>
-            <h2 id="home_steps_title" className="mt-2 type-h2">只需要三步</h2>
-          </div>
-          <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch">
-            {["创建行程", "记一笔", "看结算"].map((item, index) => (
-              <div className="contents" key={item}>
-                <article className="rounded-3xl border border-white/60 bg-card p-3 text-center shadow-capybara-warm ring-1 ring-white/60">
-                  <span className="block type-caption">第{index + 1}步</span>
-                  <strong className="mt-1 block type-h3 text-base">{item}</strong>
-                </article>
-                {index < 2 ? <span className="mx-2 self-center text-lg font-extrabold text-accent sm:mx-3">→</span> : null}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-12 grid grid-cols-2 gap-3">
-          <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-20 w-full flex-col items-start rounded-3xl bg-amber-500 hover:bg-amber-600">
+        <section className="mt-10 space-y-3">
+          <ButtonLink to="create" variant="primary" icon={Plus} className="w-full rounded-3xl bg-amber-500 py-5 text-lg shadow-lg shadow-orange-500/25 hover:bg-amber-600">
             开启无压旅行
           </ButtonLink>
-          <ButtonLink to="manage" variant="secondary" icon={Wallet} className="min-h-20 flex-col items-start rounded-3xl">
+          <ButtonLink to="manage" variant="secondary" icon={Wallet} className="w-full rounded-3xl py-4 text-base">
             查看已有行程
           </ButtonLink>
         </section>
 
-        <section className="mt-12 flex flex-col gap-5">
+        <section className="mt-8 space-y-4">
           {[
             ["不用记碎账", "只记真正影响结算的大项。"],
+            ["中途转账可抵扣", "谁提前还了钱，最终账单会自动扣掉。"],
             ["分类占比清楚", "看清钱主要花在哪。"],
-            ["适合场景", "朋友旅行、团建、家庭出游，多人共同支出更容易说清。"]
           ].map(([title, copy]) => (
-            <Panel className="w-full p-6" key={title}>
-              <h2 className="type-h2">{title}</h2>
-              <p className="mt-2 type-body">{copy}</p>
-            </Panel>
+            <div className="border-l-2 border-accent/40 pl-4" key={title}>
+              <h2 className="type-h3">{title}</h2>
+              <p className="mt-1 type-body">{copy}</p>
+            </div>
           ))}
         </section>
       </section>
@@ -449,6 +445,7 @@ function TripListPage({ type = "manage" }) {
     const trip = getRecordById(id);
     if (!trip || !window.confirm(`确认删除「${getTripTitle(trip)}」吗？`)) return;
     deleteTrip(id);
+    if (localStorage.getItem(LAST_ACTIVE_TRIP_KEY) === String(id)) localStorage.removeItem(LAST_ACTIVE_TRIP_KEY);
     setVersion((current) => current + 1);
   }
 
@@ -545,6 +542,9 @@ function DetailPage({ id }) {
   const [version, setVersion] = useState(0);
   const [message, setMessage] = useState(null);
   const trip = useTrip(id, version);
+  useEffect(() => {
+    if (trip?.id) localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
+  }, [trip?.id]);
   if (!trip) return <NotFoundPage />;
   const progress = getBudgetProgress(trip);
   const isAlert = progress >= LOW_BALANCE_RATIO;
@@ -552,7 +552,9 @@ function DetailPage({ id }) {
 
   function removeExpense(expenseId) {
     const expense = trip.expenses.find((item) => String(item.id) === String(expenseId));
-    if (!expense || !window.confirm(`确认删除「${expense.note || displayCategory(expense)}」这笔支出吗？`)) return;
+    if (!expense) return;
+    const label = isTransferEntry(expense) ? `${expense.from} 转给 ${expense.to}` : (expense.note || displayCategory(expense));
+    if (!window.confirm(`确认删除「${label}」这笔记录吗？`)) return;
     deleteExpense(trip.id, expenseId);
     setMessage({ type: "success", text: "这笔支出已删除。" });
     setVersion((current) => current + 1);
@@ -645,23 +647,38 @@ function ExpenseList({ trip, onDelete }) {
   }
   return (
     <div className="space-y-3">
-      {trip.expenses.map((expense, index) => (
-        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={expense.id}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <strong className="block break-words type-h3 text-base">#{index + 1} · {expense.note || displayCategory(expense)}</strong>
-              <p className="mt-1 type-caption normal-case">{formatDateTime(expense.time || expense.id)}</p>
+      {trip.expenses.map((expense, index) => {
+        const isTransfer = isTransferEntry(expense);
+        return (
+          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={expense.id}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <strong className="block break-words type-h3 text-base">
+                  #{index + 1} · {isTransfer ? `${expense.from || "-"} 转给 ${expense.to || "-"}` : (expense.note || displayCategory(expense))}
+                </strong>
+                <p className="mt-1 type-caption normal-case">{formatDateTime(expense.time || expense.id)}</p>
+              </div>
+              <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
             </div>
-            <Badge>{displayCategory(expense)}</Badge>
-          </div>
-          <div className="mt-3 space-y-1 type-body">
-            <p>付款人：{expense.payer || trip.manager || "-"}</p>
-            <p>参与人：{expense.participants.join("、") || "-"}</p>
-            <p>金额：<MoneyText value={formatCurrency(expense.amount)} /></p>
-          </div>
-          {onDelete ? <Button variant="danger" icon={Trash2} className="mt-3 w-full" onClick={() => onDelete(expense.id)}>删除这笔</Button> : null}
-        </article>
-      ))}
+            <div className="mt-3 space-y-1 type-body">
+              {isTransfer ? (
+                <>
+                  <p>付款人：{expense.from || "-"}</p>
+                  <p>收款人：{expense.to || "-"}</p>
+                  {expense.note ? <p>备注：{expense.note}</p> : null}
+                </>
+              ) : (
+                <>
+                  <p>付款人：{expense.payer || trip.manager || "-"}</p>
+                  <p>参与人：{expense.participants.join("、") || "-"}</p>
+                </>
+              )}
+              <p>金额：<MoneyText value={formatCurrency(expense.amount)} /></p>
+            </div>
+            {onDelete ? <Button variant="danger" icon={Trash2} className="mt-3 w-full" onClick={() => onDelete(expense.id)}>删除这笔</Button> : null}
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -712,9 +729,12 @@ function ExpensePage({ id }) {
   const [version, setVersion] = useState(0);
   const trip = useTrip(id, version);
   const [amount, setAmount] = useState("");
+  const [entryType, setEntryType] = useState("expense");
   const [category, setCategory] = useState(EXPENSE_CATEGORIES[0]);
   const [customCategory, setCustomCategory] = useState("");
   const [payer, setPayer] = useState("");
+  const [transferFrom, setTransferFrom] = useState("");
+  const [transferTo, setTransferTo] = useState("");
   const [participants, setParticipants] = useState([]);
   const [note, setNote] = useState("");
   const [time, setTime] = useState("");
@@ -726,6 +746,9 @@ function ExpensePage({ id }) {
     if (trip) {
       setParticipants(trip.people);
       setPayer(trip.people[0] || "");
+      setTransferFrom(trip.people.find((name) => name !== trip.manager) || trip.people[0] || "");
+      setTransferTo(trip.manager || trip.people[0] || "");
+      localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
     }
   }, [trip?.id]);
 
@@ -739,6 +762,31 @@ function ExpensePage({ id }) {
   function submit(event) {
     event.preventDefault();
     const expenseAmount = toPositiveNumber(amount);
+    if (entryType === "transfer") {
+      const cleanFrom = transferFrom.trim();
+      const cleanTo = transferTo.trim();
+      if (expenseAmount <= 0) return setMessage({ type: "error", text: "转账金额必须大于 0。" });
+      if (!cleanFrom || !cleanTo) return setMessage({ type: "error", text: "请选择付款人和收款人。" });
+      if (cleanFrom === cleanTo) return setMessage({ type: "error", text: "付款人和收款人不能相同。" });
+
+      const transfer = sanitizeExpense({
+        id: createId(),
+        type: "transfer",
+        amount: expenseAmount,
+        from: cleanFrom,
+        to: cleanTo,
+        note,
+        time
+      });
+      updateTrip(trip.id, (currentTrip) => ({ ...currentTrip, expenses: [...currentTrip.expenses, transfer] }));
+      setAmount("");
+      setNote("");
+      setTime("");
+      setMessage({ type: "success", text: "转账已记录，最终结算会自动抵扣。" });
+      setVersion((current) => current + 1);
+      return;
+    }
+
     const cleanPayer = isShared ? payer.trim() : trip.manager;
     if (expenseAmount <= 0) return setMessage({ type: "error", text: "金额必须大于 0。" });
     if (!participants.length) return setMessage({ type: "error", text: "至少选择 1 位参与人。" });
@@ -784,50 +832,77 @@ function ExpensePage({ id }) {
       <Panel className="space-y-5">
         <div>
           <Eyebrow>第二步</Eyebrow>
-        <h1 className="mt-2 type-h1">记一笔支出</h1>
-        <p className="mt-2 type-body">适合记录住宿、门票、聚餐、交通这类共同支出。</p>
+          <h1 className="mt-2 type-h1">{entryType === "transfer" ? "记一笔还款" : "记一笔支出"}</h1>
+          <p className="mt-2 type-body">{entryType === "transfer" ? "记录旅途中已经转过的钱，最终结算会自动抵扣。" : "适合记录住宿、门票、聚餐、交通这类共同支出。"}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 rounded-3xl bg-card/70 p-1">
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>记支出</button>
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>记还款/转账</button>
         </div>
         <form className="space-y-5" onSubmit={submit}>
           <Field label="金额">
-            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="输入本笔花费" />
+            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={entryType === "transfer" ? "输入已转账金额" : "输入本笔花费"} />
           </Field>
-          <Field label="分类">
-            <div className="grid grid-cols-3 gap-2">
-              {EXPENSE_CATEGORIES.map((item) => (
-                <Button key={item} variant={category === item ? "primary" : "secondary"} onClick={() => setCategory(item)}>{item}</Button>
-              ))}
-            </div>
-          </Field>
-          {category === "其他" ? (
-            <Field label="其他分类名称">
-              <input className={inputClass()} maxLength={16} value={customCategory} onChange={(event) => setCustomCategory(event.target.value)} placeholder="例如：停车费、伴手礼" />
-            </Field>
-          ) : null}
-          {isShared ? (
-            <Field label="付款人">
-              <select className={inputClass()} value={payer} onChange={(event) => setPayer(event.target.value)}>
-                {trip.people.map((name) => <option value={name} key={name}>{name}</option>)}
-              </select>
-            </Field>
-          ) : null}
-          <Field label="参与人">
-            <div className="grid grid-cols-2 gap-2">
-              {trip.people.map((name) => (
-                <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-white/70 text-muted")} key={name}>
-                  <input className="h-4 w-4 accent-accent" type="checkbox" checked={participants.includes(name)} onChange={() => toggleParticipant(name)} />
-                  <span className="truncate">{name}</span>
-                </label>
-              ))}
-            </div>
-          </Field>
-          <Field label="用途备注">
-            <input className={inputClass()} maxLength={30} value={note} onChange={(event) => setNote(event.target.value)} placeholder="例如：晚餐、门票、打车" />
-          </Field>
-          <DecisionCard prompt={decisionPrompt} setPrompt={setDecisionPrompt} reply={decisionReply} onAsk={askDecision} />
+          {entryType === "transfer" ? (
+            <>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
+                <Field label="付款人">
+                  <select className={inputClass()} value={transferFrom} onChange={(event) => setTransferFrom(event.target.value)}>
+                    {trip.people.map((name) => <option value={name} key={name}>{name}</option>)}
+                  </select>
+                </Field>
+                <span className="pb-4 text-xl font-extrabold text-accent">→</span>
+                <Field label="收款人">
+                  <select className={inputClass()} value={transferTo} onChange={(event) => setTransferTo(event.target.value)}>
+                    {trip.people.map((name) => <option value={name} key={name}>{name}</option>)}
+                  </select>
+                </Field>
+              </div>
+              <Field label="备注">
+                <input className={inputClass()} maxLength={30} value={note} onChange={(event) => setNote(event.target.value)} placeholder="例如：B 已转给 A" />
+              </Field>
+            </>
+          ) : (
+            <>
+              <Field label="分类">
+                <div className="grid grid-cols-3 gap-2">
+                  {EXPENSE_CATEGORIES.map((item) => (
+                    <Button key={item} variant={category === item ? "primary" : "secondary"} onClick={() => setCategory(item)}>{item}</Button>
+                  ))}
+                </div>
+              </Field>
+              {category === "其他" ? (
+                <Field label="其他分类名称">
+                  <input className={inputClass()} maxLength={16} value={customCategory} onChange={(event) => setCustomCategory(event.target.value)} placeholder="例如：停车费、伴手礼" />
+                </Field>
+              ) : null}
+              {isShared ? (
+                <Field label="付款人">
+                  <select className={inputClass()} value={payer} onChange={(event) => setPayer(event.target.value)}>
+                    {trip.people.map((name) => <option value={name} key={name}>{name}</option>)}
+                  </select>
+                </Field>
+              ) : null}
+              <Field label="参与人">
+                <div className="grid grid-cols-2 gap-2">
+                  {trip.people.map((name) => (
+                    <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-white/70 text-muted")} key={name}>
+                      <input className="h-4 w-4 accent-accent" type="checkbox" checked={participants.includes(name)} onChange={() => toggleParticipant(name)} />
+                      <span className="truncate">{name}</span>
+                    </label>
+                  ))}
+                </div>
+              </Field>
+              <Field label="用途备注">
+                <input className={inputClass()} maxLength={30} value={note} onChange={(event) => setNote(event.target.value)} placeholder="例如：晚餐、门票、打车" />
+              </Field>
+              <DecisionCard prompt={decisionPrompt} setPrompt={setDecisionPrompt} reply={decisionReply} onAsk={askDecision} />
+            </>
+          )}
           <Field label="时间">
             <input className={inputClass()} type="datetime-local" value={time} onChange={(event) => setTime(event.target.value)} />
           </Field>
-          <Button variant="primary" className="w-full" icon={ReceiptText} type="submit">保存这一笔</Button>
+          <Button variant="primary" className="w-full" icon={ReceiptText} type="submit">{entryType === "transfer" ? "保存这笔转账" : "保存这一笔"}</Button>
           <Message message={message} />
         </form>
       </Panel>
@@ -861,6 +936,9 @@ function BudgetPage({ id }) {
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState(null);
   const trip = useTrip(id, version);
+  useEffect(() => {
+    if (trip?.id) localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
+  }, [trip?.id]);
   if (!trip) return <NotFoundPage />;
 
   function submit(event) {
@@ -914,6 +992,20 @@ function isValidExpenseDate(expense) {
   return Number.isFinite(date.getTime());
 }
 
+function getExpenseDateKey(expense) {
+  const date = new Date(expense.time);
+  if (!Number.isFinite(date.getTime())) return "unknown";
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function getExpenseDateLabel(expense) {
+  const date = new Date(expense.time);
+  if (!Number.isFinite(date.getTime())) return "时间未记";
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
 function getTimelineTime(expense) {
   const date = new Date(expense.time);
   if (!Number.isFinite(date.getTime())) return "时间未记";
@@ -930,7 +1022,7 @@ function hasLandmarkSignal(expense) {
 }
 
 function getTimelineExpenses(trip) {
-  return [...(trip.expenses || [])]
+  return getExpenseEntries(trip)
     .filter((expense) => expense.amount >= 15 || hasLandmarkSignal(expense))
     .sort((left, right) => {
       const leftTime = new Date(left.time).getTime();
@@ -941,8 +1033,35 @@ function getTimelineExpenses(trip) {
     });
 }
 
+function getDailyExpenseTotals(trip) {
+  return getExpenseEntries(trip).reduce((totals, expense) => {
+    const key = getExpenseDateKey(expense);
+    totals[key] = round2((totals[key] || 0) + expense.amount);
+    return totals;
+  }, {});
+}
+
+function getTimelineGroups(expenses, dailyTotals) {
+  const groups = [];
+  for (const expense of expenses) {
+    const key = getExpenseDateKey(expense);
+    let group = groups.find((item) => item.key === key);
+    if (!group) {
+      group = {
+        key,
+        label: getExpenseDateLabel(expense),
+        total: dailyTotals[key] || 0,
+        expenses: []
+      };
+      groups.push(group);
+    }
+    group.expenses.push(expense);
+  }
+  return groups;
+}
+
 function getTripDurationText(trip) {
-  const dates = (trip.expenses || [])
+  const dates = getExpenseEntries(trip)
     .filter(isValidExpenseDate)
     .map((expense) => new Date(expense.time));
   if (!dates.length) return "未记录";
@@ -966,6 +1085,8 @@ function getCoreFootprints(trip, timelineExpenses) {
 
 function TripSummaryView({ trip, onClose }) {
   const timelineExpenses = useMemo(() => getTimelineExpenses(trip), [trip]);
+  const dailyTotals = useMemo(() => getDailyExpenseTotals(trip), [trip]);
+  const categoryTotals = useMemo(() => getCategoryTotals(trip), [trip]);
   const footprints = useMemo(() => getCoreFootprints(trip, timelineExpenses), [trip, timelineExpenses]);
   const durationText = useMemo(() => getTripDurationText(trip), [trip]);
 
@@ -1006,9 +1127,11 @@ function TripSummaryView({ trip, onClose }) {
             </div>
           </article>
 
+          <CategoryDonut totals={categoryTotals} total={getTripTotalSpent(trip)} />
+
           <section className="space-y-5">
             <h2 className="type-h2">每日行程记录</h2>
-            <Timeline expenses={timelineExpenses} />
+            <Timeline expenses={timelineExpenses} dailyTotals={dailyTotals} />
           </section>
         </div>
       </div>
@@ -1016,7 +1139,72 @@ function TripSummaryView({ trip, onClose }) {
   );
 }
 
-function Timeline({ expenses }) {
+const CHART_COLORS = ["#D97736", "#6C8B57", "#C0844B", "#7CA7B8", "#A16207", "#8B7A6A"];
+
+function CategoryDonut({ totals, total }) {
+  const circumference = 2 * Math.PI * 42;
+  let offset = 0;
+  if (!totals.length || total <= 0) {
+    return (
+      <article className="relative overflow-hidden animate-fade-in rounded-3xl border border-white/60 bg-white p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+        <EmptyWatermark />
+        <span className="relative z-10">还没有可用于生成占比图的支出。</span>
+      </article>
+    );
+  }
+
+  return (
+    <article className="animate-fade-in rounded-3xl border border-white/60 bg-white p-5 shadow-capybara-warm ring-1 ring-white/60">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <Eyebrow>资金用途占比</Eyebrow>
+          <h2 className="mt-2 type-h2">钱花在哪了</h2>
+        </div>
+        <div className="relative h-28 w-28 shrink-0">
+          <svg viewBox="0 0 100 100" className="h-full w-full">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#F9EBDD" strokeWidth="13" />
+            {totals.map((item, index) => {
+              const dash = (item.amount / total) * circumference;
+              const circle = (
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                  strokeDasharray={`${dash} ${circumference - dash}`}
+                  strokeDashoffset={-offset}
+                  strokeLinecap="round"
+                  strokeWidth="13"
+                  transform="rotate(-90 50 50)"
+                  key={item.category}
+                />
+              );
+              offset += dash;
+              return circle;
+            })}
+          </svg>
+          <div className="absolute inset-0 grid place-items-center text-center">
+            <span className="type-caption normal-case">总支出</span>
+          </div>
+        </div>
+      </div>
+      <div className="mt-5 space-y-3">
+        {totals.map((item, index) => (
+          <div className="flex items-center justify-between gap-3 type-body" key={item.category}>
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
+              <span className="truncate">{item.category}</span>
+            </span>
+            <span className="shrink-0"><MoneyText value={formatCurrency(item.amount)} /> · {item.percent}%</span>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function Timeline({ expenses, dailyTotals }) {
   if (!expenses.length) {
     return (
       <div className="relative overflow-hidden animate-fade-in rounded-3xl border border-white/60 bg-white p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
@@ -1026,18 +1214,30 @@ function Timeline({ expenses }) {
     );
   }
 
+  const groups = getTimelineGroups(expenses, dailyTotals);
   return (
     <div className="relative space-y-5">
       <div className="absolute left-4 top-0 h-full w-px bg-gray-200" aria-hidden="true" />
-      {expenses.map((expense, index) => (
-        <article className="relative animate-fade-in pl-12" style={{ animationDelay: `${index * 55}ms` }} key={expense.id}>
-          <span className="absolute left-[11px] top-5 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-amber-500 shadow-sm" aria-hidden="true" />
-          <div className="rounded-3xl border border-white/60 bg-white/80 p-5 shadow-capybara-warm ring-1 ring-white/60">
-            <p className="type-caption normal-case">{getTimelineTime(expense)}</p>
-            <h3 className="mt-1 type-h3">{getExpenseLabel(expense)}</h3>
-            <p className="mt-2 type-body">花费: <MoneyText value={formatCurrency(expense.amount)} /></p>
+      {groups.map((group, groupIndex) => (
+        <div className="relative space-y-3 pl-12" key={group.key}>
+          <div className="relative animate-fade-in rounded-2xl bg-card/80 px-4 py-3">
+            <span className="absolute -left-[37px] top-4 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-ink shadow-sm" aria-hidden="true" />
+            <div className="flex items-baseline justify-between gap-3">
+              <h3 className="type-h3">{group.label}</h3>
+              <span className="type-caption normal-case">当日 <MoneyText value={formatCurrency(group.total)} /></span>
+            </div>
           </div>
-        </article>
+          {group.expenses.map((expense, index) => (
+            <article className="relative animate-fade-in" style={{ animationDelay: `${(groupIndex + index) * 55}ms` }} key={expense.id}>
+              <span className="absolute -left-[37px] top-5 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-amber-500 shadow-sm" aria-hidden="true" />
+              <div className="rounded-3xl border border-white/60 bg-white/80 p-5 shadow-capybara-warm ring-1 ring-white/60">
+                <p className="type-caption normal-case">{getTimelineTime(expense)}</p>
+                <h3 className="mt-1 type-h3">{getExpenseLabel(expense)}</h3>
+                <p className="mt-2 type-body">花费: <MoneyText value={formatCurrency(expense.amount)} /></p>
+              </div>
+            </article>
+          ))}
+        </div>
       ))}
     </div>
   );
@@ -1046,6 +1246,9 @@ function Timeline({ expenses }) {
 function ReviewPage({ id, summary = false }) {
   const [showTripSummary, setShowTripSummary] = useState(false);
   const trip = useTrip(id);
+  useEffect(() => {
+    if (trip?.id) localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
+  }, [trip?.id]);
   if (!trip) return <NotFoundPage />;
   const parentResult = trip.mode === "parent" ? settle(trip) : null;
   const sharedResult = trip.mode === "shared" ? settleShared(trip) : null;
@@ -1075,11 +1278,6 @@ function ReviewPage({ id, summary = false }) {
       <Panel className="space-y-4">
         <SectionHead eyebrow="分类占比" title="钱主要花在哪" />
         <CategoryShareList trip={trip} />
-      </Panel>
-      <Panel className="bg-ink text-white">
-        <span className="type-kicker text-card">提醒文案</span>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">可以直接发群里</h2>
-        <p className="mt-4 text-2xl font-extrabold leading-10 text-card">{buildReviewPosterLine(trip, parentResult, sharedResult)}</p>
       </Panel>
       <Panel className="space-y-4">
         <SectionHead eyebrow="最终结算" title="谁该付给谁" />
@@ -1121,27 +1319,23 @@ function CategoryShareList({ trip }) {
 }
 
 function ParentSettlement({ trip, result }) {
-  const members = trip.people.filter((name) => name !== trip.manager);
-  const transferRows = result.mode === "extra"
-    ? members.map((name) => ({ label: `${name} 补给 ${trip.manager || "大家长"}`, amount: result.extraPerPerson }))
-    : members
-      .map((name) => ({ label: `${trip.manager || "大家长"} 退给 ${name}`, amount: Math.max(0, result.balances[name] || 0) }))
-      .filter((item) => item.amount > 0);
+  const transferRows = result.transfers || [];
+  const remainingTotal = round2(transferRows.reduce((sum, item) => sum + item.amount, 0));
   return (
     <div className="space-y-3">
       <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "超支补款" : "预算返还"}</Badge>
-            <h3 className="mt-3 type-h3">{result.mode === "extra" ? "需要补款" : "需要退款"}</h3>
+            <h3 className="mt-3 type-h3">{remainingTotal > 0 ? "剩余转账" : "已抵扣完成"}</h3>
           </div>
-          <strong className="text-xl"><MoneyText value={formatCurrency(result.mode === "extra" ? result.diff : result.totalBudget - result.totalExpense)} animate /></strong>
+          <strong className="text-xl"><MoneyText value={formatCurrency(remainingTotal)} animate /></strong>
         </div>
         <p className="mt-2 type-body">总预算 <MoneyText value={formatCurrency(result.totalBudget)} />，总支出 <MoneyText value={formatCurrency(result.totalExpense)} />。</p>
       </article>
       {transferRows.length ? transferRows.map((row) => (
-        <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60" key={row.label}>
-          <span>{row.label}</span>
+        <article className="flex items-center justify-between gap-3 rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60" key={`${row.from}-${row.to}-${row.amount}`}>
+          <span>{row.from} → {row.to}</span>
           <strong><MoneyText value={formatCurrency(row.amount)} /></strong>
         </article>
       )) : (
