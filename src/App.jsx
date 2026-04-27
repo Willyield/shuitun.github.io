@@ -826,9 +826,17 @@ function ExpensePage({ id }) {
 
   return (
     <Shell>
-      <Topbar title={getTripTitle(trip)} subtitle="Record Expense">
-        <ButtonLink to="detail" params={{ id: trip.id }} variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
-      </Topbar>
+      <header className="flex items-center justify-between gap-3">
+        <a className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-line bg-white/50 px-3 py-2 text-sm font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" href={hrefTo("detail", { id: trip.id })} aria-label="返回行程详情">
+          <ArrowLeft size={17} />
+          <span>返回</span>
+        </a>
+        <div className="min-w-0 flex-1 text-center">
+          <strong className="block truncate type-h3 text-base text-ink">{getTripTitle(trip)}</strong>
+          <small className="block truncate type-caption normal-case">Record Expense</small>
+        </div>
+        <span className="h-11 w-[72px] shrink-0" aria-hidden="true" />
+      </header>
       <Panel className="space-y-5">
         <div>
           <Eyebrow>第二步</Eyebrow>
@@ -902,7 +910,10 @@ function ExpensePage({ id }) {
           <Field label="时间">
             <input className={inputClass()} type="datetime-local" value={time} onChange={(event) => setTime(event.target.value)} />
           </Field>
-          <Button variant="primary" className="w-full" icon={ReceiptText} type="submit">{entryType === "transfer" ? "保存这笔转账" : "保存这一笔"}</Button>
+          <div className="flex flex-row gap-3">
+            <a className="inline-flex min-h-11 w-1/3 items-center justify-center rounded-2xl bg-stone-200 px-4 py-2.5 text-sm font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" href={hrefTo("detail", { id: trip.id })}>取消</a>
+            <Button variant="primary" className="w-2/3" icon={ReceiptText} type="submit">{entryType === "transfer" ? "保存这笔转账" : "保存这一笔"}</Button>
+          </div>
           <Message message={message} />
         </form>
       </Panel>

@@ -25,7 +25,7 @@ export default {
         "4xl": "32px"
       },
       fontFamily: {
-        sans: ['"PingFang SC"', '"MiSans"', '"OPPO Sans"', '"Helvetica Neue"', "sans-serif"]
+        sans: ['"PingFang SC"', '"Helvetica Neue"', "Helvetica", '"Hiragino Sans GB"', '"Microsoft YaHei"', "Arial", "sans-serif"]
       },
       keyframes: {
         "fade-in": {

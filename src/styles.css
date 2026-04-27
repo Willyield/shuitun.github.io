@@ -22,7 +22,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  font-family: "PingFang SC", "MiSans", "OPPO Sans", "Helvetica Neue", sans-serif;
+  font-family: "PingFang SC", "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif !important;
   background:
     radial-gradient(circle at top left, rgba(255, 217, 168, 0.72), transparent 30%),
     radial-gradient(circle at top right, rgba(217, 238, 242, 0.72), transparent 28%),
@@ -34,7 +34,7 @@ button,
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: "PingFang SC", "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif !important;
 }
 
 .tabular-money {
