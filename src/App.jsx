@@ -692,7 +692,7 @@ function ExpenseList({ trip, onDelete }) {
                   <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
                   {onDelete ? (
                     <button
-                      className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition-all duration-200 active:scale-[0.97]"
+                      className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-red-100 bg-red-50 text-red-600 shadow-capybara-warm transition-all duration-200 active:scale-[0.97]"
                       type="button"
                       aria-label="删除这笔"
                       title="删除这笔"
@@ -702,7 +702,7 @@ function ExpenseList({ trip, onDelete }) {
                         onDelete(expense.id);
                       }}
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={17} />
                     </button>
                   ) : null}
                 </div>
@@ -726,20 +726,6 @@ function ExpenseList({ trip, onDelete }) {
                   <strong className="shrink-0 text-xl leading-none"><MoneyText value={formatCurrency(expense.amount)} /></strong>
                 </div>
               </div>
-              {onDelete ? (
-                <button
-                  className="relative z-10 mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50/80 px-3 py-2 text-xs font-extrabold text-red-600 transition-all duration-200 active:scale-[0.97]"
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    onDelete(expense.id);
-                  }}
-                >
-                  <Trash2 size={14} />
-                  <span>删除这笔</span>
-                </button>
-              ) : null}
             </div>
           </article>
         );
