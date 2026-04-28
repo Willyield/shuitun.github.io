@@ -1026,6 +1026,7 @@ function BudgetPage({ id }) {
   const [version, setVersion] = useState(0);
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const trip = useTrip(id, version);
   useEffect(() => {
     if (trip?.id) localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
@@ -1047,9 +1048,11 @@ function BudgetPage({ id }) {
     setAmount("");
     setMessage({ type: "success", text: "预算已追加。" });
     setVersion((current) => current + 1);
+    setShowSuccessModal(true);
   }
 
   return (
+    <>
     <Shell>
       <Topbar title={getTripTitle(trip)} subtitle="Add Budget">
         <ButtonLink to="detail" params={{ id: trip.id }} variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
@@ -1069,6 +1072,31 @@ function BudgetPage({ id }) {
         </form>
       </Panel>
     </Shell>
+    {showSuccessModal ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="budget-success-title">
+        <motion.div
+          className="w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-soft"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-50 text-4xl">✅</div>
+          <h2 id="budget-success-title" className="mt-5 type-h2">预算已增加！</h2>
+          <p className="mt-2 type-body">已同步至当前行程</p>
+          <Button
+            variant="primary"
+            className="mt-6 w-full"
+            onClick={() => {
+              setShowSuccessModal(false);
+              navigate("detail", { id: trip.id });
+            }}
+          >
+            确定
+          </Button>
+        </motion.div>
+      </div>
+    ) : null}
+    </>
   );
 }
 
