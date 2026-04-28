@@ -593,10 +593,11 @@ function DetailPage({ id }) {
   function removeExpense(expenseId) {
     const expense = trip.expenses.find((item) => String(item.id) === String(expenseId));
     if (!expense) return;
-    const label = isTransferEntry(expense) ? `${expense.from} 转给 ${expense.to}` : (expense.note || displayCategory(expense));
+    const label = isTransferEntry(expense) ? `${expense.from || "-"} 转给 ${expense.to || "-"}` : (expense.note || displayCategory(expense));
     if (!window.confirm(`确认删除「${label}」这笔记录吗？`)) return;
-    deleteExpense(trip.id, expenseId);
-    setMessage({ type: "success", text: "这笔支出已删除。" });
+    const updatedTrip = deleteExpense(trip.id, expenseId);
+    if (!updatedTrip) return setMessage({ type: "error", text: "删除失败，请重新进入行程后再试。" });
+    setMessage({ type: "success", text: "这笔记录已删除。" });
     setVersion((current) => current + 1);
   }
 
@@ -690,7 +691,17 @@ function ExpenseList({ trip, onDelete }) {
                 <div className="flex shrink-0 items-start gap-2">
                   <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
                   {onDelete ? (
-                    <button className="grid h-8 w-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition-all duration-200 active:scale-[0.97]" type="button" aria-label="删除这笔" onClick={() => onDelete(expense.id)}>
+                    <button
+                      className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition-all duration-200 active:scale-[0.97]"
+                      type="button"
+                      aria-label="删除这笔"
+                      title="删除这笔"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onDelete(expense.id);
+                      }}
+                    >
                       <Trash2 size={15} />
                     </button>
                   ) : null}
@@ -715,6 +726,20 @@ function ExpenseList({ trip, onDelete }) {
                   <strong className="shrink-0 text-xl leading-none"><MoneyText value={formatCurrency(expense.amount)} /></strong>
                 </div>
               </div>
+              {onDelete ? (
+                <button
+                  className="relative z-10 mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50/80 px-3 py-2 text-xs font-extrabold text-red-600 transition-all duration-200 active:scale-[0.97]"
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onDelete(expense.id);
+                  }}
+                >
+                  <Trash2 size={14} />
+                  <span>删除这笔</span>
+                </button>
+              ) : null}
             </div>
           </article>
         );
