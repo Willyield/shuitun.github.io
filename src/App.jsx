@@ -64,6 +64,7 @@ const pageTitles = {
 
 const LAST_ACTIVE_TRIP_KEY = "lastActiveTripId";
 const WARM_YELLOW_CARD_CLASS = "border-sand/80 bg-gradient-to-br from-[#FFE9B8] via-[#FFF7E8] to-[#FFDFA3] shadow-capybara-warm ring-1 ring-white/70";
+const WHITE_LEDGER_CARD_CLASS = "border-line/65 bg-gradient-to-br from-white/90 via-[#FFFDF8]/88 to-[#F7EFE8]/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_28px_rgba(104,67,35,0.07)] ring-1 ring-white/75";
 
 function parseRoute() {
   const hash = window.location.hash.startsWith("#/") ? window.location.hash.slice(1) : "";
@@ -720,7 +721,7 @@ function SectionHead({ eyebrow, title, badge }) {
 function ExpenseList({ trip, onDelete }) {
   if (!trip.expenses.length) {
     return (
-      <div className={classNames("relative overflow-hidden rounded-3xl border p-4 type-body", WARM_YELLOW_CARD_CLASS)}>
+      <div className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 type-body backdrop-blur", WHITE_LEDGER_CARD_CLASS)}>
         <EmptyWatermark />
         <span className="relative z-10">还没有支出记录，先去记一笔。</span>
       </div>
@@ -735,7 +736,7 @@ function ExpenseList({ trip, onDelete }) {
         return (
           <article className="relative pl-9" key={expense.id}>
             <span className={classNames("absolute left-[9px] top-5 h-3 w-3 rounded-full border-2 border-[#FFF8ED]", isTransfer ? "bg-sky-400" : "bg-amber-500")} aria-hidden="true" />
-            <div className={classNames("relative overflow-hidden rounded-3xl border p-4 backdrop-blur", WARM_YELLOW_CARD_CLASS)}>
+            <div className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 backdrop-blur", WHITE_LEDGER_CARD_CLASS)}>
               <div className={classNames("absolute left-0 top-0 h-full w-1", isTransfer ? "bg-sky-400" : "bg-accent")} aria-hidden="true" />
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -780,12 +781,12 @@ function LedgerView({ trip }) {
     return (
       <div className="space-y-3">
         {rows.length ? rows.map(([name, amount]) => (
-          <article className={classNames("rounded-3xl border p-4", WARM_YELLOW_CARD_CLASS)} key={name}>
+          <article className={classNames("ledger-paper rounded-3xl border p-4 backdrop-blur", WHITE_LEDGER_CARD_CLASS)} key={name}>
             <strong className="block type-h3 text-base">{name}</strong>
             <p className="mt-1 type-body">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         )) : (
-          <div className={classNames("relative overflow-hidden rounded-3xl border p-4 type-body", WARM_YELLOW_CARD_CLASS)}>
+          <div className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 type-body backdrop-blur", WHITE_LEDGER_CARD_CLASS)}>
             <EmptyWatermark />
             <span className="relative z-10">暂无净额数据。</span>
           </div>
@@ -800,7 +801,7 @@ function LedgerView({ trip }) {
         const spent = ledger[name] || 0;
         const balance = round2((trip.per || 0) - spent);
         return (
-          <article className={classNames("rounded-3xl border p-4", WARM_YELLOW_CARD_CLASS)} key={name}>
+          <article className={classNames("ledger-paper rounded-3xl border p-4 backdrop-blur", WHITE_LEDGER_CARD_CLASS)} key={name}>
             <div className="flex items-center justify-between gap-3">
               <strong className="type-h3 text-base">{name}</strong>
               <Badge tone={balance < 0 ? "alert" : "default"}>{balance < 0 ? "已超支" : "未超支"}</Badge>
