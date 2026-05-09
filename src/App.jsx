@@ -342,10 +342,10 @@ function HomePage() {
   }, []);
 
   return (
-    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[480px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-4 text-ink animate-page-in">
+    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[480px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+12px)] text-ink animate-page-in">
       <AppBackdrop home />
       <a
-        className="absolute right-5 top-5 z-20 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/70 bg-white/42 px-3.5 py-1.5 text-sm font-extrabold text-[#3E2718] shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
+        className="absolute right-5 top-[calc(env(safe-area-inset-top)+16px)] z-20 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/70 bg-white/42 px-3.5 py-1.5 text-sm font-extrabold text-[#3E2718] shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
         href={hrefTo("about")}
       >
         <Sparkles size={16} />
@@ -353,19 +353,19 @@ function HomePage() {
       </a>
 
       <section className="relative z-10 flex flex-1 flex-col items-center pt-12">
-        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border border-white/80 bg-[#F9EADB] shadow-md">
+        <div className="grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-[20px] border border-white/80 bg-[#F9EADB] shadow-md">
           <img className="h-full w-full scale-[1.42] object-cover object-[52%_56%]" src={productCapybara} alt="水豚旅行" />
         </div>
         <h1 className="mt-3 text-center text-3xl font-black tracking-tight text-[#3E2718]">水豚旅行</h1>
 
-        <section className="ledger-paper relative mt-8 w-full overflow-hidden rounded-[32px] border border-white/70 bg-white/60 p-6 shadow-[0_8px_32px_rgba(107,83,67,0.15)] backdrop-blur-md">
+        <section className="ledger-paper relative mt-8 min-h-[380px] w-full overflow-hidden rounded-[32px] border border-white/70 bg-white/60 px-7 py-8 shadow-[0_8px_32px_rgba(107,83,67,0.15)] backdrop-blur-md">
           <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
           <div className="absolute -right-1 top-7 z-0 h-[112px] w-[112px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/70 shadow-[0_8px_24px_rgba(107,83,67,0.12)]">
             <img className="h-full w-full scale-[1.55] object-cover object-[54%_57%]" src={productCapybara} alt="" aria-hidden="true" />
           </div>
           <div className="relative z-10">
             <span className="inline-flex w-fit rounded-md bg-[#C4A790] px-2 py-1 text-xs font-bold tracking-widest text-white">多人旅行账本</span>
-            <h2 className="mt-4 max-w-[250px] text-[34px] font-black leading-tight tracking-tighter text-[#3E2718]">
+            <h2 className="mt-5 max-w-[250px] text-[38px] font-black leading-tight tracking-tighter text-[#3E2718]">
               难开口的账，<br />
               轻松算清。
             </h2>
@@ -376,7 +376,7 @@ function HomePage() {
               <span>分摊，一页看懂。</span>
             </p>
           </div>
-          <div className="relative z-10 mt-8 flex gap-2">
+          <div className="relative z-10 mt-12 flex gap-2">
             {["📝 简易记录", "🏷️ 抵扣核算", "🧹 一键清除"].map((item) => (
               <span className="flex flex-1 items-center justify-center gap-1 rounded-full border border-white/55 bg-[#F6EFE9]/80 px-2.5 py-2 text-center text-[12px] font-extrabold text-[#5C4033] shadow-sm" key={item}>
                 {item}
@@ -386,11 +386,11 @@ function HomePage() {
         </section>
 
         <section className="mt-auto w-full space-y-4 pt-8">
-          <a className="inline-flex w-full min-h-14 items-center justify-center gap-2 rounded-full border-t border-white/20 bg-[#4A3018] px-4 py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(74,48,24,0.3)] transition-all duration-200 active:scale-[0.97]" href={hrefTo("create")}>
+          <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[28px] border-t border-white/20 bg-[#4A3018] px-4 py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(74,48,24,0.3)] transition-all duration-200 active:scale-[0.97]" href={hrefTo("create")}>
             <Plus size={20} />
             <span>开启新旅程</span>
           </a>
-          <a className="inline-flex w-full min-h-14 items-center justify-center gap-2 rounded-full border border-[#4A3018]/18 bg-white/88 px-4 py-4 text-lg font-bold text-[#4A3018] shadow-sm backdrop-blur transition-all duration-200 active:scale-[0.97]" href={hrefTo("manage")}>
+          <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[28px] border border-[#4A3018]/18 bg-white/88 px-4 py-4 text-lg font-bold text-[#4A3018] shadow-sm backdrop-blur transition-all duration-200 active:scale-[0.97]" href={hrefTo("manage")}>
             <Wallet size={20} />
             <span>已有行程</span>
           </a>
