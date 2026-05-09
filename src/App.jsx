@@ -334,23 +334,13 @@ function CapybaraMark({ variant = "brand", size = "md", className = "" }) {
 function CapybaraTravelSticker() {
   return (
     <div className="absolute -right-1 top-7 z-0 h-[122px] w-[122px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/78 shadow-[0_8px_24px_rgba(107,83,67,0.12)]" aria-hidden="true">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(196,226,224,0.55),transparent_32%),linear-gradient(135deg,#FFF8E8,#F6E0CF)]" />
-      <div className="absolute right-4 top-5 h-4 w-4 rounded-full border-2 border-[#B9783E]/60" />
-      <div className="absolute right-10 top-2 h-9 w-px rotate-[-18deg] bg-[#B9783E]/45" />
-      <div className="absolute left-8 top-21 h-12 w-10 rounded-xl border-2 border-[#7A4B31] bg-[#FFD067] shadow-sm">
-        <span className="absolute left-2 top-2 h-6 w-1 rounded-full bg-[#F4B86A]" />
-        <span className="absolute right-2 top-2 h-6 w-1 rounded-full bg-[#F4B86A]" />
-      </div>
-      <div className="absolute left-10 top-28 h-7 w-12 rounded-[50%] bg-[#E7B36C]/40 blur-md" />
-      <div className="absolute left-11 top-11 h-14 w-11 rounded-[44%_56%_48%_52%] bg-[#E9A95D] shadow-[inset_-5px_-6px_0_rgba(122,75,49,0.14)]" />
-      <div className="absolute left-6 top-5 h-16 w-14 rounded-[48%_52%_50%_50%] bg-[#E9A95D] shadow-[inset_-4px_-5px_0_rgba(122,75,49,0.12)]" />
-      <div className="absolute left-4 top-9 h-8 w-6 rounded-full bg-[#B97858]" />
-      <div className="absolute left-[37px] top-[48px] h-1.5 w-1.5 rounded-full bg-[#4A3018]" />
-      <div className="absolute left-[55px] top-[46px] h-1.5 w-2 rounded-full bg-[#4A3018]" />
-      <div className="absolute left-[70px] top-[24px] h-9 w-14 -rotate-6 rounded-[50%] border-b-[7px] border-[#B9783E] bg-[#F4C76B] shadow-sm" />
-      <div className="absolute left-[54px] top-[31px] h-4 w-20 -rotate-6 rounded-full bg-[#F4C76B] shadow-[0_2px_0_rgba(74,48,24,0.18)]" />
-      <div className="absolute left-[78px] top-[83px] h-4 w-3 rounded-full bg-[#C4824B]" />
-      <div className="absolute left-[65px] top-[82px] h-4 w-3 rounded-full bg-[#C4824B]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(196,226,224,0.5),transparent_32%),linear-gradient(135deg,#FFF8E8,#F6E0CF)]" />
+      <img
+        className="absolute inset-0 h-full w-full scale-[1.42] object-cover object-[50%_54%]"
+        src={productCapybara}
+        alt=""
+      />
+      <div className="absolute inset-0 rounded-full ring-1 ring-white/70" />
     </div>
   );
 }
