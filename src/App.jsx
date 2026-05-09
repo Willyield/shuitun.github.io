@@ -189,13 +189,87 @@ function Shell({ children, wide = false }) {
   );
 }
 
-function Topbar({ title = "水豚旅行", subtitle = "", children }) {
+const capybaraMarkTone = {
+  brand: {
+    halo: "bg-[#FFE8A8]",
+    accent: "bg-accent",
+    detail: "spark"
+  },
+  choice: {
+    halo: "bg-[#FBEBCF]",
+    accent: "bg-primaryDeep",
+    detail: "dot"
+  },
+  trip: {
+    halo: "bg-[#FFF0C7]",
+    accent: "bg-accent",
+    detail: "route"
+  },
+  entry: {
+    halo: "bg-[#FFF6D8]",
+    accent: "bg-primaryDeep",
+    detail: "pen"
+  },
+  budget: {
+    halo: "bg-[#FFEAB8]",
+    accent: "bg-accent",
+    detail: "coin"
+  },
+  settlement: {
+    halo: "bg-[#F9E2BA]",
+    accent: "bg-primaryDeep",
+    detail: "receipt"
+  },
+  archive: {
+    halo: "bg-[#FFF3D6]",
+    accent: "bg-muted",
+    detail: "list"
+  }
+};
+
+function CapybaraMark({ variant = "brand", size = "md", className = "" }) {
+  const tone = capybaraMarkTone[variant] || capybaraMarkTone.brand;
+  const sizeClass = size === "lg" ? "h-14 w-16" : size === "sm" ? "h-9 w-11" : "h-11 w-12";
+  return (
+    <span className={classNames("relative isolate inline-flex shrink-0 items-center justify-center", sizeClass, className)} aria-hidden="true">
+      <span className={classNames("absolute inset-x-1 bottom-0 top-1 -z-10 -rotate-6 rounded-[44%_56%_48%_52%]", tone.halo)} />
+      <span className={classNames("absolute right-0 top-1 z-20 h-2.5 w-2.5 rounded-[4px]", tone.accent)} />
+      <svg className="relative z-10 h-full w-full drop-shadow-sm" viewBox="0 0 76 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24.5 18.5C29.2 11.6 40.7 9.3 49.9 13.6C58.9 17.8 63.5 27.7 61 37C58.4 46.7 48.1 52.3 36.8 50.3C25.4 48.2 17.9 38.8 19.5 28.9C20.1 25 21.8 21.5 24.5 18.5Z" fill="#7A3E24" />
+        <path d="M20.1 26.8C15.9 27.3 12.2 30.9 11.7 35.1C11.1 40.3 15.6 45.1 21.8 45.7C25.2 46.1 29 45.2 31.7 43.4L28.9 26.2C26.5 26 23.5 26.4 20.1 26.8Z" fill="#A65D31" />
+        <path d="M37.5 13.7C38.8 9.8 42.2 7.8 45 9.2C47.4 10.4 48.2 13.6 46.9 17.2L37.5 13.7Z" fill="#8B4A28" />
+        <path d="M52 18.7C54.3 16.2 57.5 16.2 59.1 18.5C60.6 20.8 59.6 24.2 56.9 26.3L52 18.7Z" fill="#8B4A28" />
+        <circle cx="50.4" cy="29.6" r="2.1" fill="#24140E" />
+        <path d="M56.2 35.6C53.6 38 49.7 38.7 45.9 37.4" stroke="#24140E" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M24.4 36.7C27.5 39.1 31.3 40.7 35.4 41" stroke="#D89C61" strokeWidth="3" strokeLinecap="round" />
+        {tone.detail === "spark" ? (
+          <path d="M11 15.5L13.2 20.2L18 22.4L13.2 24.5L11 29.3L8.8 24.5L4 22.4L8.8 20.2L11 15.5Z" fill="#D97736" />
+        ) : null}
+        {tone.detail === "route" ? (
+          <path d="M6 48C13.3 42.3 18.7 42.3 26 48" stroke="#D97736" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="1 5" />
+        ) : null}
+        {tone.detail === "pen" ? (
+          <path d="M8 47L18.5 36.5L22 40L11.5 50.5L7 52L8 47Z" fill="#D97736" />
+        ) : null}
+        {tone.detail === "coin" ? (
+          <path d="M14 49.5C18.4 49.5 22 47.5 22 45C22 42.5 18.4 40.5 14 40.5C9.6 40.5 6 42.5 6 45C6 47.5 9.6 49.5 14 49.5Z" fill="#D97736" />
+        ) : null}
+        {tone.detail === "receipt" ? (
+          <path d="M7 39H21V52L18.5 50.7L16 52L13.5 50.7L11 52L8.5 50.7L7 52V39Z" fill="#D97736" />
+        ) : null}
+        {tone.detail === "list" ? (
+          <path d="M7 40H23M7 46H19M7 52H22" stroke="#8B7A6A" strokeWidth="2.5" strokeLinecap="round" />
+        ) : null}
+      </svg>
+    </span>
+  );
+}
+
+function Topbar({ title = "水豚旅行", subtitle = "", children, markVariant = "brand", markSize = "md" }) {
   return (
     <header className="flex items-center justify-between gap-3">
       <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-paper/80 ring-1 ring-line/60">
-          <img className="h-8 w-8" src={heroCapybara} alt="水豚旅行头像" />
-        </span>
+        <CapybaraMark variant={markVariant} size={markSize} />
         <span className="min-w-0">
           <strong className="block truncate type-h3 text-base text-ink">{title}</strong>
           {subtitle ? <small className="block truncate type-caption normal-case">{subtitle}</small> : null}
@@ -262,7 +336,7 @@ function HomePage() {
 
   return (
     <Shell>
-      <Topbar>
+      <Topbar markVariant="brand" markSize="lg">
         <ButtonLink to="about" variant="ghost" icon={Sparkles}>说明</ButtonLink>
       </Topbar>
 
@@ -301,7 +375,7 @@ function HomePage() {
 function CreateChoicePage() {
   return (
     <Shell>
-      <Topbar title="选模式">
+      <Topbar title="选模式" markVariant="choice" markSize="sm">
         <ButtonLink to="home" variant="ghost" icon={ArrowLeft}>首页</ButtonLink>
       </Topbar>
       <section className="space-y-2">
@@ -374,7 +448,7 @@ function CreateTripPage({ mode }) {
 
   return (
     <Shell>
-      <Topbar title={isShared ? "共同记账" : "大家长模式"}>
+      <Topbar title={isShared ? "共同记账" : "大家长模式"} markVariant="choice" markSize="sm">
         <ButtonLink to="create" variant="ghost" icon={ArrowLeft}>重选</ButtonLink>
         <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
       </Topbar>
@@ -449,7 +523,7 @@ function TripListPage({ type = "manage" }) {
 
   return (
     <Shell>
-      <Topbar title={isArchive ? "行程存档" : "已有行程"}>
+      <Topbar title={isArchive ? "行程存档" : "已有行程"} markVariant="archive" markSize="sm">
         <ButtonLink to="home" variant="ghost" icon={Home}>首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus}>创建</ButtonLink>
       </Topbar>
@@ -564,7 +638,7 @@ function useTrip(id, version = 0) {
 function NotFoundPage({ title = "没有找到这趟行程。", copy = "请从已有行程页面重新进入。" }) {
   return (
     <Shell>
-      <Topbar title="水豚旅行" />
+      <Topbar title="水豚旅行" markVariant="brand" markSize="lg" />
       <Panel className="relative overflow-hidden space-y-4 text-center">
         <EmptyWatermark />
         <div className="relative z-10 space-y-4">
@@ -603,7 +677,7 @@ function DetailPage({ id }) {
 
   return (
     <Shell>
-      <Topbar title="旅行中" subtitle={getTripTitle(trip)} />
+      <Topbar title="旅行中" subtitle={getTripTitle(trip)} markVariant="trip" />
       <section className="rounded-3xl border border-line/60 bg-paper/70 p-4 ring-1 ring-white/55 backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{shortModeLabel(trip.mode)}</Badge>
@@ -875,7 +949,9 @@ function ExpensePage({ id }) {
           <strong className="block truncate type-h3 text-base text-ink">记一笔</strong>
           <small className="block truncate type-caption normal-case">{getTripTitle(trip)}</small>
         </div>
-        <span className="h-11 w-[72px] shrink-0" aria-hidden="true" />
+        <span className="flex h-11 w-[72px] shrink-0 justify-end" aria-hidden="true">
+          <CapybaraMark variant="entry" size="sm" />
+        </span>
       </header>
       <Panel className="space-y-5">
         <div>
@@ -1041,7 +1117,7 @@ function BudgetPage({ id }) {
   return (
     <>
     <Shell>
-      <Topbar title="加预算" subtitle={getTripTitle(trip)}>
+      <Topbar title="加预算" subtitle={getTripTitle(trip)} markVariant="budget" markSize="sm">
         <ButtonLink to="detail" params={{ id: trip.id }} variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
       </Topbar>
       <Panel>
@@ -1385,7 +1461,7 @@ function ReviewPage({ id, summary = false }) {
 
   return (
     <Shell>
-      <Topbar title={summary ? "结算总结" : "结算"} />
+      <Topbar title={summary ? "结算总结" : "结算"} markVariant="settlement" markSize="sm" />
       <section className="space-y-2">
         <Eyebrow>{summary ? "总结" : "结算"}</Eyebrow>
         <h1 className="type-h1">{getTripTitle(trip)}</h1>
@@ -1520,7 +1596,7 @@ function SharedSettlement({ result }) {
 function AboutPage() {
   return (
     <Shell>
-      <Topbar title="说明">
+      <Topbar title="说明" markVariant="brand" markSize="lg">
         <ButtonLink to="home" variant="ghost" icon={ArrowLeft}>首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus}>开始</ButtonLink>
       </Topbar>
