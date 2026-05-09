@@ -8,6 +8,22 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --page-bg-top: #F7EFE2;
+  --page-bg-mid: #FFF7EA;
+  --page-bg-bottom: #F5E5D0;
+  --card-bg: rgba(255, 250, 240, 0.82);
+  --card-border: rgba(92, 72, 52, 0.52);
+  --inner-bg-start: #FFF8E8;
+  --inner-bg-mid: #FFE9B8;
+  --inner-bg-end: #FFDFA0;
+  --blue-soft: #C4E2E0;
+  --brown-main: #332018;
+  --brown-sub: #6E5A49;
+  --brown-light: #8B7867;
+  --brown-accent: #B9783E;
+  --badge-bg: rgba(246, 224, 207, 0.72);
+  --safe-bg: rgba(214, 232, 202, 0.72);
+  --safe-text: #4D6841;
 }
 
 * {
@@ -15,7 +31,7 @@
 }
 
 html {
-  background: #f4ebe1;
+  background: var(--page-bg-mid);
 }
 
 body {
@@ -23,15 +39,12 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: "PingFang SC", "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif !important;
-  background:
-    radial-gradient(circle at 14% 2%, rgba(255, 255, 255, 0.72), transparent 22%),
-    radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.38), transparent 20%),
-    radial-gradient(circle at 50% 26%, rgba(255, 247, 217, 0.62), transparent 24%),
-    linear-gradient(rgba(90, 50, 31, 0.014) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 50, 31, 0.012) 1px, transparent 1px),
-    linear-gradient(180deg, #e8f0f2 0%, #f4ebe1 48%, #f2e5d5 100%);
-  background-size: auto, auto, auto, 36px 36px, 36px 36px, auto;
-  color: #292524;
+  background-image:
+    linear-gradient(rgba(123, 86, 54, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123, 86, 54, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, var(--page-bg-top) 0%, var(--page-bg-mid) 48%, var(--page-bg-bottom) 100%);
+  background-size: 42px 42px, 42px 42px, 100% 100%;
+  color: var(--brown-main);
 }
 
 button,
@@ -47,34 +60,68 @@ textarea {
 
 @layer utilities {
   .type-h1 {
-    @apply text-4xl font-black leading-tight tracking-tighter text-stone-800;
+    @apply text-4xl font-black leading-tight tracking-tighter;
+    color: var(--brown-main);
   }
 
   .type-h2 {
-    @apply text-2xl font-bold tracking-tight text-stone-800;
+    @apply text-2xl font-bold tracking-tight;
+    color: var(--brown-main);
   }
 
   .type-h3 {
-    @apply text-lg font-semibold text-stone-700;
+    @apply text-lg font-semibold;
+    color: var(--brown-main);
   }
 
   .type-body {
-    @apply text-[15px] font-normal leading-relaxed text-stone-500;
+    @apply text-[15px] font-normal leading-relaxed;
+    color: var(--brown-sub);
   }
 
   .type-caption {
-    @apply text-xs font-medium uppercase tracking-widest text-stone-400;
+    @apply text-xs font-medium uppercase tracking-widest;
+    color: var(--brown-light);
   }
 
   .type-kicker {
-    @apply text-xs font-medium uppercase tracking-widest text-accent;
+    @apply text-xs font-medium uppercase tracking-widest;
+    color: var(--brown-accent);
   }
 
   .ledger-paper {
     background-image:
-      linear-gradient(rgba(90, 50, 31, 0.026) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(90, 50, 31, 0.02) 1px, transparent 1px);
-    background-size: 28px 28px;
+      linear-gradient(rgba(123, 86, 54, 0.034) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(123, 86, 54, 0.03) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+
+  .surface-card {
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    box-shadow:
+      0 18px 36px rgba(91, 57, 32, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .inner-warm-card {
+    background:
+      radial-gradient(circle at 92% 12%, rgba(196, 226, 224, 0.45), transparent 28%),
+      linear-gradient(135deg, var(--inner-bg-start) 0%, var(--inner-bg-mid) 58%, var(--inner-bg-end) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 8px 20px rgba(156, 103, 47, 0.10);
+  }
+
+  .badge-soft {
+    background: var(--badge-bg);
+    color: var(--brown-main);
+  }
+
+  .badge-safe {
+    background: var(--safe-bg);
+    color: var(--safe-text);
   }
 
   .ticket-edge {
