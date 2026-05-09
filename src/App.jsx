@@ -171,9 +171,9 @@ function Button({ variant = "ghost", icon: Icon, children, className, ...props }
 function buttonClass(variant) {
   const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
   const variants = {
-    primary: "bg-primaryDeep text-white shadow-lg shadow-primaryDeep/20 hover:bg-primaryDeepHover",
-    secondary: "border border-white/60 bg-paper/80 text-ink shadow-capybara-warm ring-1 ring-white/60 hover:bg-card",
-    ghost: "border border-line bg-white/50 text-ink hover:bg-paper",
+    primary: "bg-primaryDeep text-white shadow-button hover:bg-primaryDeepHover",
+    secondary: "border border-line/70 bg-paper/70 text-ink ring-1 ring-white/50 hover:bg-card",
+    ghost: "border border-line/70 bg-white/35 text-ink hover:bg-paper",
     dark: "bg-ink text-white hover:bg-[#352111]",
     danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
   };
@@ -182,7 +182,7 @@ function buttonClass(variant) {
 
 function Shell({ children, wide = false }) {
   return (
-    <main className={classNames("mx-auto min-h-screen pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[520px]")}>
+    <main className={classNames("mx-auto min-h-screen px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[520px]")}>
       <div className="space-y-5">{children}</div>
     </main>
   );
@@ -192,7 +192,7 @@ function Topbar({ title = "水豚旅行", subtitle = "", children }) {
   return (
     <header className="flex items-center justify-between gap-3">
       <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/35">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-paper/80 ring-1 ring-line/60">
           <img className="h-8 w-8" src={heroCapybara} alt="水豚旅行头像" />
         </span>
         <span className="min-w-0">
@@ -212,8 +212,8 @@ function Eyebrow({ children }) {
 function Badge({ children, tone = "default" }) {
   return (
     <span className={classNames(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2 py-1 text-xs font-medium uppercase tracking-widest",
-      tone === "alert" ? "bg-red-100 text-red-700" : tone === "dark" ? "bg-ink text-white" : "bg-card text-ink"
+      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2 py-1 text-xs font-bold uppercase tracking-widest",
+      tone === "alert" ? "bg-red-100 text-red-700" : tone === "dark" ? "bg-primaryDeep text-white" : "bg-card/90 text-primaryDeep"
     )}>
       {children}
     </span>
@@ -221,13 +221,13 @@ function Badge({ children, tone = "default" }) {
 }
 
 function Panel({ children, className }) {
-  return <section className={classNames("rounded-3xl border border-white/60 bg-white/70 p-5 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur", className)}>{children}</section>;
+  return <section className={classNames("rounded-3xl border border-line/60 bg-paper/72 p-5 ring-1 ring-white/55 backdrop-blur", className)}>{children}</section>;
 }
 
 function Metric({ label, value, valueClassName }) {
   const isMoney = isCurrencyValue(value);
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-start justify-center rounded-3xl border border-white/60 bg-white/70 px-2 py-4 shadow-capybara-warm ring-1 ring-white/60">
+    <div className="flex min-w-0 flex-1 flex-col items-start justify-center rounded-3xl border border-line/60 bg-paper/80 px-2 py-4 ring-1 ring-white/55">
       <span className="text-xs font-medium tracking-wide text-stone-500">{label}</span>
       <strong className={classNames("mt-1 min-w-0 text-xl font-black leading-none tracking-tighter tabular-nums sm:text-2xl", valueClassName || "text-ink")}>
         {isMoney ? <MoneyText value={value} animate className="block" /> : <span className="block">{value}</span>}
@@ -266,35 +266,31 @@ function HomePage() {
       </Topbar>
 
       <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
-        <div>
-          <Eyebrow>告别“谈钱内耗”的多人账本</Eyebrow>
-          <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tighter text-stone-800">
-            把旅行里最难开口的账，<br />
-            温柔地算清楚。
-          </h1>
-          <p className="mt-4 type-body">共同支出、中途还款，最后一键算清。</p>
-        </div>
+        <section className="ledger-paper relative overflow-hidden rounded-[32px] bg-primaryDeep p-6 text-white shadow-ledger">
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-white/10" aria-hidden="true" />
+          <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-white/8" aria-hidden="true" />
+          <div className="relative z-10">
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-sand">多人旅行账本</span>
+            <h1 className="mt-5 text-[34px] font-black leading-tight tracking-tighter">
+              难开口的账，<br />
+              轻松算清。
+            </h1>
+            <p className="mt-4 text-sm leading-relaxed text-white/72">支出、还款、分摊，一页看懂。</p>
+          </div>
+          <div className="relative z-10 mt-8 grid grid-cols-3 gap-2">
+            {["少记", "抵扣", "清楚"].map((item) => (
+              <span className="rounded-2xl border border-white/12 bg-white/10 px-3 py-2 text-center text-xs font-extrabold text-white/88" key={item}>{item}</span>
+            ))}
+          </div>
+        </section>
 
-        <section className="mt-10 space-y-3">
+        <section className="mt-6 space-y-3">
           <ButtonLink to="create" variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">
             开启旅行
           </ButtonLink>
           <ButtonLink to="manage" variant="secondary" icon={Wallet} className="w-full rounded-3xl py-4 text-base">
             已有行程
           </ButtonLink>
-        </section>
-
-        <section className="mt-8 space-y-4">
-          {[
-            ["少记", "只记大项。"],
-            ["抵扣", "还款自动扣。"],
-            ["看清", "分类有占比。"],
-          ].map(([title, copy]) => (
-            <div className="border-l-2 border-accent/40 pl-4" key={title}>
-              <h2 className="type-h3">{title}</h2>
-              <p className="mt-1 type-body">{copy}</p>
-            </div>
-          ))}
         </section>
       </section>
     </Shell>
@@ -312,19 +308,25 @@ function CreateChoicePage() {
         <h1 className="type-h1">这趟旅行怎么记？</h1>
       </section>
       <section className="space-y-4">
-        <ModeCard to="create-parent" badge="大家长模式" title="大家长记账" copy="一人记账，大家查看。" />
-        <ModeCard to="create-shared" badge="共同记账" title="大家一起记" copy="多人编辑，共同分摊。" />
+        <ModeCard to="create-parent" index="01" badge="大家长模式" title="大家长记账" copy="一人记账，大家查看。" />
+        <ModeCard to="create-shared" index="02" badge="共同记账" title="大家一起记" copy="多人编辑，共同分摊。" />
       </section>
     </Shell>
   );
 }
 
-function ModeCard({ to, badge, title, copy }) {
+function ModeCard({ to, index, badge, title, copy }) {
   return (
-    <a className="block rounded-3xl border border-white/60 bg-white/70 p-6 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
-      <Badge>{badge}</Badge>
-      <h2 className="mt-4 type-h2">{title}</h2>
-      <p className="mt-2 type-body">{copy}</p>
+    <a className="group block rounded-3xl border border-line/60 bg-paper/80 p-5 ring-1 ring-white/55 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
+      <div className="flex items-start justify-between gap-4">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primaryDeep text-xs font-black tracking-widest text-white">{index}</span>
+        <span className="text-xl font-black text-accent transition-transform group-hover:translate-x-0.5">→</span>
+      </div>
+      <div className="mt-5">
+        <Badge>{badge}</Badge>
+        <h2 className="mt-3 type-h2">{title}</h2>
+        <p className="mt-2 type-body">{copy}</p>
+      </div>
     </a>
   );
 }
@@ -520,35 +522,37 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
   const percent = Math.min(Math.max(progress, 0), 1) * 100;
   const isOverBudget = remaining < 0;
   return (
-    <Panel className={classNames("space-y-4 bg-white/70 backdrop-blur", compact ? "p-4" : "p-5")}>
+    <section className={classNames("ledger-paper space-y-4 rounded-[32px] border border-primaryDeep/20 bg-primaryDeep text-white shadow-ledger", compact ? "p-4" : "p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Eyebrow>预算</Eyebrow>
-          <p className="mt-2 type-caption normal-case">{isOverBudget ? "已超支" : "剩余预算"}</p>
-          <p className={classNames("mt-1 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-600" : "text-ink")}>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-sand">预算</span>
+          <p className="mt-2 text-xs font-medium tracking-widest text-white/55">{isOverBudget ? "已超支" : "剩余预算"}</p>
+          <p className={classNames("mt-2 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-200" : "text-white")}>
             <MoneyText value={formatCurrency(remaining)} animate />
           </p>
         </div>
-        <Badge tone={isOverBudget ? "alert" : "default"}>{getProgressText(trip)}</Badge>
+        <span className={classNames("rounded-full px-3 py-1 text-xs font-black tracking-widest", isOverBudget ? "bg-rose-100 text-rose-700" : "bg-white/12 text-white")}>{getProgressText(trip)}</span>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-white/60 bg-white/60 p-3">
-          <p className="type-caption normal-case">总预算</p>
-          <p className="mt-1 text-lg leading-none"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+          <p className="text-xs font-medium tracking-widest text-white/50">总预算</p>
+          <p className="mt-1 text-lg leading-none text-white"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
         </div>
-        <div className="rounded-2xl border border-white/60 bg-white/60 p-3">
-          <p className="type-caption normal-case">总支出</p>
-          <p className="mt-1 text-lg leading-none"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
+        <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
+          <p className="text-xs font-medium tracking-widest text-white/50">总支出</p>
+          <p className="mt-1 text-lg leading-none text-white"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
         </div>
       </div>
       <div className="space-y-2">
-        <ProgressBar width={`${percent}%`} alert={isOverBudget || progress >= LOW_BALANCE_RATIO} />
-        <div className="flex justify-between type-caption normal-case">
+        <div className="h-3 overflow-hidden rounded-full bg-white/14">
+          <div className={classNames("h-full rounded-full transition-all", isOverBudget || progress >= LOW_BALANCE_RATIO ? "bg-rose-300" : "bg-sand")} style={{ width: `${percent}%` }} />
+        </div>
+        <div className="flex justify-between text-xs font-medium tracking-widest text-white/55">
           <span>进度</span>
           <strong>{Math.round(progress * 100)}%</strong>
         </div>
       </div>
-    </Panel>
+    </section>
   );
 }
 
@@ -599,7 +603,7 @@ function DetailPage({ id }) {
   return (
     <Shell>
       <Topbar title="旅行中" subtitle={getTripTitle(trip)} />
-      <section className="rounded-3xl border border-white/60 bg-white/50 p-4 backdrop-blur">
+      <section className="rounded-3xl border border-line/60 bg-paper/70 p-4 ring-1 ring-white/55 backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{shortModeLabel(trip.mode)}</Badge>
           <span className="type-body text-sm">{trip.people.join("、") || "-"}</span>
@@ -639,7 +643,7 @@ function DetailPage({ id }) {
         <Message message={message} />
       </Panel>
       <Panel className="space-y-4">
-        <SectionHead eyebrow="实时结果" title="当前分摊结果" badge="自动更新" />
+        <SectionHead eyebrow="净额" title="成员净额" badge="实时" />
         <LedgerView trip={trip} />
       </Panel>
     </Shell>
@@ -661,7 +665,7 @@ function SectionHead({ eyebrow, title, badge }) {
 function ExpenseList({ trip, onDelete }) {
   if (!trip.expenses.length) {
     return (
-      <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60">
+      <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-4 type-body ring-1 ring-white/55">
         <EmptyWatermark />
         <span className="relative z-10">还没有支出记录，先去记一笔。</span>
       </div>
@@ -676,8 +680,8 @@ function ExpenseList({ trip, onDelete }) {
         return (
           <article className="relative pl-9" key={expense.id}>
             <span className={classNames("absolute left-[9px] top-5 h-3 w-3 rounded-full border-2 border-[#FFF8ED]", isTransfer ? "bg-sky-400" : "bg-amber-500")} aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
-              <div className="absolute left-0 top-0 h-full w-1 bg-accent/50" aria-hidden="true" />
+            <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/84 p-4 ring-1 ring-white/55 backdrop-blur">
+              <div className={classNames("absolute left-0 top-0 h-full w-1", isTransfer ? "bg-sky-400" : "bg-accent")} aria-hidden="true" />
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="type-caption normal-case">#{index + 1} · {formatDateTime(expense.time || expense.id)}</p>
@@ -687,7 +691,7 @@ function ExpenseList({ trip, onDelete }) {
                   <Badge>{isTransfer ? "还款/转账" : displayCategory(expense)}</Badge>
                   {onDelete ? (
                     <button
-                      className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-red-100 bg-red-50 text-red-600 shadow-capybara-warm transition-all duration-200 active:scale-[0.97]"
+                      className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-red-100 bg-red-50 text-red-600 transition-all duration-200 active:scale-[0.97]"
                       type="button"
                       aria-label="删除这笔"
                       title="删除这笔"
@@ -721,12 +725,12 @@ function LedgerView({ trip }) {
     return (
       <div className="space-y-3">
         {rows.length ? rows.map(([name, amount]) => (
-          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
+          <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55" key={name}>
             <strong className="block type-h3 text-base">{name}</strong>
             <p className="mt-1 type-body">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60">
+          <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-4 type-body ring-1 ring-white/55">
             <EmptyWatermark />
             <span className="relative z-10">暂无净额数据。</span>
           </div>
@@ -741,7 +745,7 @@ function LedgerView({ trip }) {
         const spent = ledger[name] || 0;
         const balance = round2((trip.per || 0) - spent);
         return (
-          <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={name}>
+          <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55" key={name}>
             <div className="flex items-center justify-between gap-3">
               <strong className="type-h3 text-base">{name}</strong>
               <Badge tone={balance < 0 ? "alert" : "default"}>{balance < 0 ? "已超支" : "未超支"}</Badge>
@@ -878,8 +882,8 @@ function ExpensePage({ id }) {
           <h1 className="mt-2 type-h1">记一笔</h1>
         </div>
         <div className="grid grid-cols-2 gap-2 rounded-3xl bg-card/70 p-1">
-          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>支出</button>
-          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>还款</button>
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>支出</button>
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>还款</button>
         </div>
         <form className="space-y-5" onSubmit={submit}>
           <Field label="金额">
@@ -928,7 +932,7 @@ function ExpensePage({ id }) {
               <Field label="参与人">
                 <div className="grid grid-cols-2 gap-2">
                   {trip.people.map((name) => (
-                    <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-white/70 text-muted")} key={name}>
+                    <label className={classNames("flex min-h-12 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", participants.includes(name) ? "border-accent bg-accent/10 text-ink" : "border-line bg-paper/70 text-muted")} key={name}>
                       <input className="h-4 w-4 accent-accent" type="checkbox" checked={participants.includes(name)} onChange={() => toggleParticipant(name)} />
                       <span className="truncate">{name}</span>
                     </label>
@@ -982,7 +986,7 @@ function ExpensePage({ id }) {
 
 function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
   return (
-    <details className="group rounded-3xl border border-line bg-white/55 p-3 shadow-capybara-warm">
+    <details className="group rounded-3xl border border-line bg-paper/72 p-3 ring-1 ring-white/55">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-1 py-1 text-sm font-extrabold text-ink transition-all active:scale-[0.98]">
         <span>水豚拍板</span>
         <span className="type-caption normal-case text-muted group-open:hidden">可选</span>
@@ -1214,19 +1218,19 @@ function TripSummaryView({ trip, onClose }) {
 
       <div className="h-full overflow-y-auto px-5 pb-10 pt-24">
         <div className="mx-auto max-w-[520px] space-y-5">
-          <article className="animate-fade-in rounded-3xl border border-white/60 bg-white p-6 shadow-capybara-warm ring-1 ring-white/60">
+          <article className="ledger-paper animate-fade-in rounded-[32px] bg-primaryDeep p-6 text-white shadow-ledger">
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <span className="type-caption">总耗时</span>
-                <strong className="mt-2 block type-h2">{durationText}</strong>
+                <span className="text-xs font-semibold tracking-[0.22em] text-sand">总耗时</span>
+                <strong className="mt-2 block text-2xl font-black tracking-tight text-white">{durationText}</strong>
               </div>
               <div className="text-right">
-                <span className="type-caption">总花费</span>
-                <strong className="mt-2 block text-3xl"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
+                <span className="text-xs font-semibold tracking-[0.22em] text-sand">总花费</span>
+                <strong className="mt-2 block text-3xl text-white"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
               </div>
-              <div className="col-span-2 rounded-3xl bg-card/65 p-4">
-                <span className="type-caption">核心足迹</span>
-                <p className="mt-2 type-body text-stone-700">📍 {footprints.join(" ➔ ")}</p>
+              <div className="col-span-2 rounded-3xl border border-white/10 bg-white/10 p-4">
+                <span className="text-xs font-semibold tracking-[0.22em] text-white/50">核心足迹</span>
+                <p className="mt-2 text-sm leading-relaxed text-white/82">📍 {footprints.join(" ➔ ")}</p>
               </div>
             </div>
           </article>
@@ -1256,7 +1260,7 @@ function MemoryHighlights({ trip, topExpense, topCategory, footprints }) {
   return (
     <section className="grid grid-cols-2 gap-3">
       {items.map(([label, value]) => (
-        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur" key={label}>
+        <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55 backdrop-blur" key={label}>
           <p className="type-caption normal-case">{label}</p>
           <h3 className="mt-2 line-clamp-2 text-base font-extrabold leading-snug text-ink">{value}</h3>
         </article>
@@ -1270,7 +1274,7 @@ function CategoryDonut({ totals, total }) {
   let offset = 0;
   if (!totals.length || total <= 0) {
     return (
-      <article className="relative overflow-hidden animate-fade-in rounded-3xl border border-white/60 bg-white p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+      <article className="relative overflow-hidden animate-fade-in rounded-3xl border border-line/60 bg-paper/80 p-5 type-body ring-1 ring-white/55">
         <EmptyWatermark />
         <span className="relative z-10">还没有可用于生成占比图的支出。</span>
       </article>
@@ -1278,7 +1282,7 @@ function CategoryDonut({ totals, total }) {
   }
 
   return (
-    <article className="animate-fade-in rounded-3xl border border-white/60 bg-white p-5 shadow-capybara-warm ring-1 ring-white/60">
+    <article className="animate-fade-in rounded-3xl border border-line/60 bg-paper/80 p-5 ring-1 ring-white/55">
       <div className="flex items-center justify-between gap-4">
         <div>
           <Eyebrow>占比</Eyebrow>
@@ -1286,7 +1290,7 @@ function CategoryDonut({ totals, total }) {
         </div>
         <div className="relative h-28 w-28 shrink-0">
           <svg viewBox="0 0 100 100" className="h-full w-full">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#F9EBDD" strokeWidth="13" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#E9CDAF" strokeWidth="13" />
             {totals.map((item, index) => {
               const dash = (item.amount / total) * circumference;
               const circle = (
@@ -1331,7 +1335,7 @@ function CategoryDonut({ totals, total }) {
 function Timeline({ expenses, dailyTotals }) {
   if (!expenses.length) {
     return (
-      <div className="relative overflow-hidden animate-fade-in rounded-3xl border border-white/60 bg-white p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+      <div className="relative overflow-hidden animate-fade-in rounded-3xl border border-line/60 bg-paper/80 p-5 type-body ring-1 ring-white/55">
         <EmptyWatermark />
         <span className="relative z-10">还没有可生成回忆的核心支出。</span>
       </div>
@@ -1354,7 +1358,7 @@ function Timeline({ expenses, dailyTotals }) {
           {group.expenses.map((expense, index) => (
             <article className="relative animate-fade-in" style={{ animationDelay: `${(groupIndex + index) * 55}ms` }} key={expense.id}>
               <span className="absolute -left-[37px] top-5 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-amber-500 shadow-sm" aria-hidden="true" />
-              <div className="rounded-3xl border border-white/60 bg-white/80 p-5 shadow-capybara-warm ring-1 ring-white/60">
+              <div className="rounded-3xl border border-line/60 bg-paper/82 p-5 ring-1 ring-white/55">
                 <p className="type-caption normal-case">{getTimelineTime(expense)}</p>
                 <h3 className="mt-1 type-h3">{getExpenseLabel(expense)}</h3>
                 <p className="mt-2 type-body">花费: <MoneyText value={formatCurrency(expense.amount)} /></p>
@@ -1403,7 +1407,7 @@ function ReviewPage({ id, summary = false }) {
         <SectionHead eyebrow="明细" title="支出记录" />
         <ExpenseList trip={trip} />
       </Panel>
-      <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-primaryDeep px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-primaryDeep/20 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
+      <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-primaryDeep px-4 py-4 text-sm font-extrabold text-white shadow-button transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
         <span>生成旅行回忆</span>
       </button>
       {showTripSummary ? <TripSummaryView trip={trip} onClose={() => setShowTripSummary(false)} /> : null}
@@ -1415,16 +1419,16 @@ function CategoryShareList({ trip }) {
   const totals = getCategoryTotals(trip);
   if (!totals.length) {
     return (
-      <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-4 type-body shadow-capybara-warm ring-1 ring-white/60">
+      <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-4 type-body ring-1 ring-white/55">
         <EmptyWatermark />
-        <span className="relative z-10">还没有支出记录，暂无分类占比。</span>
+        <span className="relative z-10">还没有支出记录。</span>
       </div>
     );
   }
   return (
     <div className="space-y-3">
       {totals.map((item) => (
-        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60" key={item.category}>
+        <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55" key={item.category}>
           <div className="flex items-center justify-between gap-3 text-sm">
             <strong className="type-h3 text-base">{item.category}</strong>
             <span><MoneyText value={formatCurrency(item.amount)} /> · {item.percent}%</span>
@@ -1443,23 +1447,23 @@ function ParentSettlement({ trip, result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {transferRows.length ? transferRows.map((row) => (
-          <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${row.from}-${row.to}-${row.amount}`}>
+          <article className="ledger-paper rounded-[28px] bg-primaryDeep p-5 text-white shadow-ledger" key={`${row.from}-${row.to}-${row.amount}`}>
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <p className="type-caption normal-case">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{row.from} <span className="text-accent">→</span> {row.to}</h3>
+                <p className="text-xs font-semibold tracking-[0.22em] text-sand">转账路径</p>
+                <h3 className="mt-2 text-xl font-black tracking-tight text-white">{row.from} <span className="text-sand">→</span> {row.to}</h3>
               </div>
-              <strong className="shrink-0 text-2xl leading-none"><MoneyText value={formatCurrency(row.amount)} /></strong>
+              <strong className="shrink-0 text-2xl leading-none text-white"><MoneyText value={formatCurrency(row.amount)} /></strong>
             </div>
           </article>
         )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+          <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-5 type-body ring-1 ring-white/55">
             <EmptyWatermark />
             <span className="relative z-10">当前已平账，无需额外转账。</span>
           </div>
         )}
       </div>
-      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
+      <article className="rounded-3xl border border-line/60 bg-paper/78 p-4 ring-1 ring-white/55 backdrop-blur">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "补款" : "返还"}</Badge>
@@ -1478,17 +1482,17 @@ function SharedSettlement({ result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {result.transfers.length ? result.transfers.map((transfer) => (
-          <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+          <article className="ledger-paper rounded-[28px] bg-primaryDeep p-5 text-white shadow-ledger" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <p className="type-caption normal-case">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{transfer.from} <span className="text-accent">→</span> {transfer.to}</h3>
+                <p className="text-xs font-semibold tracking-[0.22em] text-sand">转账路径</p>
+                <h3 className="mt-2 text-xl font-black tracking-tight text-white">{transfer.from} <span className="text-sand">→</span> {transfer.to}</h3>
               </div>
-              <strong className="shrink-0 text-2xl leading-none"><MoneyText value={formatCurrency(transfer.amount)} /></strong>
+              <strong className="shrink-0 text-2xl leading-none text-white"><MoneyText value={formatCurrency(transfer.amount)} /></strong>
             </div>
           </article>
         )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-5 type-body shadow-capybara-warm ring-1 ring-white/60">
+          <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-5 type-body ring-1 ring-white/55">
             <EmptyWatermark />
             <span className="relative z-10">当前已平账，无需额外转账。</span>
           </div>
@@ -1498,7 +1502,7 @@ function SharedSettlement({ result }) {
         <h3 className="mb-3 type-h3 text-base">成员净额</h3>
         <div className="grid grid-cols-3 gap-2">
           {netRows.map(([name, amount]) => (
-            <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-capybara-warm ring-1 ring-white/60" key={name}>
+            <article className="rounded-2xl border border-line/60 bg-paper/78 p-3 ring-1 ring-white/55" key={name}>
               <strong className="block truncate text-sm font-extrabold text-ink">{name}</strong>
               <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "平账"}</p>
               <p className={classNames("mt-1 text-sm leading-none", amount < 0 ? "text-rose-600" : "text-ink")}>{amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
