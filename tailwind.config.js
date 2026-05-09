@@ -10,8 +10,11 @@ export default {
         ink: "#292524",
         muted: "#876C58",
         line: "rgba(75, 47, 26, 0.14)",
+        primaryDeep: "#5A321F",
+        primaryDeepHover: "#3F2418",
         accent: "#D97736",
         accentDark: "#A94E1C",
+        danger: "#E11D48",
         leaf: "#6C8B57",
         sky: "#D9EEF2"
       },

@@ -50,12 +50,12 @@ const pageTitles = {
   home: "水豚旅行 | 多人旅行记账与分摊",
   create: "选择记账模式 | 水豚旅行",
   "create-parent": "大家长模式 | 水豚旅行",
-  "create-shared": "多人付款模式 | 水豚旅行",
+  "create-shared": "共同记账 | 水豚旅行",
   manage: "已有行程 | 水豚旅行",
   archive: "行程存档 | 水豚旅行",
   detail: "行程详情 | 水豚旅行",
   expense: "记一笔 | 水豚旅行",
-  budget: "增加预算 | 水豚旅行",
+  budget: "加预算 | 水豚旅行",
   review: "结算 | 水豚旅行",
   summary: "结算总结 | 水豚旅行",
   about: "产品介绍 | 水豚旅行"
@@ -171,8 +171,8 @@ function Button({ variant = "ghost", icon: Icon, children, className, ...props }
 function buttonClass(variant) {
   const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
   const variants = {
-    primary: "bg-accent text-white shadow-float hover:bg-accentDark",
-    secondary: "border border-white/60 bg-paper text-ink shadow-capybara-warm ring-1 ring-white/60 hover:bg-card",
+    primary: "bg-primaryDeep text-white shadow-lg shadow-primaryDeep/20 hover:bg-primaryDeepHover",
+    secondary: "border border-white/60 bg-paper/80 text-ink shadow-capybara-warm ring-1 ring-white/60 hover:bg-card",
     ghost: "border border-line bg-white/50 text-ink hover:bg-paper",
     dark: "bg-ink text-white hover:bg-[#352111]",
     danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
@@ -188,16 +188,16 @@ function Shell({ children, wide = false }) {
   );
 }
 
-function Topbar({ title = "水豚旅行", subtitle = "Capybara Trip", children }) {
+function Topbar({ title = "水豚旅行", subtitle = "", children }) {
   return (
     <header className="flex items-center justify-between gap-3">
       <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/45">
-          <img className="h-9 w-9" src={heroCapybara} alt="水豚旅行头像" />
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/35">
+          <img className="h-8 w-8" src={heroCapybara} alt="水豚旅行头像" />
         </span>
         <span className="min-w-0">
           <strong className="block truncate type-h3 text-base text-ink">{title}</strong>
-          <small className="block truncate type-caption normal-case">{subtitle}</small>
+          {subtitle ? <small className="block truncate type-caption normal-case">{subtitle}</small> : null}
         </span>
       </a>
       {children ? <nav className="flex shrink-0 flex-wrap justify-end gap-2">{children}</nav> : null}
@@ -221,7 +221,7 @@ function Badge({ children, tone = "default" }) {
 }
 
 function Panel({ children, className }) {
-  return <section className={classNames("rounded-3xl border border-white/60 bg-paper/90 p-5 shadow-capybara-warm ring-1 ring-white/60", className)}>{children}</section>;
+  return <section className={classNames("rounded-3xl border border-white/60 bg-white/70 p-5 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur", className)}>{children}</section>;
 }
 
 function Metric({ label, value, valueClassName }) {
@@ -262,7 +262,7 @@ function HomePage() {
   return (
     <Shell>
       <Topbar>
-        <ButtonLink to="about" variant="ghost" icon={Sparkles}>介绍</ButtonLink>
+        <ButtonLink to="about" variant="ghost" icon={Sparkles}>说明</ButtonLink>
       </Topbar>
 
       <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
@@ -272,25 +272,23 @@ function HomePage() {
             把旅行里最难开口的账，<br />
             温柔地算清楚。
           </h1>
-          <p className="mt-4 type-body">
-            记录共同支出、中途还款，最后一键算清谁该转给谁。
-          </p>
+          <p className="mt-4 type-body">共同支出、中途还款，最后一键算清。</p>
         </div>
 
         <section className="mt-10 space-y-3">
-          <ButtonLink to="create" variant="primary" icon={Plus} className="w-full rounded-3xl bg-amber-500 py-5 text-lg shadow-lg shadow-orange-500/25 hover:bg-amber-600">
-            开启无压旅行
+          <ButtonLink to="create" variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">
+            开启旅行
           </ButtonLink>
           <ButtonLink to="manage" variant="secondary" icon={Wallet} className="w-full rounded-3xl py-4 text-base">
-            查看已有行程
+            已有行程
           </ButtonLink>
         </section>
 
         <section className="mt-8 space-y-4">
           {[
-            ["不用记碎账", "只记真正影响结算的大项。"],
-            ["中途转账可抵扣", "谁提前还了钱，最终账单会自动扣掉。"],
-            ["分类占比清楚", "看清钱主要花在哪。"],
+            ["少记", "只记大项。"],
+            ["抵扣", "还款自动扣。"],
+            ["看清", "分类有占比。"],
           ].map(([title, copy]) => (
             <div className="border-l-2 border-accent/40 pl-4" key={title}>
               <h2 className="type-h3">{title}</h2>
@@ -306,7 +304,7 @@ function HomePage() {
 function CreateChoicePage() {
   return (
     <Shell>
-      <Topbar title="选择模式" subtitle="Choose Mode">
+      <Topbar title="选模式">
         <ButtonLink to="home" variant="ghost" icon={ArrowLeft}>首页</ButtonLink>
       </Topbar>
       <section className="space-y-2">
@@ -314,8 +312,8 @@ function CreateChoicePage() {
         <h1 className="type-h1">这趟旅行怎么记？</h1>
       </section>
       <section className="space-y-4">
-        <ModeCard to="create-parent" badge="大家长模式" title="大家长记账" copy="适合先收预算、统一垫付，最后看谁该退、谁该补。" />
-        <ModeCard to="create-shared" badge="共同记账" title="大家一起记" copy="适合大家轮流付款，最后直接生成转账路径。" />
+        <ModeCard to="create-parent" badge="大家长模式" title="大家长记账" copy="一人记账，大家查看。" />
+        <ModeCard to="create-shared" badge="共同记账" title="大家一起记" copy="多人编辑，共同分摊。" />
       </section>
     </Shell>
   );
@@ -323,7 +321,7 @@ function CreateChoicePage() {
 
 function ModeCard({ to, badge, title, copy }) {
   return (
-    <a className="block rounded-3xl border border-white/60 bg-paper/90 p-6 shadow-capybara-warm ring-1 ring-white/60 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
+    <a className="block rounded-3xl border border-white/60 bg-white/70 p-6 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
       <Badge>{badge}</Badge>
       <h2 className="mt-4 type-h2">{title}</h2>
       <p className="mt-2 type-body">{copy}</p>
@@ -373,16 +371,13 @@ function CreateTripPage({ mode }) {
 
   return (
     <Shell>
-      <Topbar title={isShared ? "多人付款模式" : "大家长模式"} subtitle={isShared ? "Shared Mode" : "Parent Mode"}>
+      <Topbar title={isShared ? "共同记账" : "大家长模式"}>
         <ButtonLink to="create" variant="ghost" icon={ArrowLeft}>重选</ButtonLink>
         <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
       </Topbar>
       <section className="space-y-3">
-        <Eyebrow>{isShared ? "谁付款就记谁" : "一个人统一管钱"}</Eyebrow>
-        <h1 className="type-h1">{isShared ? "适合大家轮流付款的旅行。" : "适合先收预算、统一垫付的旅行。"}</h1>
-        <p className="type-body">
-          {isShared ? "每笔支出填写付款人和参与人，结算时自动生成转账路径。" : "系统会按每个人的预算和实际分摊算出该退或该补的金额。"}
-        </p>
+        <Eyebrow>{isShared ? "多人编辑" : "一人记账"}</Eyebrow>
+        <h1 className="type-h1">设置行程</h1>
       </section>
       <Panel>
         <form className="space-y-5" onSubmit={submit}>
@@ -402,16 +397,16 @@ function CreateTripPage({ mode }) {
             </div>
           </Field>
           {!isShared ? (
-            <Field label="大家长" hint="大家长负责统一垫付、退款或收款。">
+            <Field label="大家长">
               <select className={inputClass()} value={selectedManager} onChange={(event) => setManager(event.target.value)}>
                 {names.map((name) => <option value={name} key={name}>{name}</option>)}
               </select>
             </Field>
           ) : null}
-          <Field label={isShared ? "行程总预算" : "每人预算"} hint={isShared ? "多人付款模式会把总预算换算成人均参考值。" : "系统会按成员数自动换算总预算。"}>
+          <Field label={isShared ? "总预算" : "每人预算"}>
             <input className={inputClass()} type="number" min="0" step="0.01" value={budget} onChange={(event) => setBudget(event.target.value)} placeholder={isShared ? "输入这趟旅行总预算" : "输入每个人的预算金额"} />
           </Field>
-          <Button variant="primary" className="w-full" icon={ReceiptText} type="submit">保存并进入记账页</Button>
+          <Button variant="primary" className="w-full" icon={ReceiptText} type="submit">创建行程</Button>
           <Message message={message} />
         </form>
       </Panel>
@@ -451,13 +446,13 @@ function TripListPage({ type = "manage" }) {
 
   return (
     <Shell>
-      <Topbar title={isArchive ? "行程存档" : "已有行程"} subtitle={isArchive ? "Archive" : "Manage Trips"}>
+      <Topbar title={isArchive ? "行程存档" : "已有行程"}>
         <ButtonLink to="home" variant="ghost" icon={Home}>首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus}>创建</ButtonLink>
       </Topbar>
       <section className="space-y-2">
         <Eyebrow>{isArchive ? "历史记录" : "继续使用"}</Eyebrow>
-        <h1 className="type-h1">{isArchive ? "这里保留所有本机创建过的旅行账本。" : "选择一趟行程继续记账或查看结算。"}</h1>
+        <h1 className="type-h1">{isArchive ? "历史账本" : "继续记账"}</h1>
       </section>
       {trips.length ? (
         <section className="space-y-4">
@@ -468,7 +463,7 @@ function TripListPage({ type = "manage" }) {
           <EmptyWatermark />
           <div className="relative z-10 space-y-4">
             <Badge>还没有行程</Badge>
-          <h2 className="type-h2">先创建一趟旅行，再回来继续记账和结算。</h2>
+           <h2 className="type-h2">还没有行程</h2>
             <ButtonLink to="create" variant="primary" icon={Plus}>创建行程</ButtonLink>
           </div>
         </Panel>
@@ -486,7 +481,7 @@ function TripCard({ trip, onDelete }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="break-words type-h2">{getTripTitle(trip)}</h2>
-          <p className="mt-1 type-body">{tripModeLabel(trip.mode)} · {trip.people.join("、") || "暂无成员"}</p>
+          <p className="mt-1 truncate type-body">{shortModeLabel(trip.mode)} · {trip.people.join("、") || "暂无成员"}</p>
         </div>
         <Badge tone={isAlert ? "alert" : "default"}>{isAlert ? "预算告急" : "状态正常"}</Badge>
       </div>
@@ -518,7 +513,7 @@ function ProgressBar({ width, alert }) {
 }
 
 function shortModeLabel(mode) {
-  return mode === "shared" ? "多人付款" : "大家长";
+  return mode === "shared" ? "共同记账" : "大家长";
 }
 
 function BudgetOverview({ trip, remaining, progress, compact = false }) {
@@ -528,7 +523,7 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
     <Panel className={classNames("space-y-4 bg-white/70 backdrop-blur", compact ? "p-4" : "p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Eyebrow>预算概览</Eyebrow>
+          <Eyebrow>预算</Eyebrow>
           <p className="mt-2 type-caption normal-case">{isOverBudget ? "已超支" : "剩余预算"}</p>
           <p className={classNames("mt-1 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-600" : "text-ink")}>
             <MoneyText value={formatCurrency(remaining)} animate />
@@ -549,7 +544,7 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
       <div className="space-y-2">
         <ProgressBar width={`${percent}%`} alert={isOverBudget || progress >= LOW_BALANCE_RATIO} />
         <div className="flex justify-between type-caption normal-case">
-          <span>预算使用进度</span>
+          <span>进度</span>
           <strong>{Math.round(progress * 100)}%</strong>
         </div>
       </div>
@@ -613,7 +608,7 @@ function DetailPage({ id }) {
       </section>
       <BudgetOverview trip={trip} remaining={remaining} progress={progress} />
       <section className="space-y-3">
-        <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus} className="w-full rounded-3xl bg-amber-500 py-5 text-lg shadow-lg shadow-orange-500/25 hover:bg-amber-600">记一笔</ButtonLink>
+        <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">记一笔</ButtonLink>
         <div className="grid grid-cols-3 gap-2">
           <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-10 px-2 py-2 text-xs">结算</ButtonLink>
           <ButtonLink to="budget" params={{ id: trip.id }} variant="secondary" icon={Wallet} className="min-h-10 px-2 py-2 text-xs">预算</ButtonLink>
@@ -625,15 +620,15 @@ function DetailPage({ id }) {
           <div className="flex items-start justify-between gap-3">
             <div>
               <Eyebrow>预算提醒</Eyebrow>
-          <h2 className="mt-2 type-h2">预算快见底了</h2>
+          <h2 className="mt-2 type-h2">预算告急</h2>
             </div>
             <Badge tone="alert">{progress > 1 ? "已超预算" : "预算告急"}</Badge>
           </div>
             <p className="mt-2 type-body text-red-700">
             {progress > 1 ? (
-              <>当前已经超出预算 <MoneyText value={formatCurrency(Math.abs(remaining))} />，建议追加预算或进入结算。</>
+              <>超支 <MoneyText value={formatCurrency(Math.abs(remaining))} /></>
             ) : (
-              <>当前已使用 {Math.round(progress * 100)}% 预算，仅剩 <MoneyText value={formatCurrency(remaining)} />。</>
+              <>仅剩 <MoneyText value={formatCurrency(remaining)} /></>
             )}
           </p>
         </Panel>
@@ -707,24 +702,9 @@ function ExpenseList({ trip, onDelete }) {
                   ) : null}
                 </div>
               </div>
-              <div className="mt-4 border-t border-line/60 pt-3">
-                <div className="flex items-end justify-between gap-3">
-                  <div className="min-w-0 space-y-1 type-body text-sm">
-                    {isTransfer ? (
-                      <>
-                        <p>付款人：{expense.from || "-"}</p>
-                        <p>收款人：{expense.to || "-"}</p>
-                        {expense.note ? <p>备注：{expense.note}</p> : null}
-                      </>
-                    ) : (
-                      <>
-                        <p>付款人：{expense.payer || trip.manager || "-"}</p>
-                        <p className="truncate">参与人：{expense.participants.join("、") || "-"}</p>
-                      </>
-                    )}
-                  </div>
-                  <strong className="shrink-0 text-xl leading-none"><MoneyText value={formatCurrency(expense.amount)} /></strong>
-                </div>
+              <div className="mt-4 flex items-end justify-between gap-3 border-t border-line/60 pt-3">
+                <span className="truncate type-caption normal-case">{isTransfer ? "已抵扣" : (expense.payer || trip.manager || "已记录")}</span>
+                <strong className="shrink-0 text-xl leading-none"><MoneyText value={formatCurrency(expense.amount)} /></strong>
               </div>
             </div>
           </article>
@@ -792,7 +772,7 @@ function ExpensePage({ id }) {
   const [message, setMessage] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [decisionPrompt, setDecisionPrompt] = useState("");
-  const [decisionReply, setDecisionReply] = useState("点一个快捷问题，或直接输入你们的纠结。");
+  const [decisionReply, setDecisionReply] = useState("写下问题，水豚给个轻建议。");
 
   useEffect(() => {
     if (trip) {
@@ -887,24 +867,23 @@ function ExpensePage({ id }) {
           <span>返回</span>
         </a>
         <div className="min-w-0 flex-1 text-center">
-          <strong className="block truncate type-h3 text-base text-ink">{getTripTitle(trip)}</strong>
-          <small className="block truncate type-caption normal-case">Record Expense</small>
+          <strong className="block truncate type-h3 text-base text-ink">记一笔</strong>
+          <small className="block truncate type-caption normal-case">{getTripTitle(trip)}</small>
         </div>
         <span className="h-11 w-[72px] shrink-0" aria-hidden="true" />
       </header>
       <Panel className="space-y-5">
         <div>
-          <Eyebrow>第二步</Eyebrow>
-          <h1 className="mt-2 type-h1">{entryType === "transfer" ? "记一笔还款" : "记一笔支出"}</h1>
-          <p className="mt-2 type-body">{entryType === "transfer" ? "记录旅途中已经转过的钱，最终结算会自动抵扣。" : "适合记录住宿、门票、聚餐、交通这类共同支出。"}</p>
+          <Eyebrow>{entryType === "transfer" ? "还款" : "支出"}</Eyebrow>
+          <h1 className="mt-2 type-h1">记一笔</h1>
         </div>
         <div className="grid grid-cols-2 gap-2 rounded-3xl bg-card/70 p-1">
-          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>记支出</button>
-          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>记还款/转账</button>
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>支出</button>
+          <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-white text-ink shadow-capybara-warm" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>还款</button>
         </div>
         <form className="space-y-5" onSubmit={submit}>
           <Field label="金额">
-            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={entryType === "transfer" ? "输入已转账金额" : "输入本笔花费"} />
+            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={entryType === "transfer" ? "转账金额" : "本笔花费"} />
           </Field>
           {entryType === "transfer" ? (
             <>
@@ -956,7 +935,7 @@ function ExpensePage({ id }) {
                   ))}
                 </div>
               </Field>
-              <Field label="用途备注">
+              <Field label="备注">
                 <input className={inputClass()} maxLength={30} value={note} onChange={(event) => setNote(event.target.value)} placeholder="例如：晚餐、门票、打车" />
               </Field>
               <DecisionCard prompt={decisionPrompt} setPrompt={setDecisionPrompt} reply={decisionReply} onAsk={askDecision} />
@@ -967,7 +946,7 @@ function ExpensePage({ id }) {
           </Field>
           <div className="flex flex-row gap-3">
             <a className="inline-flex min-h-11 w-1/3 items-center justify-center rounded-2xl bg-stone-200 px-4 py-2.5 text-sm font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" href={hrefTo("detail", { id: trip.id })}>取消</a>
-            <Button variant="primary" className="w-2/3" icon={ReceiptText} type="submit">{entryType === "transfer" ? "保存这笔转账" : "保存这一笔"}</Button>
+            <Button variant="primary" className="w-2/3" icon={ReceiptText} type="submit">保存</Button>
           </div>
           <Message message={message} />
         </form>
@@ -1003,22 +982,25 @@ function ExpensePage({ id }) {
 
 function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
   return (
-    <section className="space-y-3 rounded-3xl bg-ink p-3 text-white shadow-capybara-warm">
-      <div>
-        <span className="type-kicker text-card">选择困难时</span>
-        <h2 className="mt-1 text-xl font-bold tracking-tight text-white">水豚拍板</h2>
-      </div>
+    <details className="group rounded-3xl border border-line bg-white/55 p-3 shadow-capybara-warm">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-1 py-1 text-sm font-extrabold text-ink transition-all active:scale-[0.98]">
+        <span>水豚拍板</span>
+        <span className="type-caption normal-case text-muted group-open:hidden">可选</span>
+        <span className="hidden type-caption normal-case text-muted group-open:inline">收起</span>
+      </summary>
+      <div className="mt-3 space-y-3">
       <div className="flex flex-wrap gap-2">
         {DECISION_TAGS.map((tag) => (
-          <button className="rounded-full bg-white/12 px-2 py-1.5 text-xs font-extrabold text-white transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
+          <button className="rounded-full bg-card px-2 py-1.5 text-xs font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
             {tag}
           </button>
         ))}
       </div>
-      <textarea rows={2} className="w-full rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-normal leading-relaxed outline-none placeholder:text-white/50 focus:ring-4 focus:ring-white/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：今晚吃火锅还是烧烤？" />
+      <textarea rows={2} className="w-full rounded-2xl border border-line bg-white/75 px-3 py-2 text-sm font-normal leading-relaxed text-ink outline-none placeholder:text-muted/65 focus:ring-4 focus:ring-accent/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：火锅还是烧烤？" />
       <Button variant="secondary" className="min-h-9 w-full py-2 text-xs" icon={Sparkles} onClick={onAsk}>给个建议</Button>
-      <div className="rounded-2xl bg-white/10 p-3 text-sm font-normal leading-relaxed text-white/85">{reply}</div>
-    </section>
+      <div className="rounded-2xl bg-paper p-3 text-sm font-normal leading-relaxed text-muted">{reply}</div>
+      </div>
+    </details>
   );
 }
 
@@ -1054,20 +1036,20 @@ function BudgetPage({ id }) {
   return (
     <>
     <Shell>
-      <Topbar title={getTripTitle(trip)} subtitle="Add Budget">
+      <Topbar title="加预算" subtitle={getTripTitle(trip)}>
         <ButtonLink to="detail" params={{ id: trip.id }} variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
       </Topbar>
       <Panel>
         <form className="space-y-5" onSubmit={submit}>
           <div>
             <Eyebrow>预算</Eyebrow>
-        <h1 className="mt-2 type-h1">增加预算</h1>
+        <h1 className="mt-2 type-h1">加预算</h1>
           </div>
           <Metric label="当前总预算" value={formatCurrency(trip.totalBudget)} />
-          <Field label="追加金额" hint={trip.mode === "shared" ? "多人付款模式会增加总预算，并刷新人均参考值。" : "大家长模式会重新平均到每个人的预算。"}>
-            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="输入要补充的金额" />
+          <Field label="追加金额">
+            <input className={inputClass()} type="number" min="0" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="补充金额" />
           </Field>
-          <Button variant="secondary" className="w-full" icon={Wallet} type="submit">增加预算</Button>
+          <Button variant="primary" className="w-full" icon={Wallet} type="submit">保存</Button>
           <Message message={message} />
         </form>
       </Panel>
@@ -1081,7 +1063,7 @@ function BudgetPage({ id }) {
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-50 text-4xl">✅</div>
-          <h2 id="budget-success-title" className="mt-5 type-h2">预算已增加！</h2>
+          <h2 id="budget-success-title" className="mt-5 type-h2">预算已增加</h2>
           <p className="mt-2 type-body">已同步至当前行程</p>
           <Button
             variant="primary"
@@ -1208,6 +1190,8 @@ function TripSummaryView({ trip, onClose }) {
   const categoryTotals = useMemo(() => getCategoryTotals(trip), [trip]);
   const footprints = useMemo(() => getCoreFootprints(trip, timelineExpenses), [trip, timelineExpenses]);
   const durationText = useMemo(() => getTripDurationText(trip), [trip]);
+  const expenseEntries = useMemo(() => getExpenseEntries(trip), [trip]);
+  const topExpense = useMemo(() => expenseEntries.reduce((top, item) => (!top || item.amount > top.amount ? item : top), null), [expenseEntries]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -1224,7 +1208,7 @@ function TripSummaryView({ trip, onClose }) {
           <ArrowLeft size={18} />
           <span>返回</span>
         </button>
-        <h1 className="min-w-0 flex-1 truncate px-3 text-center text-base font-extrabold text-ink">{getTripTitle(trip)}复盘</h1>
+        <h1 className="min-w-0 flex-1 truncate px-3 text-center text-base font-extrabold text-ink">旅行回忆</h1>
         <span className="h-10 w-[58px] shrink-0" aria-hidden="true" />
       </header>
 
@@ -1238,7 +1222,7 @@ function TripSummaryView({ trip, onClose }) {
               </div>
               <div className="text-right">
                 <span className="type-caption">总花费</span>
-                <strong className="mt-2 block text-3xl"><MoneyText value={formatCurrency(trip.currentSpent)} animate /></strong>
+                <strong className="mt-2 block text-3xl"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
               </div>
               <div className="col-span-2 rounded-3xl bg-card/65 p-4">
                 <span className="type-caption">核心足迹</span>
@@ -1247,10 +1231,11 @@ function TripSummaryView({ trip, onClose }) {
             </div>
           </article>
 
+          <MemoryHighlights trip={trip} topExpense={topExpense} topCategory={categoryTotals[0]} footprints={footprints} />
           <CategoryDonut totals={categoryTotals} total={getTripTotalSpent(trip)} />
 
           <section className="space-y-5">
-            <h2 className="type-h2">每日行程记录</h2>
+            <h2 className="type-h2">时间线</h2>
             <Timeline expenses={timelineExpenses} dailyTotals={dailyTotals} />
           </section>
         </div>
@@ -1260,6 +1245,25 @@ function TripSummaryView({ trip, onClose }) {
 }
 
 const CHART_COLORS = ["#D97736", "#6C8B57", "#C0844B", "#7CA7B8", "#A16207", "#8B7A6A"];
+
+function MemoryHighlights({ trip, topExpense, topCategory, footprints }) {
+  const items = [
+    ["一句话", `${getTripTitle(trip)}，账已算清。`],
+    ["最贵", topExpense ? `${getExpenseLabel(topExpense)} · ${formatCurrency(topExpense.amount)}` : "还没记录"],
+    ["花在哪", topCategory ? `${topCategory.category} · ${topCategory.percent}%` : "暂无占比"],
+    ["记住", footprints[0] || getTripTitle(trip)]
+  ];
+  return (
+    <section className="grid grid-cols-2 gap-3">
+      {items.map(([label, value]) => (
+        <article className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur" key={label}>
+          <p className="type-caption normal-case">{label}</p>
+          <h3 className="mt-2 line-clamp-2 text-base font-extrabold leading-snug text-ink">{value}</h3>
+        </article>
+      ))}
+    </section>
+  );
+}
 
 function CategoryDonut({ totals, total }) {
   const circumference = 2 * Math.PI * 42;
@@ -1277,8 +1281,8 @@ function CategoryDonut({ totals, total }) {
     <article className="animate-fade-in rounded-3xl border border-white/60 bg-white p-5 shadow-capybara-warm ring-1 ring-white/60">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <Eyebrow>资金用途占比</Eyebrow>
-          <h2 className="mt-2 type-h2">钱花在哪了</h2>
+          <Eyebrow>占比</Eyebrow>
+          <h2 className="mt-2 type-h2">资金占比</h2>
         </div>
         <div className="relative h-28 w-28 shrink-0">
           <svg viewBox="0 0 100 100" className="h-full w-full">
@@ -1376,35 +1380,32 @@ function ReviewPage({ id, summary = false }) {
 
   return (
     <Shell>
-      <Topbar title={summary ? "结算总结" : "结算"} subtitle={summary ? "Trip Summary" : "Trip Review"} />
+      <Topbar title={summary ? "结算总结" : "结算"} />
       <section className="space-y-2">
-        <Eyebrow>{summary ? "结算总结" : "第三步"}</Eyebrow>
+        <Eyebrow>{summary ? "总结" : "结算"}</Eyebrow>
         <h1 className="type-h1">{getTripTitle(trip)}</h1>
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{shortModeLabel(trip.mode)}</Badge>
           <span className="type-body text-sm">成员：{trip.people.join("、") || "-"}</span>
         </div>
       </section>
-      <BudgetOverview trip={trip} remaining={remaining} progress={getBudgetProgress(trip)} compact />
       <Panel className="space-y-4">
-        <SectionHead eyebrow="分类占比" title="钱主要花在哪" />
-        <CategoryShareList trip={trip} />
-      </Panel>
-      <Panel className="space-y-4">
-        <SectionHead eyebrow="最终结算" title="谁该付给谁" />
+        <SectionHead eyebrow="转账" title="转账路径" />
         {trip.mode === "shared" && sharedResult ? <SharedSettlement result={sharedResult} /> : null}
         {trip.mode === "parent" && parentResult ? <ParentSettlement trip={trip} result={parentResult} /> : null}
       </Panel>
-      <div className="grid grid-cols-2 gap-3">
-        <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-amber-500 px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-orange-500/30 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
-          <span>🌟 生成这趟旅行回忆</span>
-        </button>
-        <ButtonLink to="detail" params={{ id: trip.id }} variant="secondary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
-      </div>
+      <ButtonLink to="detail" params={{ id: trip.id }} variant="secondary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
       <Panel className="space-y-4">
-        <SectionHead eyebrow="支出拆解" title="每笔支出明细" />
+        <SectionHead eyebrow="分类" title="钱花在哪" />
+        <CategoryShareList trip={trip} />
+      </Panel>
+      <Panel className="space-y-4">
+        <SectionHead eyebrow="明细" title="支出记录" />
         <ExpenseList trip={trip} />
       </Panel>
+      <button className="inline-flex w-full min-h-14 items-center justify-center rounded-2xl bg-primaryDeep px-4 py-4 text-sm font-extrabold text-white shadow-lg shadow-primaryDeep/20 transition-all duration-200 active:scale-[0.97]" type="button" onClick={() => setShowTripSummary(true)}>
+        <span>生成旅行回忆</span>
+      </button>
       {showTripSummary ? <TripSummaryView trip={trip} onClose={() => setShowTripSummary(false)} /> : null}
     </Shell>
   );
@@ -1440,16 +1441,6 @@ function ParentSettlement({ trip, result }) {
   const remainingTotal = round2(transferRows.reduce((sum, item) => sum + item.amount, 0));
   return (
     <div className="space-y-4">
-      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "超支补款" : "预算返还"}</Badge>
-            <h3 className="mt-3 type-h3">当前分摊结果</h3>
-          </div>
-          <strong className="text-2xl leading-none"><MoneyText value={formatCurrency(remainingTotal)} animate /></strong>
-        </div>
-        <p className="mt-2 type-body">总预算 <MoneyText value={formatCurrency(result.totalBudget)} />，总支出 <MoneyText value={formatCurrency(result.totalExpense)} />。</p>
-      </article>
       <div className="space-y-3">
         {transferRows.length ? transferRows.map((row) => (
           <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${row.from}-${row.to}-${row.amount}`}>
@@ -1468,6 +1459,15 @@ function ParentSettlement({ trip, result }) {
           </div>
         )}
       </div>
+      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "补款" : "返还"}</Badge>
+            <h3 className="mt-3 type-h3">成员净额</h3>
+          </div>
+          <strong className="text-2xl leading-none"><MoneyText value={formatCurrency(remainingTotal)} animate /></strong>
+        </div>
+      </article>
     </div>
   );
 }
@@ -1476,25 +1476,6 @@ function SharedSettlement({ result }) {
   const netRows = Object.entries(result.net || {});
   return (
     <div className="space-y-4">
-      <article className="rounded-3xl border border-white/60 bg-white/60 p-4 shadow-capybara-warm ring-1 ring-white/60 backdrop-blur">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <Badge>多人付款</Badge>
-            <h3 className="mt-3 type-h3">当前分摊结果</h3>
-          </div>
-          <strong className="text-2xl leading-none"><MoneyText value={formatCurrency(result.totalExpense)} /></strong>
-        </div>
-        <p className="mt-2 type-body">系统已按付款人、参与人和中途转账计算净额。</p>
-      </article>
-      <div className="grid grid-cols-3 gap-2">
-        {netRows.map(([name, amount]) => (
-          <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-capybara-warm ring-1 ring-white/60" key={name}>
-            <strong className="block truncate text-sm font-extrabold text-ink">{name}</strong>
-            <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"}</p>
-            <p className={classNames("mt-1 text-sm leading-none", amount < 0 ? "text-rose-600" : "text-ink")}>{amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
-          </article>
-        ))}
-      </div>
       <div className="space-y-3">
         {result.transfers.length ? result.transfers.map((transfer) => (
           <article className="rounded-3xl border border-amber-200/60 bg-amber-50/70 p-5 shadow-capybara-warm ring-1 ring-white/70" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
@@ -1513,6 +1494,18 @@ function SharedSettlement({ result }) {
           </div>
         )}
       </div>
+      <div>
+        <h3 className="mb-3 type-h3 text-base">成员净额</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {netRows.map(([name, amount]) => (
+            <article className="rounded-2xl border border-white/60 bg-white/60 p-3 shadow-capybara-warm ring-1 ring-white/60" key={name}>
+              <strong className="block truncate text-sm font-extrabold text-ink">{name}</strong>
+              <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "平账"}</p>
+              <p className={classNames("mt-1 text-sm leading-none", amount < 0 ? "text-rose-600" : "text-ink")}>{amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
+            </article>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1520,20 +1513,20 @@ function SharedSettlement({ result }) {
 function AboutPage() {
   return (
     <Shell>
-      <Topbar title="产品介绍" subtitle="About">
+      <Topbar title="说明">
         <ButtonLink to="home" variant="ghost" icon={ArrowLeft}>首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus}>开始</ButtonLink>
       </Topbar>
       <section className="space-y-3">
-        <Eyebrow>What It Does</Eyebrow>
-        <h1 className="type-h1">水豚旅行是一个多人旅行记账与分摊工具。</h1>
-        <p className="type-body">它专门处理住宿、门票、聚餐、交通这类共同支出，减少旅行结束后的算账沟通成本。</p>
+        <Eyebrow>水豚旅行</Eyebrow>
+        <h1 className="type-h1">多人旅行账本</h1>
+        <p className="type-body">记支出、算分摊、生成转账路径。</p>
       </section>
       <section className="space-y-4">
         {[
-          ["创建行程", "先定成员和预算", "选择大家长模式或多人付款模式，再进入详情页记账。"],
-          ["记一笔", "记录付款人和参与人", "每笔支出都能明确是谁付的、谁参与分摊。"],
-          ["看结算", "自动生成结果", "系统会给出分类占比、支出拆解和最终转账路径。"]
+          ["创建", "定成员和预算", "选择大家长或共同记账。"],
+          ["记录", "谁付谁参与", "支出、还款都能记。"],
+          ["结算", "看转账路径", "谁转给谁一眼清楚。"]
         ].map(([badge, title, copy]) => (
           <Panel key={badge}>
             <Badge>{badge}</Badge>

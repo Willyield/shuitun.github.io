@@ -58,7 +58,7 @@ export function createId() {
 }
 
 export function tripModeLabel(mode) {
-  return mode === "shared" ? "多人付款模式" : "大家长模式";
+  return mode === "shared" ? "共同记账" : "大家长模式";
 }
 
 export function getTripTitle(trip) {
