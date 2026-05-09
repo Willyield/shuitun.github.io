@@ -15,7 +15,7 @@
 }
 
 html {
-  background: #fff8ed;
+  background: #f4ebe1;
 }
 
 body {
@@ -24,12 +24,13 @@ body {
   margin: 0;
   font-family: "PingFang SC", "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif !important;
   background:
-    radial-gradient(circle at 12% 0%, rgba(244, 184, 106, 0.22), transparent 26%),
-    radial-gradient(circle at 88% 8%, rgba(255, 241, 214, 0.84), transparent 24%),
-    linear-gradient(rgba(90, 50, 31, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 50, 31, 0.014) 1px, transparent 1px),
-    linear-gradient(180deg, #fffdf8 0%, #fff8ed 54%, #f6e5d0 100%);
-  background-size: auto, auto, 36px 36px, 36px 36px, auto;
+    radial-gradient(circle at 14% 2%, rgba(255, 255, 255, 0.72), transparent 22%),
+    radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.38), transparent 20%),
+    radial-gradient(circle at 50% 26%, rgba(255, 247, 217, 0.62), transparent 24%),
+    linear-gradient(rgba(90, 50, 31, 0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 50, 31, 0.012) 1px, transparent 1px),
+    linear-gradient(180deg, #e8f0f2 0%, #f4ebe1 48%, #f2e5d5 100%);
+  background-size: auto, auto, auto, 36px 36px, 36px 36px, auto;
   color: #292524;
 }
 

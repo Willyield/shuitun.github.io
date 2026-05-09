@@ -185,9 +185,41 @@ function buttonClass(variant) {
 
 function Shell({ children, wide = false }) {
   return (
-    <main className={classNames("mx-auto min-h-screen px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[520px]")}>
-      <div className="space-y-5">{children}</div>
+    <main className={classNames("relative isolate mx-auto min-h-[100svh] overflow-hidden px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[480px]")}>
+      <AppBackdrop />
+      <div className="relative z-10 space-y-5">{children}</div>
     </main>
+  );
+}
+
+function AppBackdrop({ home = false }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div className="absolute -left-24 -top-28 h-64 w-64 rounded-full bg-white/42 blur-sm" />
+      <div className="absolute -right-28 top-24 h-72 w-72 rounded-full bg-white/28 blur-sm" />
+      <div className="absolute left-1/2 top-[11%] h-40 w-40 -translate-x-1/2 rounded-full bg-[#FFF7D9]/45 blur-3xl" />
+      <div className="absolute inset-x-0 top-[18%] h-44 opacity-70">
+        <div className="absolute -left-10 bottom-0 h-32 w-72 rounded-t-[100%] bg-gradient-to-t from-[#9FAFB1]/50 to-[#C9D8D9]/20 blur-[1px]" />
+        <div className="absolute left-24 bottom-0 h-40 w-80 rounded-t-[100%] bg-gradient-to-t from-[#879CA0]/45 to-[#DCE8E9]/15 blur-[2px]" />
+        <div className="absolute -right-20 bottom-0 h-36 w-80 rounded-t-[100%] bg-gradient-to-t from-[#AEB8AD]/40 to-[#E8EEE9]/10 blur-[2px]" />
+      </div>
+      <div className="absolute left-9 top-[18%] h-16 w-10 rounded-[50%] bg-[#D8B58F]/30 blur-[2px]">
+        <span className="absolute left-1/2 top-full h-10 w-px -translate-x-1/2 bg-[#9B7A60]/20" />
+      </div>
+      <div className="absolute right-12 top-[21%] h-12 w-8 rounded-[50%] bg-[#E3BC87]/26 blur-[2px]">
+        <span className="absolute left-1/2 top-full h-8 w-px -translate-x-1/2 bg-[#9B7A60]/16" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#F6E1CC]/72 via-[#F8EBDD]/35 to-transparent" />
+      <div className="absolute left-3 top-[40%] text-2xl text-primaryDeep/10">⌁</div>
+      <div className="absolute right-7 top-[36%] text-xl text-primaryDeep/12">⌖</div>
+      <div className="absolute bottom-16 right-6 text-2xl text-white/70">✦</div>
+      {home ? (
+        <>
+          <div className="absolute bottom-28 left-5 h-8 w-8 rounded-full border border-primaryDeep/10" />
+          <div className="absolute bottom-40 right-7 h-10 w-10 rounded-full border border-primaryDeep/10" />
+        </>
+      ) : null}
+    </div>
   );
 }
 
@@ -310,46 +342,61 @@ function HomePage() {
   }, []);
 
   return (
-    <Shell>
-      <Topbar markVariant="brand" markSize="lg">
-        <ButtonLink to="about" variant="ghost" icon={Sparkles}>说明</ButtonLink>
-      </Topbar>
+    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[480px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-4 text-ink animate-page-in">
+      <AppBackdrop home />
+      <a
+        className="absolute right-5 top-5 z-20 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/70 bg-white/42 px-3.5 py-1.5 text-sm font-extrabold text-[#3E2718] shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
+        href={hrefTo("about")}
+      >
+        <Sparkles size={16} />
+        <span>新手指南</span>
+      </a>
 
-      <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
-        <section className={classNames("ledger-paper relative overflow-hidden rounded-[32px] border p-6 text-ink", WARM_YELLOW_CARD_CLASS)}>
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-primaryDeep/8" aria-hidden="true" />
-          <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-primaryDeep/5" aria-hidden="true" />
-          <img
-            className="pointer-events-none absolute -right-5 top-3 z-0 h-28 w-24 rotate-3 rounded-[34%_66%_40%_60%/42%_48%_52%_58%] object-cover object-[52%_56%] opacity-95 shadow-capybara-warm sm:h-32 sm:w-28"
-            src={productCapybara}
-            alt=""
-            aria-hidden="true"
-          />
+      <section className="relative z-10 flex flex-1 flex-col items-center pt-12">
+        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl border border-white/80 bg-[#F9EADB] shadow-md">
+          <img className="h-full w-full scale-[1.42] object-cover object-[52%_56%]" src={productCapybara} alt="水豚旅行" />
+        </div>
+        <h1 className="mt-3 text-center text-3xl font-black tracking-tight text-[#3E2718]">水豚旅行</h1>
+
+        <section className="ledger-paper relative mt-8 w-full overflow-hidden rounded-[32px] border border-white/70 bg-white/60 p-6 shadow-[0_8px_32px_rgba(107,83,67,0.15)] backdrop-blur-md">
+          <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
+          <div className="absolute -right-1 top-7 z-0 h-[112px] w-[112px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/70 shadow-[0_8px_24px_rgba(107,83,67,0.12)]">
+            <img className="h-full w-full scale-[1.55] object-cover object-[54%_57%]" src={productCapybara} alt="" aria-hidden="true" />
+          </div>
           <div className="relative z-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">多人旅行账本</span>
-            <h1 className="mt-5 max-w-[240px] text-[34px] font-black leading-tight tracking-tighter">
+            <span className="inline-flex w-fit rounded-md bg-[#C4A790] px-2 py-1 text-xs font-bold tracking-widest text-white">多人旅行账本</span>
+            <h2 className="mt-4 max-w-[250px] text-[34px] font-black leading-tight tracking-tighter text-[#3E2718]">
               难开口的账，<br />
               轻松算清。
-            </h1>
-            <p className="mt-4 max-w-[230px] text-sm leading-relaxed text-muted">支出、还款、分摊，一页看懂。</p>
+            </h2>
+            <p className="mt-4 flex max-w-[270px] items-center gap-1 text-sm font-medium leading-relaxed text-[#6B5343]">
+              <span>🧾</span>
+              <span>支出、还款、</span>
+              <span>📊</span>
+              <span>分摊，一页看懂。</span>
+            </p>
           </div>
-          <div className="relative z-10 mt-8 grid grid-cols-3 gap-2">
-            {["少记", "抵扣", "清楚"].map((item) => (
-              <span className="rounded-2xl border border-sand/70 bg-paper/70 px-3 py-2 text-center text-xs font-extrabold text-primaryDeep" key={item}>{item}</span>
+          <div className="relative z-10 mt-8 flex gap-2">
+            {["📝 简易记录", "🏷️ 抵扣核算", "🧹 一键清除"].map((item) => (
+              <span className="flex flex-1 items-center justify-center gap-1 rounded-full border border-white/55 bg-[#F6EFE9]/80 px-2.5 py-2 text-center text-[12px] font-extrabold text-[#5C4033] shadow-sm" key={item}>
+                {item}
+              </span>
             ))}
           </div>
         </section>
 
-        <section className="mt-6 space-y-3">
-          <ButtonLink to="create" variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">
-            开启旅行
-          </ButtonLink>
-          <ButtonLink to="manage" variant="secondary" icon={Wallet} className="w-full rounded-3xl py-4 text-base">
-            已有行程
-          </ButtonLink>
+        <section className="mt-auto w-full space-y-4 pt-8">
+          <a className="inline-flex w-full min-h-14 items-center justify-center gap-2 rounded-full border-t border-white/20 bg-[#4A3018] px-4 py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(74,48,24,0.3)] transition-all duration-200 active:scale-[0.97]" href={hrefTo("create")}>
+            <Plus size={20} />
+            <span>开启新旅程</span>
+          </a>
+          <a className="inline-flex w-full min-h-14 items-center justify-center gap-2 rounded-full border border-[#4A3018]/18 bg-white/88 px-4 py-4 text-lg font-bold text-[#4A3018] shadow-sm backdrop-blur transition-all duration-200 active:scale-[0.97]" href={hrefTo("manage")}>
+            <Wallet size={20} />
+            <span>已有行程</span>
+          </a>
         </section>
       </section>
-    </Shell>
+    </main>
   );
 }
 
