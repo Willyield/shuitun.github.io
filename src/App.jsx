@@ -311,11 +311,11 @@ function CreateChoicePage() {
       </Topbar>
       <section className="space-y-2">
         <Eyebrow>创建行程前</Eyebrow>
-        <h1 className="type-h1">先选择这趟旅行怎么记账。</h1>
+        <h1 className="type-h1">这趟旅行怎么记？</h1>
       </section>
       <section className="space-y-4">
-        <ModeCard to="create-parent" badge="大家长模式" title="一个人统一管钱" copy="适合先收预算、统一垫付，最后看谁该退、谁该补。" />
-        <ModeCard to="create-shared" badge="多人付款模式" title="谁付款就记谁" copy="适合大家轮流付款，最后直接生成转账路径。" />
+        <ModeCard to="create-parent" badge="大家长模式" title="大家长记账" copy="适合先收预算、统一垫付，最后看谁该退、谁该补。" />
+        <ModeCard to="create-shared" badge="共同记账" title="大家一起记" copy="适合大家轮流付款，最后直接生成转账路径。" />
       </section>
     </Shell>
   );
