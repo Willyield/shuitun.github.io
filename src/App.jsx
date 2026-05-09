@@ -62,6 +62,7 @@ const pageTitles = {
 };
 
 const LAST_ACTIVE_TRIP_KEY = "lastActiveTripId";
+const WARM_YELLOW_CARD_CLASS = "border-sand/80 bg-gradient-to-br from-[#FFE9B8] via-[#FFF7E8] to-[#FFDFA3] shadow-capybara-warm ring-1 ring-white/70";
 
 function parseRoute() {
   const hash = window.location.hash.startsWith("#/") ? window.location.hash.slice(1) : "";
@@ -266,7 +267,7 @@ function HomePage() {
       </Topbar>
 
       <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
-        <section className="ledger-paper relative overflow-hidden rounded-[32px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep p-6 text-ink shadow-capybara-warm ring-1 ring-white/70">
+        <section className={classNames("ledger-paper relative overflow-hidden rounded-[32px] border p-6 text-ink", WARM_YELLOW_CARD_CLASS)}>
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-primaryDeep/8" aria-hidden="true" />
           <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-primaryDeep/5" aria-hidden="true" />
           <div className="relative z-10">
@@ -317,7 +318,7 @@ function CreateChoicePage() {
 
 function ModeCard({ to, index, badge, title, copy }) {
   return (
-    <a className="group block rounded-3xl border border-line/60 bg-paper/80 p-5 ring-1 ring-white/55 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" href={hrefTo(to)}>
+    <a className={classNames("group block rounded-3xl border p-5 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]", WARM_YELLOW_CARD_CLASS)} href={hrefTo(to)}>
       <div className="flex items-start justify-between gap-4">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primaryDeep text-xs font-black tracking-widest text-white">{index}</span>
         <span className="text-xl font-black text-accent transition-transform group-hover:translate-x-0.5">→</span>
@@ -522,7 +523,7 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
   const percent = Math.min(Math.max(progress, 0), 1) * 100;
   const isOverBudget = remaining < 0;
   return (
-    <section className={classNames("ledger-paper space-y-4 rounded-[32px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep text-ink shadow-capybara-warm ring-1 ring-white/70", compact ? "p-4" : "p-5")}>
+    <section className={classNames("ledger-paper space-y-4 rounded-[32px] border text-ink", WARM_YELLOW_CARD_CLASS, compact ? "p-4" : "p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">预算</span>
@@ -665,7 +666,7 @@ function SectionHead({ eyebrow, title, badge }) {
 function ExpenseList({ trip, onDelete }) {
   if (!trip.expenses.length) {
     return (
-      <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-4 type-body ring-1 ring-white/55">
+      <div className={classNames("relative overflow-hidden rounded-3xl border p-4 type-body", WARM_YELLOW_CARD_CLASS)}>
         <EmptyWatermark />
         <span className="relative z-10">还没有支出记录，先去记一笔。</span>
       </div>
@@ -680,7 +681,7 @@ function ExpenseList({ trip, onDelete }) {
         return (
           <article className="relative pl-9" key={expense.id}>
             <span className={classNames("absolute left-[9px] top-5 h-3 w-3 rounded-full border-2 border-[#FFF8ED]", isTransfer ? "bg-sky-400" : "bg-amber-500")} aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/84 p-4 ring-1 ring-white/55 backdrop-blur">
+            <div className={classNames("relative overflow-hidden rounded-3xl border p-4 backdrop-blur", WARM_YELLOW_CARD_CLASS)}>
               <div className={classNames("absolute left-0 top-0 h-full w-1", isTransfer ? "bg-sky-400" : "bg-accent")} aria-hidden="true" />
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -725,12 +726,12 @@ function LedgerView({ trip }) {
     return (
       <div className="space-y-3">
         {rows.length ? rows.map(([name, amount]) => (
-          <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55" key={name}>
+          <article className={classNames("rounded-3xl border p-4", WARM_YELLOW_CARD_CLASS)} key={name}>
             <strong className="block type-h3 text-base">{name}</strong>
             <p className="mt-1 type-body">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         )) : (
-          <div className="relative overflow-hidden rounded-3xl border border-line/60 bg-paper/80 p-4 type-body ring-1 ring-white/55">
+          <div className={classNames("relative overflow-hidden rounded-3xl border p-4 type-body", WARM_YELLOW_CARD_CLASS)}>
             <EmptyWatermark />
             <span className="relative z-10">暂无净额数据。</span>
           </div>
@@ -745,7 +746,7 @@ function LedgerView({ trip }) {
         const spent = ledger[name] || 0;
         const balance = round2((trip.per || 0) - spent);
         return (
-          <article className="rounded-3xl border border-line/60 bg-paper/80 p-4 ring-1 ring-white/55" key={name}>
+          <article className={classNames("rounded-3xl border p-4", WARM_YELLOW_CARD_CLASS)} key={name}>
             <div className="flex items-center justify-between gap-3">
               <strong className="type-h3 text-base">{name}</strong>
               <Badge tone={balance < 0 ? "alert" : "default"}>{balance < 0 ? "已超支" : "未超支"}</Badge>
