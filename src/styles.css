@@ -24,8 +24,12 @@ body {
   margin: 0;
   font-family: "PingFang SC", "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif !important;
   background:
-    radial-gradient(circle at 12% 0%, rgba(217, 119, 54, 0.16), transparent 24%),
-    linear-gradient(180deg, #fffdf8 0%, #fff8ed 56%, #f4dfca 100%);
+    radial-gradient(circle at 12% 0%, rgba(244, 184, 106, 0.22), transparent 26%),
+    radial-gradient(circle at 88% 8%, rgba(255, 241, 214, 0.84), transparent 24%),
+    linear-gradient(rgba(90, 50, 31, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 50, 31, 0.014) 1px, transparent 1px),
+    linear-gradient(180deg, #fffdf8 0%, #fff8ed 54%, #f6e5d0 100%);
+  background-size: auto, auto, 36px 36px, 36px 36px, auto;
   color: #292524;
 }
 
@@ -67,8 +71,8 @@ textarea {
 
   .ledger-paper {
     background-image:
-      linear-gradient(rgba(90, 50, 31, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(90, 50, 31, 0.035) 1px, transparent 1px);
+      linear-gradient(rgba(90, 50, 31, 0.026) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(90, 50, 31, 0.02) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 

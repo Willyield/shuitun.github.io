@@ -266,20 +266,20 @@ function HomePage() {
       </Topbar>
 
       <section className="flex min-h-[calc(100vh-120px)] flex-col justify-center py-4">
-        <section className="ledger-paper relative overflow-hidden rounded-[32px] bg-primaryDeep p-6 text-white shadow-ledger">
-          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-white/10" aria-hidden="true" />
-          <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-white/8" aria-hidden="true" />
+        <section className="ledger-paper relative overflow-hidden rounded-[32px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep p-6 text-ink shadow-capybara-warm ring-1 ring-white/70">
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-primaryDeep/8" aria-hidden="true" />
+          <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-primaryDeep/5" aria-hidden="true" />
           <div className="relative z-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-sand">多人旅行账本</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">多人旅行账本</span>
             <h1 className="mt-5 text-[34px] font-black leading-tight tracking-tighter">
               难开口的账，<br />
               轻松算清。
             </h1>
-            <p className="mt-4 text-sm leading-relaxed text-white/72">支出、还款、分摊，一页看懂。</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted">支出、还款、分摊，一页看懂。</p>
           </div>
           <div className="relative z-10 mt-8 grid grid-cols-3 gap-2">
             {["少记", "抵扣", "清楚"].map((item) => (
-              <span className="rounded-2xl border border-white/12 bg-white/10 px-3 py-2 text-center text-xs font-extrabold text-white/88" key={item}>{item}</span>
+              <span className="rounded-2xl border border-sand/70 bg-paper/70 px-3 py-2 text-center text-xs font-extrabold text-primaryDeep" key={item}>{item}</span>
             ))}
           </div>
         </section>
@@ -522,32 +522,32 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
   const percent = Math.min(Math.max(progress, 0), 1) * 100;
   const isOverBudget = remaining < 0;
   return (
-    <section className={classNames("ledger-paper space-y-4 rounded-[32px] border border-primaryDeep/20 bg-primaryDeep text-white shadow-ledger", compact ? "p-4" : "p-5")}>
+    <section className={classNames("ledger-paper space-y-4 rounded-[32px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep text-ink shadow-capybara-warm ring-1 ring-white/70", compact ? "p-4" : "p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-sand">预算</span>
-          <p className="mt-2 text-xs font-medium tracking-widest text-white/55">{isOverBudget ? "已超支" : "剩余预算"}</p>
-          <p className={classNames("mt-2 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-200" : "text-white")}>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">预算</span>
+          <p className="mt-2 text-xs font-medium tracking-widest text-muted">{isOverBudget ? "已超支" : "剩余预算"}</p>
+          <p className={classNames("mt-2 leading-none tracking-tighter", compact ? "text-3xl" : "text-4xl", isOverBudget ? "text-rose-600" : "text-primaryDeep")}>
             <MoneyText value={formatCurrency(remaining)} animate />
           </p>
         </div>
-        <span className={classNames("rounded-full px-3 py-1 text-xs font-black tracking-widest", isOverBudget ? "bg-rose-100 text-rose-700" : "bg-white/12 text-white")}>{getProgressText(trip)}</span>
+        <span className={classNames("rounded-full px-3 py-1 text-xs font-black tracking-widest", isOverBudget ? "bg-rose-100 text-rose-700" : "bg-primaryDeep/8 text-primaryDeep")}>{getProgressText(trip)}</span>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
-          <p className="text-xs font-medium tracking-widest text-white/50">总预算</p>
-          <p className="mt-1 text-lg leading-none text-white"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
+        <div className="rounded-2xl border border-sand/60 bg-paper/68 p-3">
+          <p className="text-xs font-medium tracking-widest text-muted">总预算</p>
+          <p className="mt-1 text-lg leading-none text-ink"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-3">
-          <p className="text-xs font-medium tracking-widest text-white/50">总支出</p>
-          <p className="mt-1 text-lg leading-none text-white"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
+        <div className="rounded-2xl border border-sand/60 bg-paper/68 p-3">
+          <p className="text-xs font-medium tracking-widest text-muted">总支出</p>
+          <p className="mt-1 text-lg leading-none text-ink"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 overflow-hidden rounded-full bg-white/14">
-          <div className={classNames("h-full rounded-full transition-all", isOverBudget || progress >= LOW_BALANCE_RATIO ? "bg-rose-300" : "bg-sand")} style={{ width: `${percent}%` }} />
+        <div className="h-3 overflow-hidden rounded-full bg-paperDeep">
+          <div className={classNames("h-full rounded-full transition-all", isOverBudget || progress >= LOW_BALANCE_RATIO ? "bg-rose-500" : "bg-accent")} style={{ width: `${percent}%` }} />
         </div>
-        <div className="flex justify-between text-xs font-medium tracking-widest text-white/55">
+        <div className="flex justify-between text-xs font-medium tracking-widest text-muted">
           <span>进度</span>
           <strong>{Math.round(progress * 100)}%</strong>
         </div>
@@ -1218,19 +1218,19 @@ function TripSummaryView({ trip, onClose }) {
 
       <div className="h-full overflow-y-auto px-5 pb-10 pt-24">
         <div className="mx-auto max-w-[520px] space-y-5">
-          <article className="ledger-paper animate-fade-in rounded-[32px] bg-primaryDeep p-6 text-white shadow-ledger">
+          <article className="ledger-paper animate-fade-in rounded-[32px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep p-6 text-ink shadow-capybara-warm ring-1 ring-white/70">
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <span className="text-xs font-semibold tracking-[0.22em] text-sand">总耗时</span>
-                <strong className="mt-2 block text-2xl font-black tracking-tight text-white">{durationText}</strong>
+                <span className="text-xs font-semibold tracking-[0.22em] text-accentDark">总耗时</span>
+                <strong className="mt-2 block text-2xl font-black tracking-tight text-ink">{durationText}</strong>
               </div>
               <div className="text-right">
-                <span className="text-xs font-semibold tracking-[0.22em] text-sand">总花费</span>
-                <strong className="mt-2 block text-3xl text-white"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
+                <span className="text-xs font-semibold tracking-[0.22em] text-accentDark">总花费</span>
+                <strong className="mt-2 block text-3xl text-primaryDeep"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
               </div>
-              <div className="col-span-2 rounded-3xl border border-white/10 bg-white/10 p-4">
-                <span className="text-xs font-semibold tracking-[0.22em] text-white/50">核心足迹</span>
-                <p className="mt-2 text-sm leading-relaxed text-white/82">📍 {footprints.join(" ➔ ")}</p>
+              <div className="col-span-2 rounded-3xl border border-sand/60 bg-paper/70 p-4">
+                <span className="text-xs font-semibold tracking-[0.22em] text-muted">核心足迹</span>
+                <p className="mt-2 text-sm leading-relaxed text-stone-700">📍 {footprints.join(" ➔ ")}</p>
               </div>
             </div>
           </article>
@@ -1447,13 +1447,14 @@ function ParentSettlement({ trip, result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {transferRows.length ? transferRows.map((row) => (
-          <article className="ledger-paper rounded-[28px] bg-primaryDeep p-5 text-white shadow-ledger" key={`${row.from}-${row.to}-${row.amount}`}>
+          <article className="ledger-paper relative overflow-hidden rounded-[28px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep p-5 text-ink shadow-capybara-warm ring-1 ring-white/70" key={`${row.from}-${row.to}-${row.amount}`}>
+            <div className="absolute inset-y-0 right-0 w-1.5 bg-primaryDeep" aria-hidden="true" />
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-xs font-semibold tracking-[0.22em] text-sand">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-white">{row.from} <span className="text-sand">→</span> {row.to}</h3>
+                <p className="text-xs font-semibold tracking-[0.22em] text-accentDark">转账路径</p>
+                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{row.from} <span className="text-primaryDeep">→</span> {row.to}</h3>
               </div>
-              <strong className="shrink-0 text-2xl leading-none text-white"><MoneyText value={formatCurrency(row.amount)} /></strong>
+              <strong className="shrink-0 pr-2 text-2xl leading-none text-primaryDeep"><MoneyText value={formatCurrency(row.amount)} /></strong>
             </div>
           </article>
         )) : (
@@ -1482,13 +1483,14 @@ function SharedSettlement({ result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {result.transfers.length ? result.transfers.map((transfer) => (
-          <article className="ledger-paper rounded-[28px] bg-primaryDeep p-5 text-white shadow-ledger" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+          <article className="ledger-paper relative overflow-hidden rounded-[28px] border border-sand/70 bg-gradient-to-br from-warmCard via-paper to-warmCardDeep p-5 text-ink shadow-capybara-warm ring-1 ring-white/70" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+            <div className="absolute inset-y-0 right-0 w-1.5 bg-primaryDeep" aria-hidden="true" />
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-xs font-semibold tracking-[0.22em] text-sand">转账路径</p>
-                <h3 className="mt-2 text-xl font-black tracking-tight text-white">{transfer.from} <span className="text-sand">→</span> {transfer.to}</h3>
+                <p className="text-xs font-semibold tracking-[0.22em] text-accentDark">转账路径</p>
+                <h3 className="mt-2 text-xl font-black tracking-tight text-ink">{transfer.from} <span className="text-primaryDeep">→</span> {transfer.to}</h3>
               </div>
-              <strong className="shrink-0 text-2xl leading-none text-white"><MoneyText value={formatCurrency(transfer.amount)} /></strong>
+              <strong className="shrink-0 pr-2 text-2xl leading-none text-primaryDeep"><MoneyText value={formatCurrency(transfer.amount)} /></strong>
             </div>
           </article>
         )) : (
