@@ -3,9 +3,12 @@ import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-m
 import {
   ArrowLeft,
   Calculator,
+  Link2,
   Home,
+  MoreHorizontal,
   Plus,
   ReceiptText,
+  RefreshCw,
   Sparkles,
   Trash2,
   Wallet
@@ -183,6 +186,62 @@ function buttonClass(variant) {
   return `${base} ${variants[variant] || variants.ghost}`;
 }
 
+function copyCurrentLink() {
+  const link = window.location.href;
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(link);
+  const input = document.createElement("textarea");
+  input.value = link;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand("copy");
+  document.body.removeChild(input);
+  return Promise.resolve();
+}
+
+function PageMenu({ className = "" }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function shareLink() {
+    try {
+      await copyCurrentLink();
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className={classNames(className || "relative", "z-30")}>
+      <button
+        className="grid h-11 w-11 place-items-center rounded-full border border-line/70 bg-[rgba(255,250,240,0.72)] text-ink shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
+        type="button"
+        aria-label="更多操作"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <MoreHorizontal size={22} strokeWidth={2.4} />
+      </button>
+      {open ? (
+        <div className="absolute right-0 top-12 w-36 overflow-hidden rounded-2xl border border-line/70 bg-[rgba(255,250,240,0.94)] p-1 text-sm font-bold text-ink shadow-[0_14px_34px_rgba(75,38,22,0.16)] backdrop-blur-xl">
+          <button className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#F6E0CF]/70" type="button" onClick={() => window.location.reload()}>
+            <RefreshCw size={15} />
+            <span>刷新</span>
+          </button>
+          <button className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#F6E0CF]/70" type="button" onClick={shareLink}>
+            <Link2 size={15} />
+            <span>{copied ? "已复制" : "分享链接"}</span>
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function Shell({ children, wide = false }) {
   return (
     <main className={classNames("relative isolate mx-auto min-h-[100svh] overflow-hidden px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[480px]")}>
@@ -210,9 +269,9 @@ function AppBackdrop({ home = false }) {
         <span className="absolute left-1/2 top-full h-8 w-px -translate-x-1/2 bg-[#9B7A60]/16" />
       </div>
       <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#F5E5D0]/68 via-[#FFF7EA]/35 to-transparent" />
-      <div className="absolute left-3 top-[40%] text-2xl text-primaryDeep/10">⌁</div>
-      <div className="absolute right-7 top-[36%] text-xl text-primaryDeep/12">⌖</div>
-      <div className="absolute bottom-16 right-6 text-2xl text-white/70">✦</div>
+      <div className="absolute left-4 top-[40%] h-7 w-9 -rotate-12 rounded-md border border-primaryDeep/10" />
+      <div className="absolute right-7 top-[36%] h-8 w-6 rotate-12 rounded-full border border-primaryDeep/10" />
+      <div className="absolute bottom-16 right-6 h-8 w-10 rounded-lg border border-primaryDeep/8" />
       {home ? (
         <>
           <div className="absolute bottom-28 left-5 h-8 w-8 rounded-full border border-primaryDeep/10" />
@@ -272,6 +331,30 @@ function CapybaraMark({ variant = "brand", size = "md", className = "" }) {
   );
 }
 
+function CapybaraTravelSticker() {
+  return (
+    <div className="absolute -right-1 top-7 z-0 h-[122px] w-[122px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/78 shadow-[0_8px_24px_rgba(107,83,67,0.12)]" aria-hidden="true">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(196,226,224,0.55),transparent_32%),linear-gradient(135deg,#FFF8E8,#F6E0CF)]" />
+      <div className="absolute right-4 top-5 h-4 w-4 rounded-full border-2 border-[#B9783E]/60" />
+      <div className="absolute right-10 top-2 h-9 w-px rotate-[-18deg] bg-[#B9783E]/45" />
+      <div className="absolute left-8 top-21 h-12 w-10 rounded-xl border-2 border-[#7A4B31] bg-[#FFD067] shadow-sm">
+        <span className="absolute left-2 top-2 h-6 w-1 rounded-full bg-[#F4B86A]" />
+        <span className="absolute right-2 top-2 h-6 w-1 rounded-full bg-[#F4B86A]" />
+      </div>
+      <div className="absolute left-10 top-28 h-7 w-12 rounded-[50%] bg-[#E7B36C]/40 blur-md" />
+      <div className="absolute left-11 top-11 h-14 w-11 rounded-[44%_56%_48%_52%] bg-[#E9A95D] shadow-[inset_-5px_-6px_0_rgba(122,75,49,0.14)]" />
+      <div className="absolute left-6 top-5 h-16 w-14 rounded-[48%_52%_50%_50%] bg-[#E9A95D] shadow-[inset_-4px_-5px_0_rgba(122,75,49,0.12)]" />
+      <div className="absolute left-4 top-9 h-8 w-6 rounded-full bg-[#B97858]" />
+      <div className="absolute left-[37px] top-[48px] h-1.5 w-1.5 rounded-full bg-[#4A3018]" />
+      <div className="absolute left-[55px] top-[46px] h-1.5 w-2 rounded-full bg-[#4A3018]" />
+      <div className="absolute left-[70px] top-[24px] h-9 w-14 -rotate-6 rounded-[50%] border-b-[7px] border-[#B9783E] bg-[#F4C76B] shadow-sm" />
+      <div className="absolute left-[54px] top-[31px] h-4 w-20 -rotate-6 rounded-full bg-[#F4C76B] shadow-[0_2px_0_rgba(74,48,24,0.18)]" />
+      <div className="absolute left-[78px] top-[83px] h-4 w-3 rounded-full bg-[#C4824B]" />
+      <div className="absolute left-[65px] top-[82px] h-4 w-3 rounded-full bg-[#C4824B]" />
+    </div>
+  );
+}
+
 function Topbar({ title = "水豚旅行", subtitle = "", children, markVariant = "brand", markSize = "md" }) {
   return (
     <header className="flex items-center justify-between gap-3">
@@ -282,7 +365,10 @@ function Topbar({ title = "水豚旅行", subtitle = "", children, markVariant =
           {subtitle ? <small className="block truncate type-caption normal-case">{subtitle}</small> : null}
         </span>
       </a>
-      {children ? <nav className="flex shrink-0 flex-wrap justify-end gap-2">{children}</nav> : null}
+      <nav className="flex shrink-0 flex-wrap justify-end gap-2">
+        {children}
+        <PageMenu />
+      </nav>
     </header>
   );
 }
@@ -351,6 +437,7 @@ function HomePage() {
         <Sparkles size={16} />
         <span>新手指南</span>
       </a>
+      <PageMenu className="absolute right-5 top-[calc(env(safe-area-inset-top)+64px)]" />
 
       <section className="relative z-10 flex flex-1 flex-col items-center pt-12">
         <div className="grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-[20px] border border-white/80 bg-[#F9EADB] shadow-md">
@@ -360,9 +447,7 @@ function HomePage() {
 
         <section className="ledger-paper surface-card relative mt-8 min-h-[380px] w-full overflow-hidden rounded-[32px] px-7 py-8 backdrop-blur-md">
           <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
-          <div className="absolute -right-1 top-7 z-0 h-[112px] w-[112px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/70 shadow-[0_8px_24px_rgba(107,83,67,0.12)]">
-            <img className="h-full w-full scale-[1.55] object-cover object-[54%_57%]" src={productCapybara} alt="" aria-hidden="true" />
-          </div>
+          <CapybaraTravelSticker />
           <div className="relative z-10">
             <span className="inline-flex w-fit rounded-md bg-[#C4A790] px-2 py-1 text-xs font-bold tracking-widest text-white">多人旅行账本</span>
             <h2 className="mt-5 max-w-[250px] text-[38px] font-black leading-tight tracking-tighter text-[#3E2718]">
