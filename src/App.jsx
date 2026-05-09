@@ -45,6 +45,7 @@ import {
   tripModeLabel,
   updateTrip
 } from "./lib/travel";
+import productCapybara from "../assets/product-capybara.png";
 
 const pageTitles = {
   home: "水豚旅行 | 多人旅行记账与分摊",
@@ -192,75 +193,48 @@ function Shell({ children, wide = false }) {
 const capybaraMarkTone = {
   brand: {
     halo: "bg-[#FFE8A8]",
-    accent: "bg-accent",
-    detail: "spark"
+    accent: "bg-accent"
   },
   choice: {
     halo: "bg-[#FBEBCF]",
-    accent: "bg-primaryDeep",
-    detail: "dot"
+    accent: "bg-primaryDeep"
   },
   trip: {
     halo: "bg-[#FFF0C7]",
-    accent: "bg-accent",
-    detail: "route"
+    accent: "bg-accent"
   },
   entry: {
     halo: "bg-[#FFF6D8]",
-    accent: "bg-primaryDeep",
-    detail: "pen"
+    accent: "bg-primaryDeep"
   },
   budget: {
     halo: "bg-[#FFEAB8]",
-    accent: "bg-accent",
-    detail: "coin"
+    accent: "bg-accent"
   },
   settlement: {
     halo: "bg-[#F9E2BA]",
-    accent: "bg-primaryDeep",
-    detail: "receipt"
+    accent: "bg-primaryDeep"
   },
   archive: {
     halo: "bg-[#FFF3D6]",
-    accent: "bg-muted",
-    detail: "list"
+    accent: "bg-muted"
   }
 };
 
 function CapybaraMark({ variant = "brand", size = "md", className = "" }) {
   const tone = capybaraMarkTone[variant] || capybaraMarkTone.brand;
-  const sizeClass = size === "lg" ? "h-14 w-16" : size === "sm" ? "h-9 w-11" : "h-11 w-12";
+  const sizeClass = size === "lg" ? "h-14 w-14" : size === "sm" ? "h-9 w-9" : "h-11 w-11";
   return (
     <span className={classNames("relative isolate inline-flex shrink-0 items-center justify-center", sizeClass, className)} aria-hidden="true">
-      <span className={classNames("absolute inset-x-1 bottom-0 top-1 -z-10 -rotate-6 rounded-[44%_56%_48%_52%]", tone.halo)} />
-      <span className={classNames("absolute right-0 top-1 z-20 h-2.5 w-2.5 rounded-[4px]", tone.accent)} />
-      <svg className="relative z-10 h-full w-full drop-shadow-sm" viewBox="0 0 76 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M24.5 18.5C29.2 11.6 40.7 9.3 49.9 13.6C58.9 17.8 63.5 27.7 61 37C58.4 46.7 48.1 52.3 36.8 50.3C25.4 48.2 17.9 38.8 19.5 28.9C20.1 25 21.8 21.5 24.5 18.5Z" fill="#7A3E24" />
-        <path d="M20.1 26.8C15.9 27.3 12.2 30.9 11.7 35.1C11.1 40.3 15.6 45.1 21.8 45.7C25.2 46.1 29 45.2 31.7 43.4L28.9 26.2C26.5 26 23.5 26.4 20.1 26.8Z" fill="#A65D31" />
-        <path d="M37.5 13.7C38.8 9.8 42.2 7.8 45 9.2C47.4 10.4 48.2 13.6 46.9 17.2L37.5 13.7Z" fill="#8B4A28" />
-        <path d="M52 18.7C54.3 16.2 57.5 16.2 59.1 18.5C60.6 20.8 59.6 24.2 56.9 26.3L52 18.7Z" fill="#8B4A28" />
-        <circle cx="50.4" cy="29.6" r="2.1" fill="#24140E" />
-        <path d="M56.2 35.6C53.6 38 49.7 38.7 45.9 37.4" stroke="#24140E" strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M24.4 36.7C27.5 39.1 31.3 40.7 35.4 41" stroke="#D89C61" strokeWidth="3" strokeLinecap="round" />
-        {tone.detail === "spark" ? (
-          <path d="M11 15.5L13.2 20.2L18 22.4L13.2 24.5L11 29.3L8.8 24.5L4 22.4L8.8 20.2L11 15.5Z" fill="#D97736" />
-        ) : null}
-        {tone.detail === "route" ? (
-          <path d="M6 48C13.3 42.3 18.7 42.3 26 48" stroke="#D97736" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="1 5" />
-        ) : null}
-        {tone.detail === "pen" ? (
-          <path d="M8 47L18.5 36.5L22 40L11.5 50.5L7 52L8 47Z" fill="#D97736" />
-        ) : null}
-        {tone.detail === "coin" ? (
-          <path d="M14 49.5C18.4 49.5 22 47.5 22 45C22 42.5 18.4 40.5 14 40.5C9.6 40.5 6 42.5 6 45C6 47.5 9.6 49.5 14 49.5Z" fill="#D97736" />
-        ) : null}
-        {tone.detail === "receipt" ? (
-          <path d="M7 39H21V52L18.5 50.7L16 52L13.5 50.7L11 52L8.5 50.7L7 52V39Z" fill="#D97736" />
-        ) : null}
-        {tone.detail === "list" ? (
-          <path d="M7 40H23M7 46H19M7 52H22" stroke="#8B7A6A" strokeWidth="2.5" strokeLinecap="round" />
-        ) : null}
-      </svg>
+      <span className={classNames("absolute -inset-1 -z-10 rotate-[-7deg] rounded-[42%_58%_46%_54%/54%_44%_56%_46%]", tone.halo)} />
+      <span className={classNames("absolute right-0 top-0 z-20 h-2.5 w-2.5 rounded-[4px]", tone.accent)} />
+      <span className="relative h-full w-full overflow-hidden rounded-[38%_62%_44%_56%/54%_44%_56%_46%] shadow-sm">
+        <img
+          className="h-full w-full scale-[1.78] object-cover object-[52%_56%]"
+          src={productCapybara}
+          alt=""
+        />
+      </span>
     </span>
   );
 }
@@ -344,13 +318,19 @@ function HomePage() {
         <section className={classNames("ledger-paper relative overflow-hidden rounded-[32px] border p-6 text-ink", WARM_YELLOW_CARD_CLASS)}>
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full border border-primaryDeep/8" aria-hidden="true" />
           <div className="absolute bottom-0 right-0 h-24 w-24 rounded-tl-[48px] bg-primaryDeep/5" aria-hidden="true" />
+          <img
+            className="pointer-events-none absolute -right-5 top-3 z-0 h-28 w-24 rotate-3 rounded-[34%_66%_40%_60%/42%_48%_52%_58%] object-cover object-[52%_56%] opacity-95 shadow-capybara-warm sm:h-32 sm:w-28"
+            src={productCapybara}
+            alt=""
+            aria-hidden="true"
+          />
           <div className="relative z-10">
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">多人旅行账本</span>
-            <h1 className="mt-5 text-[34px] font-black leading-tight tracking-tighter">
+            <h1 className="mt-5 max-w-[240px] text-[34px] font-black leading-tight tracking-tighter">
               难开口的账，<br />
               轻松算清。
             </h1>
-            <p className="mt-4 text-sm leading-relaxed text-muted">支出、还款、分摊，一页看懂。</p>
+            <p className="mt-4 max-w-[230px] text-sm leading-relaxed text-muted">支出、还款、分摊，一页看懂。</p>
           </div>
           <div className="relative z-10 mt-8 grid grid-cols-3 gap-2">
             {["少记", "抵扣", "清楚"].map((item) => (
