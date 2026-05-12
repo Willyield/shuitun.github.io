@@ -54,7 +54,7 @@ const pageTitles = {
   home: "水豚旅行 | 多人旅行记账与分摊",
   create: "选择记账模式 | 水豚旅行",
   "create-parent": "大家长模式 | 水豚旅行",
-  "create-shared": "共同记账 | 水豚旅行",
+  "create-shared": "共同管理模式 | 水豚旅行",
   manage: "已有行程 | 水豚旅行",
   archive: "行程存档 | 水豚旅行",
   detail: "行程详情 | 水豚旅行",
@@ -177,10 +177,10 @@ function Button({ variant = "ghost", icon: Icon, children, className, ...props }
 function buttonClass(variant) {
   const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
   const variants = {
-    primary: "bg-primaryDeep text-white shadow-button hover:bg-primaryDeepHover",
-    secondary: "border border-line/70 bg-[rgba(255,250,240,0.76)] text-ink ring-1 ring-white/55 hover:bg-card",
-    ghost: "border border-line/70 bg-[rgba(255,250,240,0.46)] text-ink hover:bg-paper",
-    dark: "bg-ink text-white hover:bg-[#352111]",
+    primary: "bg-[#321D13] text-white shadow-button hover:bg-[#24140E]",
+    secondary: "border border-[#8F7058]/55 bg-[rgba(255,250,240,0.78)] text-[#321D13] ring-1 ring-white/55 hover:bg-[#F6E0CF]",
+    ghost: "border border-[#8F7058]/45 bg-[rgba(255,250,240,0.52)] text-[#321D13] hover:bg-paper",
+    dark: "bg-[#321D13] text-white hover:bg-[#24140E]",
     danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
   };
   return `${base} ${variants[variant] || variants.ghost}`;
@@ -487,7 +487,7 @@ function CreateChoicePage() {
       </section>
       <section className="space-y-4">
         <ModeCard to="create-parent" index="01" badge="大家长模式" title="大家长记账" copy="一人记账，大家查看。" />
-        <ModeCard to="create-shared" index="02" badge="共同记账" title="大家一起记" copy="多人编辑，共同分摊。" />
+        <ModeCard to="create-shared" index="02" badge="共同管理模式" title="大家一起管" copy="多人编辑，共同分摊。" />
       </section>
     </Shell>
   );
@@ -551,13 +551,24 @@ function CreateTripPage({ mode }) {
 
   return (
     <Shell>
-      <Topbar title={isShared ? "共同记账" : "大家长模式"} markVariant="choice" markSize="sm">
-        <ButtonLink to="create" variant="ghost" icon={ArrowLeft}>重选</ButtonLink>
-        <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
-      </Topbar>
-      <section className="space-y-3">
-        <Eyebrow>{isShared ? "多人编辑" : "一人记账"}</Eyebrow>
-        <h1 className="type-h1">设置行程</h1>
+      <header className="flex items-center justify-between gap-2">
+        <ButtonLink to="create" variant="ghost" icon={ArrowLeft} className="shrink-0">重选</ButtonLink>
+        <div className="flex shrink-0 items-center gap-2">
+          <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
+          <PageMenu />
+        </div>
+      </header>
+      <section className="inner-warm-card rounded-3xl p-5">
+        <div className="flex items-start gap-4">
+          <CapybaraMark variant="choice" size="lg" />
+          <div className="min-w-0 flex-1">
+            <Badge>{isShared ? "共同管理模式" : "大家长模式"}</Badge>
+            <div className="mt-3">
+              <Eyebrow>{isShared ? "多人编辑，共同分摊" : "一人记账，大家查看"}</Eyebrow>
+            </div>
+            <h1 className="mt-2 type-h1">设置行程</h1>
+          </div>
+        </div>
       </section>
       <Panel>
         <form className="space-y-5" onSubmit={submit}>
@@ -693,7 +704,7 @@ function ProgressBar({ width, alert }) {
 }
 
 function shortModeLabel(mode) {
-  return mode === "shared" ? "共同记账" : "大家长";
+  return mode === "shared" ? "共同管理模式" : "大家长";
 }
 
 function BudgetOverview({ trip, remaining, progress, compact = false }) {
@@ -1386,18 +1397,23 @@ function TripSummaryView({ trip, onClose }) {
   }, []);
 
   return (
-    <motion.section className="fixed inset-0 z-50 bg-[#FDFBF7] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
-      <header className="fixed inset-x-0 top-0 z-10 flex h-16 items-center justify-between border-b border-line/60 bg-[#FDFBF7]/95 px-5 backdrop-blur">
-        <button className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-2xl px-2 type-caption text-ink transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose} aria-label="返回上一页">
-          <ArrowLeft size={18} />
-          <span>返回</span>
-        </button>
-        <h1 className="min-w-0 flex-1 truncate px-3 text-center text-base font-extrabold text-ink">旅行回忆</h1>
-        <span className="h-10 w-[58px] shrink-0" aria-hidden="true" />
+    <motion.section className="fixed inset-0 z-50 bg-[linear-gradient(180deg,#FFF8EA_0%,#FDFBF7_46%,#F5E5D0_100%)] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
+      <header className="fixed inset-x-0 top-0 z-10 border-b border-line/60 bg-[#FFF8EA]/92 px-5 pb-3 pt-[calc(env(safe-area-inset-top)+10px)] backdrop-blur">
+        <div className="mx-auto flex max-w-[430px] items-center justify-between gap-3">
+          <button className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-[#8F7058]/45 bg-[rgba(255,250,240,0.82)] px-3 text-sm font-extrabold text-ink shadow-sm transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose} aria-label="返回上一页">
+            <ArrowLeft size={18} />
+            <span>返回</span>
+          </button>
+          <div className="min-w-0 flex-1 text-center">
+            <h1 className="truncate text-base font-black text-ink">旅行回忆</h1>
+            <p className="truncate text-xs font-semibold text-muted">{getTripTitle(trip)}</p>
+          </div>
+          <span className="h-11 w-[72px] shrink-0" aria-hidden="true" />
+        </div>
       </header>
 
-      <div className="h-full overflow-y-auto px-5 pb-10 pt-24">
-        <div className="mx-auto max-w-[520px] space-y-5">
+      <div className="h-full overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+42px)] pt-[calc(env(safe-area-inset-top)+112px)]">
+        <div className="mx-auto max-w-[430px] space-y-6">
           <article className="ledger-paper inner-warm-card animate-fade-in rounded-[32px] p-6 text-ink">
             <div className="grid grid-cols-2 gap-5">
               <div>
@@ -1454,8 +1470,8 @@ function CategoryDonut({ totals, total }) {
   let offset = 0;
   if (!totals.length || total <= 0) {
     return (
-      <article className="surface-card relative overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
-        <EmptyWatermark />
+      <article className="surface-card relative flex min-h-[98px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
+        <img className="pointer-events-none absolute -right-8 -bottom-10 z-0 h-36 w-36 opacity-[0.055]" src={heroCapybara} alt="" aria-hidden="true" />
         <span className="relative z-10">还没有可用于生成占比图的支出。</span>
       </article>
     );
@@ -1515,8 +1531,8 @@ function CategoryDonut({ totals, total }) {
 function Timeline({ expenses, dailyTotals }) {
   if (!expenses.length) {
     return (
-      <div className="surface-card relative overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
-        <EmptyWatermark />
+      <div className="surface-card relative flex min-h-[108px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
+        <img className="pointer-events-none absolute -right-8 -bottom-10 z-0 h-36 w-36 opacity-[0.055]" src={heroCapybara} alt="" aria-hidden="true" />
         <span className="relative z-10">还没有可生成回忆的核心支出。</span>
       </div>
     );
@@ -1710,7 +1726,7 @@ function AboutPage() {
       </section>
       <section className="space-y-4">
         {[
-          ["创建", "定成员和预算", "选择大家长或共同记账。"],
+          ["创建", "定成员和预算", "选择大家长或共同管理模式。"],
           ["记录", "谁付谁参与", "支出、还款都能记。"],
           ["结算", "看转账路径", "谁转给谁一眼清楚。"]
         ].map(([badge, title, copy]) => (
