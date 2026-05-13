@@ -446,8 +446,8 @@ function FeatureCard() {
       <div className="relative z-10">
         <span className="inline-flex w-fit rounded-md bg-transparent px-0 py-1 text-[16px] font-bold tracking-wide text-[#A8754B]">多人旅行账本</span>
         <h2 className="mt-5 max-w-[260px] text-[38px] font-black leading-[1.12] tracking-tighter text-[#3B2418]">
-          难开口的账，<br />
-          轻松算清。
+          难开口的账<br />
+          轻松算清
         </h2>
         <p className="mt-4 flex max-w-[295px] flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold leading-relaxed text-[#5F4736]">
           <FileText className="h-5 w-5 shrink-0 text-[#A8754B]" strokeWidth={1.9} />
