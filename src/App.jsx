@@ -2,14 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-motion";
 import {
   ArrowLeft,
+  Brush,
   Calculator,
-  Link2,
+  Camera,
+  Compass,
+  FileText,
   Home,
-  MoreHorizontal,
+  Map,
+  MapPin,
+  PieChart,
+  PencilLine,
   Plus,
   ReceiptText,
-  RefreshCw,
   Sparkles,
+  Tag,
   Trash2,
   Wallet
 } from "lucide-react";
@@ -26,7 +32,6 @@ import {
   deleteTrip,
   displayCategory,
   formatCurrency,
-  formatDateTime,
   getBudgetProgress,
   getCategoryTotals,
   getExpenseEntries,
@@ -186,62 +191,6 @@ function buttonClass(variant) {
   return `${base} ${variants[variant] || variants.ghost}`;
 }
 
-function copyCurrentLink() {
-  const link = window.location.href;
-  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(link);
-  const input = document.createElement("textarea");
-  input.value = link;
-  input.setAttribute("readonly", "");
-  input.style.position = "fixed";
-  input.style.opacity = "0";
-  document.body.appendChild(input);
-  input.select();
-  document.execCommand("copy");
-  document.body.removeChild(input);
-  return Promise.resolve();
-}
-
-function PageMenu({ className = "" }) {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  async function shareLink() {
-    try {
-      await copyCurrentLink();
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      setCopied(false);
-    }
-  }
-
-  return (
-    <div className={classNames(className || "relative", "z-30")}>
-      <button
-        className="grid h-11 w-11 place-items-center rounded-full border border-line/70 bg-[rgba(255,250,240,0.72)] text-ink shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
-        type="button"
-        aria-label="更多操作"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <MoreHorizontal size={22} strokeWidth={2.4} />
-      </button>
-      {open ? (
-        <div className="absolute right-0 top-12 w-36 overflow-hidden rounded-2xl border border-line/70 bg-[rgba(255,250,240,0.94)] p-1 text-sm font-bold text-ink shadow-[0_14px_34px_rgba(75,38,22,0.16)] backdrop-blur-xl">
-          <button className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#F6E0CF]/70" type="button" onClick={() => window.location.reload()}>
-            <RefreshCw size={15} />
-            <span>刷新</span>
-          </button>
-          <button className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#F6E0CF]/70" type="button" onClick={shareLink}>
-            <Link2 size={15} />
-            <span>{copied ? "已复制" : "分享链接"}</span>
-          </button>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 function Shell({ children, wide = false }) {
   return (
     <main className={classNames("relative isolate mx-auto min-h-[100svh] overflow-hidden px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[480px]")}>
@@ -348,17 +297,14 @@ function CapybaraTravelSticker() {
 function Topbar({ title = "水豚旅行", subtitle = "", children, markVariant = "brand", markSize = "md" }) {
   return (
     <header className="flex items-center justify-between gap-3">
-      <a className="flex min-w-0 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
+      <a className="flex min-w-0 flex-1 items-center gap-3" href={hrefTo("home")} aria-label="水豚旅行首页">
         <CapybaraMark variant={markVariant} size={markSize} />
         <span className="min-w-0">
           <strong className="block truncate type-h3 text-base text-ink">{title}</strong>
           {subtitle ? <small className="block truncate type-caption normal-case">{subtitle}</small> : null}
         </span>
       </a>
-      <nav className="flex shrink-0 flex-wrap justify-end gap-2">
-        {children}
-        <PageMenu />
-      </nav>
+      {children ? <nav className="flex shrink-0 flex-wrap justify-end gap-2">{children}</nav> : null}
     </header>
   );
 }
@@ -406,6 +352,140 @@ function Message({ message }) {
   );
 }
 
+function BackgroundScene() {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#DDEFF2_0%,#F8F3E8_44%,#F8DFB9_100%)]" />
+      <div className="absolute -left-24 -top-24 h-56 w-56 rounded-full bg-white/54 blur-[1px]" />
+      <div className="absolute -right-20 top-24 h-44 w-44 rounded-full bg-white/46 blur-[1px]" />
+      <div className="absolute inset-x-0 top-[23%] h-52">
+        <div className="absolute -left-16 bottom-8 h-28 w-64 rounded-t-[100%] bg-[#9CB8C2]/34 blur-sm" />
+        <div className="absolute left-10 bottom-10 h-36 w-80 rounded-t-[100%] bg-[#88A8B7]/26 blur-sm" />
+        <div className="absolute -right-20 bottom-8 h-32 w-72 rounded-t-[100%] bg-[#CBDAD8]/32 blur-sm" />
+        <div className="absolute inset-x-[-18%] bottom-0 h-24 bg-[linear-gradient(180deg,rgba(221,239,242,0.24),rgba(185,220,223,0.54),rgba(248,243,232,0.16))]" />
+      </div>
+      <div className="absolute left-9 top-[17%] h-20 w-12 rounded-[50%] bg-[#D9B68E]/24 blur-[2px]">
+        <span className="absolute left-1/2 top-full h-9 w-px -translate-x-1/2 bg-[#8A6A4E]/18" />
+      </div>
+      <div className="absolute right-9 top-[24%] h-14 w-9 rounded-[50%] bg-[#E8C58F]/22 blur-[1px]">
+        <span className="absolute left-1/2 top-full h-8 w-px -translate-x-1/2 bg-[#8A6A4E]/16" />
+      </div>
+      <FileText className="absolute left-4 top-[40%] h-8 w-8 -rotate-12 text-[#6D4B36]/16" strokeWidth={1.7} />
+      <MapPin className="absolute right-16 top-[35%] h-8 w-8 rotate-12 text-[#6D4B36]/18" strokeWidth={1.7} />
+      <Camera className="absolute bottom-32 right-7 h-8 w-8 -rotate-12 text-[#6D4B36]/12" strokeWidth={1.7} />
+      <Map className="absolute bottom-24 left-5 h-9 w-9 rotate-12 text-[#6D4B36]/12" strokeWidth={1.7} />
+      <span className="absolute bottom-[28%] right-4 h-8 w-12 rounded-[50%_48%_44%_56%] border border-[#6D4B36]/10" />
+      <span className="absolute bottom-[36%] left-1 h-7 w-10 rounded-[50%_48%_44%_56%] border border-[#6D4B36]/10" />
+      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-[linear-gradient(180deg,rgba(255,247,234,0),rgba(255,242,219,0.72)_44%,rgba(245,221,188,0.84))]" />
+    </div>
+  );
+}
+
+function CapybaraIcon({ className = "" }) {
+  return (
+    <div className={classNames("relative grid place-items-center overflow-hidden rounded-[24px] border-2 border-[#A98467]/62 bg-[#F4E7D5] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_rgba(92,72,52,0.18)]", className)} aria-label="水豚头像">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgba(255,255,255,0.72),transparent_30%),linear-gradient(135deg,#FFF4DF,#E8C9A2)]" />
+      <div className="relative h-[58%] w-[52%] rounded-[46%_44%_42%_48%] bg-[#C78F5A] shadow-[inset_-7px_-5px_0_rgba(117,75,45,0.18)]">
+        <span className="absolute -left-1 top-1 h-4 w-4 rounded-full bg-[#B67B4A]" />
+        <span className="absolute -right-1 top-1 h-4 w-4 rounded-full bg-[#B67B4A]" />
+        <span className="absolute left-3 top-5 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
+        <span className="absolute right-3 top-5 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
+        <span className="absolute left-1/2 top-7 h-3.5 w-5 -translate-x-1/2 rounded-[50%] border border-[#7A4A2A]/45 bg-[#D7A36D]" />
+        <span className="absolute bottom-2 left-1/2 h-5 w-8 -translate-x-1/2 rounded-full bg-[#D7A36D]/72" />
+      </div>
+      <span className="absolute bottom-2 right-2 h-7 w-5 rounded-md border border-[#8E6A4D]/45 bg-[#E7B567]/60" />
+    </div>
+  );
+}
+
+function BrandHeader() {
+  return (
+    <header className="relative z-20 flex flex-col items-center pt-10">
+      <a
+        className="absolute right-0 top-[calc(env(safe-area-inset-top)+8px)] inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#8F7058]/65 bg-[#FFF8EE]/78 px-3.5 py-1.5 text-sm font-extrabold text-[#3B2418] shadow-[0_8px_18px_rgba(92,72,52,0.08)] backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
+        href={hrefTo("about")}
+      >
+        <Sparkles size={16} />
+        <span>新手指南</span>
+      </a>
+      <CapybaraIcon className="h-[76px] w-[76px]" />
+      <h1 className="mt-4 text-center text-[38px] font-black leading-none tracking-tight text-[#3B2418]">水豚旅行</h1>
+    </header>
+  );
+}
+
+const homeFeatures = [
+  { label: "简易记录", icon: PencilLine },
+  { label: "抵扣核算", icon: Tag },
+  { label: "一键清除", icon: Brush }
+];
+
+function TravelIllustration() {
+  return (
+    <div className="absolute -right-5 top-4 z-0 h-[112px] w-[112px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/80 shadow-[0_8px_24px_rgba(107,83,67,0.12)]" aria-hidden="true">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(196,226,224,0.5),transparent_32%),linear-gradient(135deg,#FFF8E8,#F6E0CF)]" />
+      <Map className="absolute right-3 top-4 h-12 w-12 rotate-12 text-[#A98668]/35" strokeWidth={1.8} />
+      <Compass className="absolute left-4 top-5 h-7 w-7 -rotate-12 text-[#A66A39]/55" strokeWidth={1.8} />
+      <div className="absolute bottom-4 left-5 h-8 w-6 -rotate-12 rounded-md border border-[#6D4B36]/40 bg-[#49647A]/45" />
+      <div className="absolute bottom-5 right-5 h-8 w-6 rounded-md border border-[#8E6A4D]/35 bg-[#E7B567]/45" />
+      <div className="absolute left-[38px] top-[33px] h-12 w-9 rounded-[46%] bg-[#C78F5A] shadow-[inset_-5px_-4px_0_rgba(117,75,45,0.16)]">
+        <span className="absolute left-2 top-4 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
+        <span className="absolute right-2 top-4 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
+        <span className="absolute left-1/2 top-6 h-3 w-4 -translate-x-1/2 rounded-full border border-[#7A4A2A]/40 bg-[#D7A36D]" />
+      </div>
+      <div className="absolute inset-0 rounded-full ring-1 ring-white/70" />
+    </div>
+  );
+}
+
+function FeatureCard() {
+  return (
+    <section className="ledger-paper relative mt-9 min-h-[386px] w-full overflow-hidden rounded-[34px] border-2 border-[#E4D2BD]/88 bg-[#FFFCF6]/88 px-7 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.94),0_20px_44px_rgba(91,57,32,0.16),8px_10px_0_rgba(235,185,116,0.28)] backdrop-blur-md">
+      <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
+      <TravelIllustration />
+      <div className="relative z-10">
+        <span className="inline-flex w-fit rounded-md bg-transparent px-0 py-1 text-[16px] font-bold tracking-wide text-[#A8754B]">多人旅行账本</span>
+        <h2 className="mt-5 max-w-[260px] text-[38px] font-black leading-[1.12] tracking-tighter text-[#3B2418]">
+          难开口的账，<br />
+          轻松算清。
+        </h2>
+        <p className="mt-4 flex max-w-[295px] flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold leading-relaxed text-[#5F4736]">
+          <FileText className="h-5 w-5 shrink-0 text-[#A8754B]" strokeWidth={1.9} />
+          <span>支出、还款、</span>
+          <PieChart className="h-5 w-5 shrink-0 text-[#C18A55]" strokeWidth={1.9} />
+          <span>分摊，一页看懂。</span>
+        </p>
+      </div>
+      <div className="relative z-10 mt-12 grid grid-cols-3 gap-2">
+        {homeFeatures.map(({ label, icon: Icon }) => (
+          <span
+            className="flex min-h-[52px] items-center justify-center gap-1.5 rounded-[22px] border border-[#D8C2AA]/80 bg-[#F8EFE5]/86 px-2 text-center text-[12px] font-black leading-tight text-[#3B2418] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_8px_18px_rgba(92,72,52,0.09)]"
+            key={label}
+          >
+            <Icon className="h-4 w-4 shrink-0 text-[#A8754B]" strokeWidth={2} />
+            <span>{label}</span>
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ActionButtons() {
+  return (
+    <section className="mt-auto w-full space-y-4 pt-8">
+      <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[30px] border-t border-white/15 bg-[#321D13] px-4 py-4 text-lg font-black text-white shadow-[0_12px_24px_rgba(50,29,19,0.28)] transition-all duration-200 active:scale-[0.97]" href={hrefTo("create")}>
+        <Plus size={20} />
+        <span>开启新旅程</span>
+      </a>
+      <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[30px] border border-[#8F7058]/45 bg-[rgba(255,250,240,0.86)] px-4 py-4 text-lg font-black text-[#321D13] shadow-[0_8px_18px_rgba(92,72,52,0.08)] backdrop-blur transition-all duration-200 active:scale-[0.97]" href={hrefTo("manage")}>
+        <Wallet size={20} />
+        <span>已有行程</span>
+      </a>
+    </section>
+  );
+}
+
 function HomePage() {
   useEffect(() => {
     const lastActiveTripId = localStorage.getItem(LAST_ACTIVE_TRIP_KEY);
@@ -418,58 +498,12 @@ function HomePage() {
   }, []);
 
   return (
-    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[480px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+12px)] text-ink animate-page-in">
-      <AppBackdrop home />
-      <a
-        className="absolute right-5 top-[calc(env(safe-area-inset-top)+16px)] z-20 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[rgba(92,72,52,0.28)] bg-[rgba(255,250,240,0.72)] px-3.5 py-1.5 text-sm font-extrabold text-[#332018] shadow-sm backdrop-blur-md transition-all duration-200 active:scale-[0.97]"
-        href={hrefTo("about")}
-      >
-        <Sparkles size={16} />
-        <span>新手指南</span>
-      </a>
-      <PageMenu className="absolute right-5 top-[calc(env(safe-area-inset-top)+64px)]" />
-
-      <section className="relative z-10 flex flex-1 flex-col items-center pt-12">
-        <div className="grid h-[72px] w-[72px] place-items-center overflow-hidden rounded-[20px] border border-white/80 bg-[#F9EADB] shadow-md">
-          <img className="h-full w-full scale-[1.42] object-cover object-[52%_56%]" src={productCapybara} alt="水豚旅行" />
-        </div>
-        <h1 className="mt-3 text-center text-3xl font-black tracking-tight text-[#3E2718]">水豚旅行</h1>
-
-        <section className="ledger-paper surface-card relative mt-8 min-h-[380px] w-full overflow-hidden rounded-[32px] px-7 py-8 backdrop-blur-md">
-          <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
-          <CapybaraTravelSticker />
-          <div className="relative z-10">
-            <span className="inline-flex w-fit rounded-md bg-[#C4A790] px-2 py-1 text-xs font-bold tracking-widest text-white">多人旅行账本</span>
-            <h2 className="mt-5 max-w-[250px] text-[38px] font-black leading-tight tracking-tighter text-[#3E2718]">
-              难开口的账，<br />
-              轻松算清。
-            </h2>
-            <p className="mt-4 flex max-w-[270px] items-center gap-1 text-sm font-medium leading-relaxed text-[#6B5343]">
-              <span>🧾</span>
-              <span>支出、还款、</span>
-              <span>📊</span>
-              <span>分摊，一页看懂。</span>
-            </p>
-          </div>
-          <div className="relative z-10 mt-12 flex gap-2">
-            {["📝 简易记录", "🏷️ 抵扣核算", "🧹 一键清除"].map((item) => (
-              <span className="flex flex-1 items-center justify-center gap-1 rounded-full border border-white/55 bg-[#F6EFE9]/80 px-2.5 py-2 text-center text-[12px] font-extrabold text-[#5C4033] shadow-sm" key={item}>
-                {item}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-auto w-full space-y-4 pt-8">
-          <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[28px] border-t border-white/20 bg-[#4A3018] px-4 py-4 text-lg font-bold text-white shadow-[0_8px_20px_rgba(74,48,24,0.3)] transition-all duration-200 active:scale-[0.97]" href={hrefTo("create")}>
-            <Plus size={20} />
-            <span>开启新旅程</span>
-          </a>
-          <a className="inline-flex min-h-[72px] w-full items-center justify-center gap-2 rounded-[28px] border border-[rgba(92,72,52,0.28)] bg-[rgba(255,250,240,0.82)] px-4 py-4 text-lg font-bold text-[#332018] shadow-sm backdrop-blur transition-all duration-200 active:scale-[0.97]" href={hrefTo("manage")}>
-            <Wallet size={20} />
-            <span>已有行程</span>
-          </a>
-        </section>
+    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[430px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+12px)] text-ink animate-page-in">
+      <BackgroundScene />
+      <BrandHeader />
+      <section className="relative z-10 flex flex-1 flex-col items-center">
+        <FeatureCard />
+        <ActionButtons />
       </section>
     </main>
   );
@@ -555,7 +589,6 @@ function CreateTripPage({ mode }) {
         <ButtonLink to="create" variant="ghost" icon={ArrowLeft} className="shrink-0">重选</ButtonLink>
         <div className="flex shrink-0 items-center gap-2">
           <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
-          <PageMenu />
         </div>
       </header>
       <section className="inner-warm-card rounded-3xl p-5">
@@ -637,10 +670,11 @@ function TripListPage({ type = "manage" }) {
 
   return (
     <Shell>
-      <Topbar title={isArchive ? "行程存档" : "已有行程"} markVariant="archive" markSize="sm">
-        <ButtonLink to="home" variant="ghost" icon={Home}>首页</ButtonLink>
-        <ButtonLink to="create" variant="primary" icon={Plus}>创建</ButtonLink>
-      </Topbar>
+      <Topbar title={isArchive ? "行程存档" : "已有行程"} markVariant="archive" markSize="sm" />
+      <nav className="grid grid-cols-2 gap-3">
+        <ButtonLink to="home" variant="ghost" icon={Home} className="min-h-[54px] rounded-[22px] text-base">首页</ButtonLink>
+        <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-[54px] rounded-[22px] text-base">创建</ButtonLink>
+      </nav>
       <section className="space-y-2">
         <Eyebrow>{isArchive ? "历史记录" : "继续使用"}</Eyebrow>
         <h1 className="type-h1">{isArchive ? "历史账本" : "继续记账"}</h1>
@@ -686,10 +720,10 @@ function TripCard({ trip, onDelete }) {
         <span>剩余预算 <MoneyText value={formatCurrency(getRemainingBudget(trip))} /></span>
         <strong className="text-ink">{getProgressText(trip)}</strong>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <ButtonLink to="detail" params={{ id: trip.id }} variant="primary" icon={ReceiptText}>继续记账</ButtonLink>
-        <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator}>看结算</ButtonLink>
-        <Button variant="danger" icon={Trash2} className="col-span-2" onClick={() => onDelete(trip.id)}>删除行程</Button>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ButtonLink to="detail" params={{ id: trip.id }} variant="primary" icon={ReceiptText} className="min-h-[58px] rounded-[24px] text-base sm:col-span-2">继续记账</ButtonLink>
+        <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-[54px] rounded-[22px]">看结算</ButtonLink>
+        <Button variant="danger" icon={Trash2} className="min-h-[54px] rounded-[22px]" onClick={() => onDelete(trip.id)}>删除行程</Button>
       </div>
     </Panel>
   );
@@ -827,7 +861,7 @@ function DetailPage({ id }) {
         </Panel>
       ) : null}
       <Panel className="space-y-4">
-        <SectionHead eyebrow="已记录" title="最近支出" badge={`${trip.expenses.length} 笔`} />
+        <SectionHead eyebrow="已记录" title="最近支出" />
         <ExpenseList trip={trip} onDelete={removeExpense} />
         <Message message={message} />
       </Panel>
@@ -863,7 +897,7 @@ function ExpenseList({ trip, onDelete }) {
   return (
     <div className="relative space-y-3">
       <div className="absolute left-4 top-2 h-[calc(100%-16px)] w-px bg-line" aria-hidden="true" />
-      {trip.expenses.map((expense, index) => {
+      {trip.expenses.map((expense) => {
         const isTransfer = isTransferEntry(expense);
         const label = isTransfer ? `${expense.from || "-"} → ${expense.to || "-"}` : (expense.note || displayCategory(expense));
         return (
@@ -873,7 +907,6 @@ function ExpenseList({ trip, onDelete }) {
               <div className={classNames("absolute left-0 top-0 h-full w-1", isTransfer ? "bg-sky-400" : "bg-accent")} aria-hidden="true" />
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="type-caption normal-case">#{index + 1} · {formatDateTime(expense.time || expense.id)}</p>
                   <strong className="mt-1 block break-words type-h3 text-base">{label}</strong>
                 </div>
                 <div className="flex shrink-0 items-start gap-2">
@@ -907,6 +940,12 @@ function ExpenseList({ trip, onDelete }) {
   );
 }
 
+function netCardClass(amount) {
+  if (amount > 0) return "border-[#9BC6A4]/75 bg-[linear-gradient(135deg,rgba(246,255,236,0.96),rgba(220,243,205,0.72)_58%,rgba(255,250,240,0.9))] shadow-[0_12px_24px_rgba(93,125,73,0.10)]";
+  if (amount < 0) return "border-[#E6B7AA]/75 bg-[linear-gradient(135deg,rgba(255,248,238,0.96),rgba(255,225,211,0.76)_58%,rgba(255,250,240,0.9))] shadow-[0_12px_24px_rgba(150,82,58,0.10)]";
+  return "border-[#BFD7DC]/75 bg-[linear-gradient(135deg,rgba(245,253,255,0.96),rgba(218,239,241,0.72)_58%,rgba(255,250,240,0.9))] shadow-[0_12px_24px_rgba(73,118,128,0.09)]";
+}
+
 function LedgerView({ trip }) {
   if (trip.mode === "shared") {
     const result = settleShared(trip);
@@ -914,9 +953,10 @@ function LedgerView({ trip }) {
     return (
       <div className="space-y-3">
         {rows.length ? rows.map(([name, amount]) => (
-          <article className={classNames("ledger-paper rounded-3xl border p-4 backdrop-blur", WHITE_LEDGER_CARD_CLASS)} key={name}>
-            <strong className="block type-h3 text-base">{name}</strong>
-            <p className="mt-1 type-body">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
+          <article className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 backdrop-blur", netCardClass(amount))} key={name}>
+            <span className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full bg-white/34" aria-hidden="true" />
+            <strong className="relative z-10 block type-h3 text-base">{name}</strong>
+            <p className="relative z-10 mt-1 type-body">{amount > 0 ? "应收" : amount < 0 ? "应付" : "已平账"} · {amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
           </article>
         )) : (
           <div className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 type-body backdrop-blur", WHITE_LEDGER_CARD_CLASS)}>
@@ -934,14 +974,15 @@ function LedgerView({ trip }) {
         const spent = ledger[name] || 0;
         const balance = round2((trip.per || 0) - spent);
         return (
-          <article className={classNames("ledger-paper rounded-3xl border p-4 backdrop-blur", WHITE_LEDGER_CARD_CLASS)} key={name}>
-            <div className="flex items-center justify-between gap-3">
+          <article className={classNames("ledger-paper relative overflow-hidden rounded-3xl border p-4 backdrop-blur", netCardClass(balance))} key={name}>
+            <span className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full bg-white/34" aria-hidden="true" />
+            <div className="relative z-10 flex items-center justify-between gap-3">
               <strong className="type-h3 text-base">{name}</strong>
               <Badge tone={balance < 0 ? "alert" : "safe"}>{balance < 0 ? "已超支" : "未超支"}</Badge>
             </div>
-            <p className="mt-2 type-body">已分摊：<MoneyText value={formatCurrency(spent)} /></p>
-            <p className="type-body">人均预算：<MoneyText value={formatCurrency(trip.per)} /></p>
-            <p className="mt-2 text-2xl"><MoneyText value={formatCurrency(balance)} animate /></p>
+            <p className="relative z-10 mt-2 type-body">已分摊：<MoneyText value={formatCurrency(spent)} /></p>
+            <p className="relative z-10 type-body">人均预算：<MoneyText value={formatCurrency(trip.per)} /></p>
+            <p className="relative z-10 mt-2 text-2xl"><MoneyText value={formatCurrency(balance)} animate /></p>
           </article>
         );
       })}
