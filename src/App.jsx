@@ -5,7 +5,6 @@ import {
   Brush,
   Calculator,
   Camera,
-  Compass,
   FileText,
   Home,
   Map,
@@ -385,15 +384,11 @@ function CapybaraIcon({ className = "" }) {
   return (
     <div className={classNames("relative grid place-items-center overflow-hidden rounded-[24px] border-2 border-[#A98467]/62 bg-[#F4E7D5] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_rgba(92,72,52,0.18)]", className)} aria-label="水豚头像">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgba(255,255,255,0.72),transparent_30%),linear-gradient(135deg,#FFF4DF,#E8C9A2)]" />
-      <div className="relative h-[58%] w-[52%] rounded-[46%_44%_42%_48%] bg-[#C78F5A] shadow-[inset_-7px_-5px_0_rgba(117,75,45,0.18)]">
-        <span className="absolute -left-1 top-1 h-4 w-4 rounded-full bg-[#B67B4A]" />
-        <span className="absolute -right-1 top-1 h-4 w-4 rounded-full bg-[#B67B4A]" />
-        <span className="absolute left-3 top-5 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
-        <span className="absolute right-3 top-5 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
-        <span className="absolute left-1/2 top-7 h-3.5 w-5 -translate-x-1/2 rounded-[50%] border border-[#7A4A2A]/45 bg-[#D7A36D]" />
-        <span className="absolute bottom-2 left-1/2 h-5 w-8 -translate-x-1/2 rounded-full bg-[#D7A36D]/72" />
-      </div>
-      <span className="absolute bottom-2 right-2 h-7 w-5 rounded-md border border-[#8E6A4D]/45 bg-[#E7B567]/60" />
+      <img
+        className="relative h-full w-full scale-[1.42] object-cover object-[52%_56%]"
+        src={productCapybara}
+        alt=""
+      />
     </div>
   );
 }
@@ -424,15 +419,12 @@ function TravelIllustration() {
   return (
     <div className="absolute -right-5 top-4 z-0 h-[112px] w-[112px] overflow-hidden rounded-full border border-white/75 bg-[#F6EFE9]/80 shadow-[0_8px_24px_rgba(107,83,67,0.12)]" aria-hidden="true">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgba(196,226,224,0.5),transparent_32%),linear-gradient(135deg,#FFF8E8,#F6E0CF)]" />
-      <Map className="absolute right-3 top-4 h-12 w-12 rotate-12 text-[#A98668]/35" strokeWidth={1.8} />
-      <Compass className="absolute left-4 top-5 h-7 w-7 -rotate-12 text-[#A66A39]/55" strokeWidth={1.8} />
-      <div className="absolute bottom-4 left-5 h-8 w-6 -rotate-12 rounded-md border border-[#6D4B36]/40 bg-[#49647A]/45" />
-      <div className="absolute bottom-5 right-5 h-8 w-6 rounded-md border border-[#8E6A4D]/35 bg-[#E7B567]/45" />
-      <div className="absolute left-[38px] top-[33px] h-12 w-9 rounded-[46%] bg-[#C78F5A] shadow-[inset_-5px_-4px_0_rgba(117,75,45,0.16)]">
-        <span className="absolute left-2 top-4 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
-        <span className="absolute right-2 top-4 h-1.5 w-1.5 rounded-full bg-[#3A2418]" />
-        <span className="absolute left-1/2 top-6 h-3 w-4 -translate-x-1/2 rounded-full border border-[#7A4A2A]/40 bg-[#D7A36D]" />
-      </div>
+      <Map className="absolute right-3 top-4 h-12 w-12 rotate-12 text-[#A98668]/28" strokeWidth={1.8} />
+      <img
+        className="absolute inset-0 h-full w-full scale-[1.56] object-cover object-[50%_54%]"
+        src={productCapybara}
+        alt=""
+      />
       <div className="absolute inset-0 rounded-full ring-1 ring-white/70" />
     </div>
   );
@@ -449,7 +441,7 @@ function FeatureCard() {
           难开口的账<br />
           轻松算清
         </h2>
-        <p className="mt-4 flex max-w-[295px] flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold leading-relaxed text-[#5F4736]">
+        <p className="mt-4 flex max-w-none items-center gap-2 whitespace-nowrap text-[15px] font-semibold leading-none text-[#5F4736]">
           <FileText className="h-5 w-5 shrink-0 text-[#A8754B]" strokeWidth={1.9} />
           <span>支出、还款、</span>
           <PieChart className="h-5 w-5 shrink-0 text-[#C18A55]" strokeWidth={1.9} />
@@ -1799,5 +1791,7 @@ export default function App() {
     summary: <ReviewPage id={id} summary />,
     about: <AboutPage />
   };
-  return <div className="px-5 sm:px-6">{pages[route.name] || <HomePage />}</div>;
+  const page = pages[route.name] || <HomePage />;
+  if (route.name === "home" || !pages[route.name]) return page;
+  return <div className="px-5 sm:px-6">{page}</div>;
 }
