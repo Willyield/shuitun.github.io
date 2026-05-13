@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-motion";
 import {
   ArrowLeft,
   Brush,
   Calculator,
   Camera,
+  Copy,
   FileText,
   Home,
+  Link2,
   Map,
   MapPin,
   PieChart,
@@ -16,11 +18,13 @@ import {
   Sparkles,
   Tag,
   Trash2,
+  UserPlus,
+  Users,
+  X,
   Wallet
 } from "lucide-react";
 import heroCapybara from "../assets/hero-capybara.svg";
 import {
-  DECISION_REPLIES,
   DECISION_TAGS,
   EXPENSE_CATEGORIES,
   LOW_BALANCE_RATIO,
@@ -52,6 +56,21 @@ import {
   tripModeLabel,
   updateTrip
 } from "./lib/travel";
+import {
+  COLLAB_POLL_INTERVAL_MS,
+  createCollabChannel,
+  createCollabRoom,
+  findRoomCodeByTripId,
+  getCollabRoom,
+  getOnlineMembers,
+  getSelfNickname,
+  heartbeatCollabRoom,
+  joinCollabRoom,
+  setSelfNickname,
+  syncLocalTripFromRoom,
+  syncTripToExistingCollabRoom
+} from "./lib/collab";
+import { parseReceiptImageFile, requestDecisionAdvice } from "./lib/receipt";
 import productCapybara from "../assets/product-capybara.png";
 
 const pageTitles = {
@@ -64,6 +83,7 @@ const pageTitles = {
   detail: "行程详情 | 水豚旅行",
   expense: "记一笔 | 水豚旅行",
   budget: "加预算 | 水豚旅行",
+  collaborate: "加入协作 | 水豚旅行",
   review: "结算 | 水豚旅行",
   summary: "结算总结 | 水豚旅行",
   about: "产品介绍 | 水豚旅行"
@@ -117,6 +137,27 @@ function useRoute() {
 
 function navigate(route, params) {
   window.location.hash = hrefTo(route, params);
+}
+
+async function copyText(value) {
+  const text = String(value || "");
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+  const input = document.createElement("textarea");
+  input.value = text;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.top = "0";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+  input.focus();
+  input.select();
+  const copied = document.execCommand("copy");
+  input.remove();
+  if (!copied) throw new Error("Copy command failed");
+}
+
+function buildCollabJoinUrl(roomCode) {
+  return `${window.location.origin}${window.location.pathname}${hrefTo("collaborate", { room: roomCode })}`;
 }
 
 function classNames(...values) {
@@ -647,8 +688,96 @@ function inputClass() {
   return "min-h-12 w-full rounded-2xl border border-line bg-[rgba(255,250,240,0.78)] px-4 py-3 text-base font-semibold text-ink outline-none transition placeholder:text-muted/65 focus:border-accent focus:bg-[rgba(255,250,240,0.95)] focus:ring-4 focus:ring-accent/15";
 }
 
+function CollabInviteModal({ trip, onClose, onReady }) {
+  const [roomCode, setRoomCode] = useState(() => findRoomCodeByTripId(trip.id) || "");
+  const [nickname, setNickname] = useState(() => getSelfNickname() || trip.manager || trip.people[0] || "");
+  const [message, setMessage] = useState(null);
+  const joinUrl = roomCode ? buildCollabJoinUrl(roomCode) : "";
+
+  function ensureRoom() {
+    if (roomCode) return roomCode;
+    const cleanNickname = nickname.trim();
+    if (!cleanNickname) {
+      setMessage({ type: "error", text: "请先填写你的昵称。" });
+      return "";
+    }
+    const code = createCollabRoom(trip, cleanNickname);
+    setRoomCode(code);
+    setMessage({ type: "success", text: "协作房间已开启。" });
+    onReady?.(code);
+    return code;
+  }
+
+  async function copyRoomCode() {
+    const code = ensureRoom();
+    if (!code) return;
+    try {
+      await copyText(code);
+      setMessage({ type: "success", text: "房间码已复制。" });
+    } catch {
+      setMessage({ type: "error", text: "复制失败，请手动选中房间码复制。" });
+    }
+  }
+
+  async function copyJoinUrl() {
+    const code = ensureRoom();
+    if (!code) return;
+    try {
+      await copyText(buildCollabJoinUrl(code));
+      setMessage({ type: "success", text: "邀请链接已复制。" });
+    } catch {
+      setMessage({ type: "error", text: "复制失败，请手动选中邀请链接复制。" });
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="collab-invite-title" onClick={onClose}>
+      <motion.div
+        className="surface-card w-full max-w-sm rounded-3xl p-5 shadow-soft"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Eyebrow>多人协作</Eyebrow>
+            <h2 id="collab-invite-title" className="mt-2 type-h2">邀请同行者</h2>
+          </div>
+          <button className="grid h-10 w-10 place-items-center rounded-2xl border border-line bg-paper text-ink" type="button" onClick={onClose} aria-label="关闭">
+            <X size={18} />
+          </button>
+        </div>
+        <p className="mt-3 type-body">生成房间码后，同行者可在本浏览器环境内加入并同步行程数据。</p>
+        {!roomCode ? (
+          <Field label="你的昵称">
+            <input className={inputClass()} maxLength={16} value={nickname} onChange={(event) => setNickname(event.target.value)} placeholder="在协作中显示的名字" />
+          </Field>
+        ) : null}
+        <div className="mt-4 rounded-3xl border border-line bg-[rgba(255,250,240,0.74)] p-4 text-center">
+          <p className="type-caption normal-case">房间码</p>
+          <strong className="mt-2 block select-all text-4xl font-black tracking-[0.18em] text-primaryDeep">{roomCode || "------"}</strong>
+        </div>
+        {joinUrl ? (
+          <div className="mt-3 rounded-2xl bg-paper/75 p-3">
+            <p className="type-caption normal-case">邀请链接</p>
+            <p className="mt-1 break-all text-xs font-semibold leading-relaxed text-muted">{joinUrl}</p>
+          </div>
+        ) : null}
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {!roomCode ? <Button variant="primary" className="col-span-2" icon={UserPlus} onClick={ensureRoom}>开启协作</Button> : null}
+          <Button variant="secondary" icon={Copy} onClick={copyRoomCode}>复制房间码</Button>
+          <Button variant="secondary" icon={Link2} onClick={copyJoinUrl}>复制链接</Button>
+        </div>
+        <Message message={message} />
+      </motion.div>
+    </div>
+  );
+}
+
 function TripListPage({ type = "manage" }) {
   const [version, setVersion] = useState(0);
+  const [inviteTrip, setInviteTrip] = useState(null);
   const trips = useMemo(() => loadTrips(), [version]);
   const isArchive = type === "archive";
 
@@ -666,6 +795,7 @@ function TripListPage({ type = "manage" }) {
       <nav className="grid grid-cols-2 gap-3">
         <ButtonLink to="home" variant="ghost" icon={Home} className="min-h-[54px] rounded-[22px] text-base">首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-[54px] rounded-[22px] text-base">创建</ButtonLink>
+        {!isArchive ? <ButtonLink to="collaborate" variant="secondary" icon={Users} className="col-span-2 min-h-[54px] rounded-[22px] text-base">加入协作</ButtonLink> : null}
       </nav>
       <section className="space-y-2">
         <Eyebrow>{isArchive ? "历史记录" : "继续使用"}</Eyebrow>
@@ -673,7 +803,7 @@ function TripListPage({ type = "manage" }) {
       </section>
       {trips.length ? (
         <section className="space-y-4">
-          {trips.map((trip) => <TripCard trip={trip} onDelete={removeTrip} key={trip.id} />)}
+          {trips.map((trip) => <TripCard trip={trip} onDelete={removeTrip} onInvite={setInviteTrip} key={trip.id} />)}
         </section>
       ) : (
         <Panel className="relative overflow-hidden space-y-4 text-center">
@@ -685,11 +815,12 @@ function TripListPage({ type = "manage" }) {
           </div>
         </Panel>
       )}
+      {inviteTrip ? <CollabInviteModal trip={inviteTrip} onClose={() => setInviteTrip(null)} /> : null}
     </Shell>
   );
 }
 
-function TripCard({ trip, onDelete }) {
+function TripCard({ trip, onDelete, onInvite }) {
   const progress = getBudgetProgress(trip);
   const width = `${Math.min(Math.max(progress, 0), 1) * 100}%`;
   const isAlert = progress >= LOW_BALANCE_RATIO;
@@ -715,7 +846,8 @@ function TripCard({ trip, onDelete }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ButtonLink to="detail" params={{ id: trip.id }} variant="primary" icon={ReceiptText} className="min-h-[58px] rounded-[24px] text-base sm:col-span-2">继续记账</ButtonLink>
         <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-[54px] rounded-[22px]">看结算</ButtonLink>
-        <Button variant="danger" icon={Trash2} className="min-h-[54px] rounded-[22px]" onClick={() => onDelete(trip.id)}>删除行程</Button>
+        <Button variant="secondary" icon={UserPlus} className="min-h-[54px] rounded-[22px]" onClick={() => onInvite?.(trip)}>邀请入队</Button>
+        <Button variant="danger" icon={Trash2} className="min-h-[54px] rounded-[22px] sm:col-span-2" onClick={() => onDelete(trip.id)}>删除行程</Button>
       </div>
     </Panel>
   );
@@ -792,17 +924,67 @@ function NotFoundPage({ title = "没有找到这趟行程。", copy = "请从已
   );
 }
 
-function DetailPage({ id }) {
+function DetailPage({ id, room }) {
   const [version, setVersion] = useState(0);
   const [message, setMessage] = useState(null);
+  const [activeCollabRoomCode, setActiveCollabRoomCode] = useState(() => String(room || "").toUpperCase());
+  const [collabMembers, setCollabMembers] = useState([]);
+  const [collabNotice, setCollabNotice] = useState("");
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const collabNoticeTimer = useRef(null);
   const trip = useTrip(id, version);
   useEffect(() => {
     if (trip?.id) localStorage.setItem(LAST_ACTIVE_TRIP_KEY, trip.id);
   }, [trip?.id]);
+  useEffect(() => {
+    if (!trip?.id) return undefined;
+    const roomFromRoute = String(room || "").trim().toUpperCase();
+    const code = activeCollabRoomCode || roomFromRoute || findRoomCodeByTripId(trip.id);
+    if (!code) {
+      setCollabMembers([]);
+      return undefined;
+    }
+    if (code !== activeCollabRoomCode) setActiveCollabRoomCode(code);
+
+    const existingRoom = getCollabRoom(code);
+    if (!existingRoom) {
+      setMessage({ type: "error", text: "当前浏览器没有找到这个协作房间，请确认房间码。" });
+      return undefined;
+    }
+
+    const nickname = setSelfNickname(getSelfNickname() || existingRoom.hostNickname || "访客");
+    let lastVersion = Number(existingRoom.version) || 0;
+
+    function syncFromRoom(showNotice = false) {
+      heartbeatCollabRoom(code, nickname);
+      const latestRoom = getCollabRoom(code);
+      if (!latestRoom) return;
+      if ((Number(latestRoom.version) || 0) !== lastVersion) {
+        lastVersion = Number(latestRoom.version) || 0;
+        syncLocalTripFromRoom(code);
+        setVersion((current) => current + 1);
+        if (showNotice) {
+          setCollabNotice("已同步最新协作数据");
+          window.clearTimeout(collabNoticeTimer.current);
+          collabNoticeTimer.current = window.setTimeout(() => setCollabNotice(""), 2200);
+        }
+      }
+      setCollabMembers(getOnlineMembers(code));
+    }
+
+    syncFromRoom(false);
+    const channel = createCollabChannel(code, () => syncFromRoom(true));
+    const timer = window.setInterval(() => syncFromRoom(true), COLLAB_POLL_INTERVAL_MS);
+    return () => {
+      window.clearInterval(timer);
+      channel?.close?.();
+    };
+  }, [trip?.id, room, activeCollabRoomCode]);
   if (!trip) return <NotFoundPage />;
   const progress = getBudgetProgress(trip);
   const isAlert = progress >= LOW_BALANCE_RATIO;
   const remaining = getRemainingBudget(trip);
+  const visibleCollabRoomCode = activeCollabRoomCode || findRoomCodeByTripId(trip.id);
 
   function removeExpense(expenseId) {
     const expense = trip.expenses.find((item) => String(item.id) === String(expenseId));
@@ -811,8 +993,16 @@ function DetailPage({ id }) {
     if (!window.confirm(`确认删除「${label}」这笔记录吗？`)) return;
     const updatedTrip = deleteExpense(trip.id, expenseId);
     if (!updatedTrip) return setMessage({ type: "error", text: "删除失败，请重新进入行程后再试。" });
+    syncTripToExistingCollabRoom(trip.id);
     setMessage({ type: "success", text: "这笔记录已删除。" });
     setVersion((current) => current + 1);
+  }
+
+  function startCollab(nickname) {
+    const existingCode = findRoomCodeByTripId(trip.id);
+    const code = existingCode || createCollabRoom(trip, nickname);
+    setActiveCollabRoomCode(code);
+    setShowInviteModal(true);
   }
 
   return (
@@ -825,6 +1015,12 @@ function DetailPage({ id }) {
         </div>
         {trip.mode === "parent" ? <p className="mt-2 type-caption normal-case">大家长：{trip.manager || "-"}</p> : null}
       </section>
+      {visibleCollabRoomCode ? (
+        <CollabStatusBar roomCode={visibleCollabRoomCode} members={collabMembers} onInvite={() => setShowInviteModal(true)} />
+      ) : (
+        <CollabStartCard trip={trip} onStart={startCollab} />
+      )}
+      {collabNotice ? <div className="fixed left-1/2 top-5 z-50 -translate-x-1/2 rounded-full bg-[#321D13]/90 px-4 py-2 text-sm font-extrabold text-white shadow-lg">{collabNotice}</div> : null}
       <BudgetOverview trip={trip} remaining={remaining} progress={progress} />
       <section className="space-y-3">
         <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">记一笔</ButtonLink>
@@ -861,6 +1057,9 @@ function DetailPage({ id }) {
         <SectionHead eyebrow="净额" title="成员净额" badge="实时" />
         <LedgerView trip={trip} />
       </Panel>
+      {showInviteModal ? (
+        <CollabInviteModal trip={trip} onClose={() => setShowInviteModal(false)} onReady={setActiveCollabRoomCode} />
+      ) : null}
     </Shell>
   );
 }
@@ -982,9 +1181,64 @@ function LedgerView({ trip }) {
   );
 }
 
+function CollabStartCard({ trip, onStart }) {
+  const [nickname, setNickname] = useState(() => getSelfNickname() || trip.manager || trip.people[0] || "");
+  const [message, setMessage] = useState(null);
+
+  function start() {
+    const cleanNickname = nickname.trim();
+    if (!cleanNickname) return setMessage({ type: "error", text: "请先填写你的昵称。" });
+    onStart(cleanNickname);
+    setMessage({ type: "success", text: "协作房间已开启。" });
+  }
+
+  return (
+    <Panel className="space-y-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Eyebrow>多人协作</Eyebrow>
+          <h2 className="mt-2 type-h2">开启协作</h2>
+        </div>
+        <Badge>新功能</Badge>
+      </div>
+      <p className="type-body">生成房间码后，同行者可在本浏览器环境内加入这趟行程并同步记账。</p>
+      <Field label="你的昵称">
+        <input className={inputClass()} maxLength={16} value={nickname} onChange={(event) => setNickname(event.target.value)} placeholder="在协作中显示的名字" />
+      </Field>
+      <Button variant="primary" className="w-full" icon={UserPlus} onClick={start}>开启协作 · 生成房间码</Button>
+      <Message message={message} />
+    </Panel>
+  );
+}
+
+function CollabStatusBar({ roomCode, members, onInvite }) {
+  return (
+    <section className="rounded-3xl border border-line bg-[radial-gradient(circle_at_90%_8%,rgba(196,226,224,0.42),transparent_30%),rgba(255,250,240,0.84)] p-4 shadow-[0_12px_26px_rgba(91,57,32,0.08),inset_0_1px_0_rgba(255,255,255,0.74)] backdrop-blur">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>协作中</Badge>
+            <span className="type-caption normal-case">房间码</span>
+            <strong className="select-all text-lg font-black tracking-[0.16em] text-primaryDeep">{roomCode}</strong>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {members.length ? members.map((member) => (
+              <span className="inline-flex min-h-8 max-w-full items-center rounded-full border border-accent/25 bg-[#FFF8E8]/85 px-3 py-1 text-xs font-extrabold text-[#321D13]" key={member.nickname}>
+                {member.isHost ? "主持" : "成员"} · {member.nickname}{member.nickname === getSelfNickname() ? "（我）" : ""}
+              </span>
+            )) : <span className="inline-flex min-h-8 max-w-full items-center rounded-full border border-accent/25 bg-[#FFF8E8]/85 px-3 py-1 text-xs font-extrabold text-[#321D13]">暂无在线成员</span>}
+          </div>
+        </div>
+        <Button variant="secondary" icon={Link2} onClick={onInvite}>邀请</Button>
+      </div>
+    </section>
+  );
+}
+
 function ExpensePage({ id }) {
   const [version, setVersion] = useState(0);
   const trip = useTrip(id, version);
+  const receiptInputRef = useRef(null);
   const [amount, setAmount] = useState("");
   const [entryType, setEntryType] = useState("expense");
   const [category, setCategory] = useState(EXPENSE_CATEGORIES[0]);
@@ -996,8 +1250,12 @@ function ExpensePage({ id }) {
   const [note, setNote] = useState("");
   const [time, setTime] = useState("");
   const [message, setMessage] = useState(null);
+  const [receiptMessage, setReceiptMessage] = useState(null);
+  const [receiptDraft, setReceiptDraft] = useState(null);
+  const [isReceiptParsing, setIsReceiptParsing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [decisionPrompt, setDecisionPrompt] = useState("");
+  const [isDecisionLoading, setIsDecisionLoading] = useState(false);
   const [decisionReply, setDecisionReply] = useState("写下问题，水豚给个轻建议。");
 
   useEffect(() => {
@@ -1015,6 +1273,43 @@ function ExpensePage({ id }) {
 
   function toggleParticipant(name) {
     setParticipants((current) => current.includes(name) ? current.filter((item) => item !== name) : [...current, name]);
+  }
+
+  function applyReceiptDraft(draft) {
+    setEntryType("expense");
+    if (draft.amount > 0) setAmount(String(draft.amount));
+    if (EXPENSE_CATEGORIES.includes(draft.category)) {
+      setCategory(draft.category);
+      setCustomCategory(draft.category === "其他" ? draft.customCategory || draft.category || "" : "");
+    }
+    if (draft.note || draft.merchant) setNote(draft.note || draft.merchant);
+    if (draft.time) setTime(draft.time);
+  }
+
+  async function handleReceiptUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsReceiptParsing(true);
+    setReceiptMessage({ type: "success", text: "正在识别账单截图..." });
+    setReceiptDraft(null);
+    try {
+      const draft = await parseReceiptImageFile(file, { allowedCategories: EXPENSE_CATEGORIES });
+      applyReceiptDraft(draft);
+      setReceiptDraft(draft);
+      const warnings = [
+        draft.confidence > 0 && draft.confidence < 0.55 ? "识别置信度较低，请仔细核对。" : "",
+        ...(draft.warnings || [])
+      ].filter(Boolean);
+      setReceiptMessage({
+        type: warnings.length ? "error" : "success",
+        text: warnings.length ? warnings.join(" ") : "已识别账单，并填入下方表单。保存前请确认金额、分类和时间。"
+      });
+    } catch (error) {
+      setReceiptMessage({ type: "error", text: error.message || "账单识别失败，请手动录入。" });
+    } finally {
+      setIsReceiptParsing(false);
+      event.target.value = "";
+    }
   }
 
   function submit(event) {
@@ -1037,6 +1332,7 @@ function ExpensePage({ id }) {
         time
       });
       updateTrip(trip.id, (currentTrip) => ({ ...currentTrip, expenses: [...currentTrip.expenses, transfer] }));
+      syncTripToExistingCollabRoom(trip.id);
       setAmount("");
       setNote("");
       setTime("");
@@ -1063,6 +1359,7 @@ function ExpensePage({ id }) {
       time
     });
     updateTrip(trip.id, (currentTrip) => ({ ...currentTrip, expenses: [...currentTrip.expenses, expense] }));
+    syncTripToExistingCollabRoom(trip.id);
     setAmount("");
     setCategory(EXPENSE_CATEGORIES[0]);
     setCustomCategory("");
@@ -1075,13 +1372,31 @@ function ExpensePage({ id }) {
     setShowSuccessModal(true);
   }
 
-  function askDecision() {
+  async function askDecision() {
+    if (isDecisionLoading) return;
     if (!decisionPrompt.trim()) {
       setDecisionReply("先把问题写下来。");
       return;
     }
-    const reply = DECISION_REPLIES[Math.floor(Math.random() * DECISION_REPLIES.length)];
-    setDecisionReply(`${reply} 问题：${decisionPrompt.trim()}`);
+    setIsDecisionLoading(true);
+    setDecisionReply("水豚正在拍板...");
+    try {
+      const result = await requestDecisionAdvice({
+        prompt: decisionPrompt,
+        tripTitle: getTripTitle(trip),
+        people: trip.people,
+        category,
+        note,
+        amount,
+        time
+      });
+      const warnings = result.warnings?.length ? ` ${result.warnings.join(" ")}` : "";
+      setDecisionReply(`${result.advice}${warnings}`);
+    } catch (error) {
+      setDecisionReply(error.message || "水豚拍板暂时不可用，请稍后再试。");
+    } finally {
+      setIsDecisionLoading(false);
+    }
   }
 
   return (
@@ -1108,6 +1423,40 @@ function ExpensePage({ id }) {
         <div className="grid grid-cols-2 gap-2 rounded-3xl bg-card/70 p-1">
           <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>支出</button>
           <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>还款</button>
+        </div>
+        <div className="rounded-3xl border border-line/70 bg-[rgba(255,250,240,0.66)] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <Eyebrow>AI 识别</Eyebrow>
+              <h2 className="mt-1 type-h3">识别账单截图</h2>
+              <p className="mt-1 type-body">上传小票或支付截图，识别结果会先填入表单，确认后再保存。</p>
+            </div>
+            <Button
+              variant="secondary"
+              icon={Sparkles}
+              disabled={isReceiptParsing}
+              onClick={() => receiptInputRef.current?.click()}
+            >
+              {isReceiptParsing ? "识别中" : "上传截图"}
+            </Button>
+          </div>
+          <input
+            ref={receiptInputRef}
+            className="hidden"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            onChange={handleReceiptUpload}
+          />
+          <Message message={receiptMessage} />
+          {receiptDraft ? (
+            <div className="mt-3 grid gap-2 rounded-2xl bg-white/45 p-3 text-sm font-bold text-muted">
+              <span>金额：{receiptDraft.amount > 0 ? formatCurrency(receiptDraft.amount) : "待确认"}</span>
+              <span>分类：{receiptDraft.category}</span>
+              <span>备注：{receiptDraft.note || receiptDraft.merchant || "待确认"}</span>
+              {receiptDraft.time ? <span>时间：{receiptDraft.time.replace("T", " ")}</span> : null}
+            </div>
+          ) : null}
         </div>
         <form className="space-y-5" onSubmit={submit}>
           <Field label="金额">
@@ -1166,7 +1515,7 @@ function ExpensePage({ id }) {
               <Field label="备注">
                 <input className={inputClass()} maxLength={30} value={note} onChange={(event) => setNote(event.target.value)} placeholder="例如：晚餐、门票、打车" />
               </Field>
-              <DecisionCard prompt={decisionPrompt} setPrompt={setDecisionPrompt} reply={decisionReply} onAsk={askDecision} />
+              <DecisionCard prompt={decisionPrompt} setPrompt={setDecisionPrompt} reply={decisionReply} onAsk={askDecision} isLoading={isDecisionLoading} />
             </>
           )}
           <Field label="时间">
@@ -1208,7 +1557,7 @@ function ExpensePage({ id }) {
   );
 }
 
-function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
+function DecisionCard({ prompt, setPrompt, reply, onAsk, isLoading = false }) {
   return (
     <details className="surface-card group rounded-3xl p-3">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-1 py-1 text-sm font-extrabold text-ink transition-all active:scale-[0.98]">
@@ -1219,13 +1568,13 @@ function DecisionCard({ prompt, setPrompt, reply, onAsk }) {
       <div className="mt-3 space-y-3">
       <div className="flex flex-wrap gap-2">
         {DECISION_TAGS.map((tag) => (
-          <button className="rounded-full bg-card px-2 py-1.5 text-xs font-extrabold text-ink transition-all duration-200 active:scale-[0.97]" type="button" key={tag} onClick={() => setPrompt(tag)}>
+          <button className="rounded-full bg-card px-2 py-1.5 text-xs font-extrabold text-ink transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50" type="button" key={tag} disabled={isLoading} onClick={() => setPrompt(tag)}>
             {tag}
           </button>
         ))}
       </div>
-      <textarea rows={2} className="w-full rounded-2xl border border-line bg-[rgba(255,250,240,0.78)] px-3 py-2 text-sm font-normal leading-relaxed text-ink outline-none placeholder:text-muted/65 focus:ring-4 focus:ring-accent/15" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：火锅还是烧烤？" />
-      <Button variant="secondary" className="min-h-9 w-full py-2 text-xs" icon={Sparkles} onClick={onAsk}>给个建议</Button>
+      <textarea rows={2} className="w-full rounded-2xl border border-line bg-[rgba(255,250,240,0.78)] px-3 py-2 text-sm font-normal leading-relaxed text-ink outline-none placeholder:text-muted/65 focus:ring-4 focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60" value={prompt} disabled={isLoading} onChange={(event) => setPrompt(event.target.value)} placeholder="例如：火锅还是烧烤？" />
+      <Button variant="secondary" className="min-h-9 w-full py-2 text-xs" icon={Sparkles} disabled={isLoading} onClick={onAsk}>{isLoading ? "水豚思考中" : "给个建议"}</Button>
       <div className="rounded-2xl bg-paper p-3 text-sm font-normal leading-relaxed text-muted">{reply}</div>
       </div>
     </details>
@@ -1255,6 +1604,7 @@ function BudgetPage({ id }) {
         per: currentTrip.people.length ? round2(totalBudget / currentTrip.people.length) : currentTrip.per
       };
     });
+    syncTripToExistingCollabRoom(trip.id);
     setAmount("");
     setMessage({ type: "success", text: "预算已追加。" });
     setVersion((current) => current + 1);
@@ -1745,6 +2095,65 @@ function SharedSettlement({ result }) {
   );
 }
 
+function CollaboratePage({ room }) {
+  const [roomCode, setRoomCode] = useState(() => String(room || "").toUpperCase());
+  const [nickname, setNickname] = useState(() => getSelfNickname());
+  const [message, setMessage] = useState(null);
+
+  function submit(event) {
+    event.preventDefault();
+    const code = roomCode.trim().toUpperCase();
+    const cleanNickname = nickname.trim();
+    if (code.length !== 6) return setMessage({ type: "error", text: "请输入正确的 6 位房间码。" });
+    if (!cleanNickname) return setMessage({ type: "error", text: "请填写你的昵称。" });
+
+    const existingRoom = getCollabRoom(code);
+    if (!existingRoom) return setMessage({ type: "error", text: "房间码不存在，请确认后再试。" });
+    const isExistingName = Array.isArray(existingRoom.members) && existingRoom.members.some((member) => member.nickname === cleanNickname);
+    const joinedRoom = joinCollabRoom(code, cleanNickname);
+    if (!joinedRoom) return setMessage({ type: "error", text: "加入失败，请重新检查房间码。" });
+
+    setMessage({ type: "success", text: isExistingName ? "已使用这个昵称进入行程。" : "加入成功，正在进入行程。" });
+    window.setTimeout(() => navigate("detail", { id: joinedRoom.tripId, room: code }), 500);
+  }
+
+  return (
+    <Shell>
+      <Topbar title="加入协作" markVariant="choice" markSize="sm">
+        <ButtonLink to="manage" variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
+      </Topbar>
+      <section className="space-y-2">
+        <Eyebrow>多人协作</Eyebrow>
+        <h1 className="type-h1">加入同行者的行程</h1>
+        <p className="type-body">输入同行者分享的 6 位房间码，即可在当前浏览器环境内同步这趟行程。</p>
+      </section>
+      <Panel>
+        <form className="space-y-5" onSubmit={submit}>
+          <Field label="房间码">
+            <input
+              className={`${inputClass()} text-center text-2xl tracking-[0.2em]`}
+              maxLength={6}
+              value={roomCode}
+              onChange={(event) => setRoomCode(event.target.value.toUpperCase())}
+              placeholder="AB3K7Z"
+            />
+          </Field>
+          <Field label="你的昵称" hint="昵称会显示在协作成员列表中。">
+            <input className={inputClass()} maxLength={16} value={nickname} onChange={(event) => setNickname(event.target.value)} placeholder="在行程中显示的名字" />
+          </Field>
+          <Button variant="primary" className="w-full" icon={Users} type="submit">加入行程</Button>
+          <Message message={message} />
+        </form>
+      </Panel>
+      <Panel className="space-y-2">
+        <h2 className="type-h3">还没有房间码？</h2>
+        <p className="type-body">让行程发起人在详情页开启协作，或在已有行程页点击“邀请入队”生成房间码。</p>
+        <ButtonLink to="manage" variant="secondary" icon={Wallet}>去已有行程</ButtonLink>
+      </Panel>
+    </Shell>
+  );
+}
+
 function AboutPage() {
   return (
     <Shell>
@@ -1777,6 +2186,7 @@ function AboutPage() {
 export default function App() {
   const route = useRoute();
   const id = route.params.get("id");
+  const room = route.params.get("room");
   const pages = {
     home: <HomePage />,
     create: <CreateChoicePage />,
@@ -1784,9 +2194,10 @@ export default function App() {
     "create-shared": <CreateTripPage mode="shared" />,
     manage: <TripListPage />,
     archive: <TripListPage type="archive" />,
-    detail: <DetailPage id={id} />,
+    detail: <DetailPage id={id} room={room} />,
     expense: <ExpensePage id={id} />,
     budget: <BudgetPage id={id} />,
+    collaborate: <CollaboratePage room={room} />,
     review: <ReviewPage id={id} />,
     summary: <ReviewPage id={id} summary />,
     about: <AboutPage />
