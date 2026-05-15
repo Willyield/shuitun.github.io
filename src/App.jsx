@@ -90,8 +90,8 @@ const pageTitles = {
 };
 
 const LAST_ACTIVE_TRIP_KEY = "lastActiveTripId";
-const WARM_YELLOW_CARD_CLASS = "inner-warm-card";
-const WHITE_LEDGER_CARD_CLASS = "surface-card";
+const WARM_YELLOW_CARD_CLASS = "ledger-card";
+const WHITE_LEDGER_CARD_CLASS = "info-card";
 
 function parseRoute() {
   const hash = window.location.hash.startsWith("#/") ? window.location.hash.slice(1) : "";
@@ -220,20 +220,20 @@ function Button({ variant = "ghost", icon: Icon, children, className, ...props }
 }
 
 function buttonClass(variant) {
-  const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
+  const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-[20px] px-4 py-2.5 text-sm font-extrabold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50";
   const variants = {
-    primary: "bg-[#321D13] text-white shadow-button hover:bg-[#24140E]",
-    secondary: "border border-[#8F7058]/55 bg-[rgba(255,250,240,0.78)] text-[#321D13] ring-1 ring-white/55 hover:bg-[#F6E0CF]",
-    ghost: "border border-[#8F7058]/45 bg-[rgba(255,250,240,0.52)] text-[#321D13] hover:bg-paper",
-    dark: "bg-[#321D13] text-white hover:bg-[#24140E]",
-    danger: "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+    primary: "border border-[#321D13] bg-[#321D13] text-white shadow-button hover:bg-[#24140E]",
+    secondary: "border border-[#8F7058]/38 bg-[rgba(255,250,240,0.82)] text-[#321D13] ring-1 ring-white/55 hover:bg-[#FFF4E2]",
+    ghost: "border border-[#8F7058]/30 bg-[rgba(255,250,240,0.58)] text-[#321D13] hover:bg-paper",
+    dark: "border border-[#321D13] bg-[#321D13] text-white hover:bg-[#24140E]",
+    danger: "border border-red-200 bg-[rgba(255,241,242,0.78)] text-red-700 hover:bg-red-100"
   };
   return `${base} ${variants[variant] || variants.ghost}`;
 }
 
 function Shell({ children, wide = false }) {
   return (
-    <main className={classNames("relative isolate mx-auto min-h-[100svh] overflow-hidden px-5 pb-10 pt-5 animate-page-in", wide ? "max-w-5xl" : "max-w-[480px]")}>
+    <main className={classNames("relative isolate mx-auto min-h-[100svh] overflow-hidden px-5 pb-10 pt-[calc(env(safe-area-inset-top)+20px)] animate-page-in", wide ? "max-w-5xl" : "max-w-[480px]")}>
       <AppBackdrop />
       <div className="relative z-10 space-y-5">{children}</div>
     </main>
@@ -243,9 +243,10 @@ function Shell({ children, wide = false }) {
 function AppBackdrop({ home = false }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-      <div className="absolute -left-24 -top-28 h-64 w-64 rounded-full bg-white/38 blur-sm" />
-      <div className="absolute -right-28 top-24 h-72 w-72 rounded-full bg-[#FFF8E8]/34 blur-sm" />
-      <div className="absolute left-1/2 top-[11%] h-40 w-40 -translate-x-1/2 rounded-full bg-[#C4E2E0]/22 blur-3xl" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#DDEFF2_0%,#FFF7EA_46%,#F5DDBA_100%)]" />
+      <div className="absolute -left-24 -top-28 h-64 w-64 rounded-full bg-white/44 blur-sm" />
+      <div className="absolute -right-28 top-24 h-72 w-72 rounded-full bg-[#FFF8E8]/40 blur-sm" />
+      <div className="absolute left-1/2 top-[11%] h-40 w-40 -translate-x-1/2 rounded-full bg-[#C4E2E0]/26 blur-3xl" />
       <div className="absolute inset-x-0 top-[18%] h-44 opacity-70">
         <div className="absolute -left-10 bottom-0 h-32 w-72 rounded-t-[100%] bg-gradient-to-t from-[#C4E2E0]/26 to-[#FFF8E8]/18 blur-[1px]" />
         <div className="absolute left-24 bottom-0 h-40 w-80 rounded-t-[100%] bg-gradient-to-t from-[#AFCFCA]/22 to-[#FFF7EA]/12 blur-[2px]" />
@@ -257,7 +258,7 @@ function AppBackdrop({ home = false }) {
       <div className="absolute right-12 top-[21%] h-12 w-8 rounded-[50%] bg-[#E3BC87]/26 blur-[2px]">
         <span className="absolute left-1/2 top-full h-8 w-px -translate-x-1/2 bg-[#9B7A60]/16" />
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#F5E5D0]/68 via-[#FFF7EA]/35 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#F5DDBA]/70 via-[#FFF7EA]/35 to-transparent" />
       <div className="absolute left-4 top-[40%] h-7 w-9 -rotate-12 rounded-md border border-primaryDeep/10" />
       <div className="absolute right-7 top-[36%] h-8 w-6 rotate-12 rounded-full border border-primaryDeep/10" />
       <div className="absolute bottom-16 right-6 h-8 w-10 rounded-lg border border-primaryDeep/8" />
@@ -356,8 +357,8 @@ function Eyebrow({ children }) {
 function Badge({ children, tone = "default" }) {
   return (
     <span className={classNames(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2 py-1 text-xs font-bold uppercase tracking-widest",
-      tone === "alert" ? "bg-red-100 text-red-700" : tone === "safe" ? "badge-safe" : tone === "dark" ? "bg-primaryDeep text-white" : "badge-soft"
+      "inline-flex items-center justify-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-widest",
+      tone === "alert" ? "bg-[#F8DCD8] text-red-700" : tone === "safe" ? "badge-safe" : tone === "dark" ? "bg-primaryDeep text-white" : "badge-soft"
     )}>
       {children}
     </span>
@@ -365,13 +366,13 @@ function Badge({ children, tone = "default" }) {
 }
 
 function Panel({ children, className }) {
-  return <section className={classNames("surface-card rounded-3xl p-5 backdrop-blur", className)}>{children}</section>;
+  return <section className={classNames("surface-card rounded-[30px] p-5 backdrop-blur", className)}>{children}</section>;
 }
 
 function Metric({ label, value, valueClassName }) {
   const isMoney = isCurrencyValue(value);
   return (
-    <div className="inner-warm-card flex min-w-0 flex-1 flex-col items-start justify-center rounded-3xl px-2 py-4">
+    <div className="metric-card flex min-w-0 flex-1 flex-col items-start justify-center rounded-[24px] px-3 py-4">
       <span className="text-xs font-medium tracking-wide text-muted">{label}</span>
       <strong className={classNames("mt-1 min-w-0 text-xl font-black leading-none tracking-tighter tabular-nums sm:text-2xl", valueClassName || "text-ink")}>
         {isMoney ? <MoneyText value={value} animate className="block" /> : <span className="block">{value}</span>}
@@ -395,7 +396,8 @@ function Message({ message }) {
 function BackgroundScene() {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#DDEFF2_0%,#F8F3E8_44%,#F8DFB9_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#DDEFF2_0%,#F8F3E8_48%,#F8DFB9_100%)]" />
+      <div className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 bg-[linear-gradient(180deg,#DDEFF2_0%,#F8F3E8_48%,#F8DFB9_100%)]" />
       <div className="absolute -left-24 -top-24 h-56 w-56 rounded-full bg-white/54 blur-[1px]" />
       <div className="absolute -right-20 top-24 h-44 w-44 rounded-full bg-white/46 blur-[1px]" />
       <div className="absolute inset-x-0 top-[23%] h-52">
@@ -423,7 +425,7 @@ function BackgroundScene() {
 
 function CapybaraIcon({ className = "" }) {
   return (
-    <div className={classNames("relative grid place-items-center overflow-hidden rounded-[24px] border-2 border-[#A98467]/62 bg-[#F4E7D5] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_28px_rgba(92,72,52,0.18)]", className)} aria-label="水豚头像">
+    <div className={classNames("relative grid place-items-center overflow-hidden rounded-[24px] border border-white/80 bg-[#F4E7D5] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_14px_32px_rgba(92,72,52,0.16)]", className)} aria-label="水豚头像">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgba(255,255,255,0.72),transparent_30%),linear-gradient(135deg,#FFF4DF,#E8C9A2)]" />
       <img
         className="relative h-full w-full scale-[1.42] object-cover object-[52%_56%]"
@@ -473,7 +475,7 @@ function TravelIllustration() {
 
 function FeatureCard() {
   return (
-    <section className="ledger-paper relative mt-9 min-h-[386px] w-full overflow-hidden rounded-[34px] border-2 border-[#E4D2BD]/88 bg-[#FFFCF6]/88 px-7 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.94),0_20px_44px_rgba(91,57,32,0.16),8px_10px_0_rgba(235,185,116,0.28)] backdrop-blur-md">
+    <section className="ledger-paper travel-card relative mt-9 min-h-[386px] w-full overflow-hidden rounded-[34px] px-7 py-8">
       <div className="absolute -right-6 -top-5 h-32 w-32 rounded-full border border-[#C4A790]/30 bg-white/20" aria-hidden="true" />
       <TravelIllustration />
       <div className="relative z-10">
@@ -482,7 +484,7 @@ function FeatureCard() {
           难开口的账<br />
           轻松算清
         </h2>
-        <p className="mt-4 flex max-w-none items-center gap-2 whitespace-nowrap text-[15px] font-semibold leading-none text-[#5F4736]">
+        <p className="mt-4 flex max-w-none flex-wrap items-center gap-x-2 gap-y-2 text-[15px] font-semibold leading-none text-[#5F4736]">
           <FileText className="h-5 w-5 shrink-0 text-[#A8754B]" strokeWidth={1.9} />
           <span>支出、还款、</span>
           <PieChart className="h-5 w-5 shrink-0 text-[#C18A55]" strokeWidth={1.9} />
@@ -492,7 +494,7 @@ function FeatureCard() {
       <div className="relative z-10 mt-12 grid grid-cols-3 gap-2">
         {homeFeatures.map(({ label, icon: Icon }) => (
           <span
-            className="flex min-h-[52px] items-center justify-center gap-1.5 rounded-[22px] border border-[#D8C2AA]/80 bg-[#F8EFE5]/86 px-2 text-center text-[12px] font-black leading-tight text-[#3B2418] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_8px_18px_rgba(92,72,52,0.09)]"
+            className="info-card flex min-h-[52px] items-center justify-center gap-1.5 rounded-[22px] px-2 text-center text-[12px] font-black leading-tight text-[#3B2418]"
             key={label}
           >
             <Icon className="h-4 w-4 shrink-0 text-[#A8754B]" strokeWidth={2} />
@@ -531,7 +533,7 @@ function HomePage() {
   }, []);
 
   return (
-    <main className="relative isolate mx-auto flex min-h-[100svh] max-w-[430px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+12px)] text-ink animate-page-in">
+    <main className="relative isolate mx-auto flex min-h-[100svh] w-full max-w-[430px] flex-col overflow-hidden px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-[calc(env(safe-area-inset-top)+12px)] text-ink animate-page-in">
       <BackgroundScene />
       <BrandHeader />
       <section className="relative z-10 flex flex-1 flex-col items-center">
@@ -624,7 +626,7 @@ function CreateTripPage({ mode }) {
           <ButtonLink to="manage" variant="secondary" icon={Wallet}>已有</ButtonLink>
         </div>
       </header>
-      <section className="inner-warm-card rounded-3xl p-5">
+      <section className="ledger-card rounded-3xl p-5">
         <div className="flex items-start gap-4">
           <CapybaraMark variant="choice" size="lg" />
           <div className="min-w-0 flex-1">
@@ -636,7 +638,7 @@ function CreateTripPage({ mode }) {
           </div>
         </div>
       </section>
-      <Panel>
+      <Panel className="info-card">
         <form className="space-y-5" onSubmit={submit}>
           <Field label="行程名称">
             <input className={inputClass()} maxLength={24} value={tripName} onChange={(event) => setTripName(event.target.value)} placeholder={isShared ? "例如：周末露营局" : "例如：五一杭州旅行"} />
@@ -733,7 +735,7 @@ function CollabInviteModal({ trip, onClose, onReady }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="collab-invite-title" onClick={onClose}>
       <motion.div
-        className="surface-card w-full max-w-sm rounded-3xl p-5 shadow-soft"
+        className="guide-card w-full max-w-sm rounded-3xl p-5 shadow-soft"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
@@ -754,7 +756,7 @@ function CollabInviteModal({ trip, onClose, onReady }) {
             <input className={inputClass()} maxLength={16} value={nickname} onChange={(event) => setNickname(event.target.value)} placeholder="在协作中显示的名字" />
           </Field>
         ) : null}
-        <div className="mt-4 rounded-3xl border border-line bg-[rgba(255,250,240,0.74)] p-4 text-center">
+        <div className="mt-4 rounded-3xl border border-[#D07A36]/20 bg-[rgba(255,248,232,0.78)] p-4 text-center">
           <p className="type-caption normal-case">房间码</p>
           <strong className="mt-2 block select-all text-4xl font-black tracking-[0.18em] text-primaryDeep">{roomCode || "------"}</strong>
         </div>
@@ -792,7 +794,7 @@ function TripListPage({ type = "manage" }) {
   return (
     <Shell>
       <Topbar title={isArchive ? "行程存档" : "已有行程"} markVariant="archive" markSize="sm" />
-      <nav className="grid grid-cols-2 gap-3">
+      <nav className="info-card grid grid-cols-2 gap-3 rounded-[28px] p-3 backdrop-blur">
         <ButtonLink to="home" variant="ghost" icon={Home} className="min-h-[54px] rounded-[22px] text-base">首页</ButtonLink>
         <ButtonLink to="create" variant="primary" icon={Plus} className="min-h-[54px] rounded-[22px] text-base">创建</ButtonLink>
         {!isArchive ? <ButtonLink to="collaborate" variant="secondary" icon={Users} className="col-span-2 min-h-[54px] rounded-[22px] text-base">加入协作</ButtonLink> : null}
@@ -806,7 +808,7 @@ function TripListPage({ type = "manage" }) {
           {trips.map((trip) => <TripCard trip={trip} onDelete={removeTrip} onInvite={setInviteTrip} key={trip.id} />)}
         </section>
       ) : (
-        <Panel className="relative overflow-hidden space-y-4 text-center">
+        <Panel className="info-card relative overflow-hidden space-y-4 text-center">
           <EmptyWatermark />
           <div className="relative z-10 space-y-4">
             <Badge>还没有行程</Badge>
@@ -825,7 +827,7 @@ function TripCard({ trip, onDelete, onInvite }) {
   const width = `${Math.min(Math.max(progress, 0), 1) * 100}%`;
   const isAlert = progress >= LOW_BALANCE_RATIO;
   return (
-    <Panel className="space-y-4">
+    <Panel className="info-card space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="break-words type-h2">{getTripTitle(trip)}</h2>
@@ -833,7 +835,7 @@ function TripCard({ trip, onDelete, onInvite }) {
         </div>
         <Badge tone={isAlert ? "alert" : "default"}>{isAlert ? "预算告急" : "状态正常"}</Badge>
       </div>
-      <div className="flex flex-row justify-between gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <Metric label="总预算" value={formatCurrency(trip.totalBudget)} />
         <Metric label="总支出" value={formatCurrency(trip.currentSpent)} />
         <Metric label="记录数" value={`${trip.expenses.length} 笔`} />
@@ -855,8 +857,8 @@ function TripCard({ trip, onDelete, onInvite }) {
 
 function ProgressBar({ width, alert }) {
   return (
-    <div className="h-3 overflow-hidden rounded-full bg-card">
-      <div className={classNames("h-full rounded-full transition-all", alert ? "bg-red-500" : "bg-accent")} style={{ width }} />
+    <div className="h-3 overflow-hidden rounded-full bg-[#F2DDCF]/70">
+      <div className={classNames("h-full rounded-full transition-all", alert ? "bg-[#E26D62]" : "bg-[#C27B3C]")} style={{ width }} />
     </div>
   );
 }
@@ -869,7 +871,7 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
   const percent = Math.min(Math.max(progress, 0), 1) * 100;
   const isOverBudget = remaining < 0;
   return (
-    <section className={classNames("ledger-paper space-y-4 rounded-[32px] text-ink", WARM_YELLOW_CARD_CLASS, compact ? "p-4" : "p-5")}>
+    <section className={classNames("ledger-paper ledger-card space-y-4 rounded-[32px] text-ink", compact ? "p-4" : "p-5")}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-accentDark">预算</span>
@@ -881,11 +883,11 @@ function BudgetOverview({ trip, remaining, progress, compact = false }) {
         <span className={classNames("rounded-full px-3 py-1 text-xs font-black tracking-widest", isOverBudget ? "bg-rose-100 text-rose-700" : "bg-primaryDeep/8 text-primaryDeep")}>{getProgressText(trip)}</span>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="inner-warm-card rounded-2xl p-3">
+        <div className="metric-card rounded-2xl p-3">
           <p className="text-xs font-medium tracking-widest text-muted">总预算</p>
           <p className="mt-1 text-lg leading-none text-ink"><MoneyText value={formatCurrency(trip.totalBudget)} /></p>
         </div>
-        <div className="inner-warm-card rounded-2xl p-3">
+        <div className="metric-card rounded-2xl p-3">
           <p className="text-xs font-medium tracking-widest text-muted">总支出</p>
           <p className="mt-1 text-lg leading-none text-ink"><MoneyText value={formatCurrency(trip.currentSpent)} /></p>
         </div>
@@ -1008,7 +1010,7 @@ function DetailPage({ id, room }) {
   return (
     <Shell>
       <Topbar title="旅行中" subtitle={getTripTitle(trip)} markVariant="trip" />
-      <section className="surface-card rounded-3xl p-4 backdrop-blur">
+      <section className="info-card rounded-[28px] p-4 backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{shortModeLabel(trip.mode)}</Badge>
           <span className="type-body text-sm">{trip.people.join("、") || "-"}</span>
@@ -1024,10 +1026,10 @@ function DetailPage({ id, room }) {
       <BudgetOverview trip={trip} remaining={remaining} progress={progress} />
       <section className="space-y-3">
         <ButtonLink to="expense" params={{ id: trip.id }} variant="primary" icon={Plus} className="w-full rounded-3xl py-5 text-lg">记一笔</ButtonLink>
-        <div className="grid grid-cols-3 gap-2">
-          <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-10 px-2 py-2 text-xs">结算</ButtonLink>
-          <ButtonLink to="budget" params={{ id: trip.id }} variant="secondary" icon={Wallet} className="min-h-10 px-2 py-2 text-xs">预算</ButtonLink>
-          <ButtonLink to="manage" variant="ghost" icon={ArrowLeft} className="min-h-10 px-2 py-2 text-xs">管理</ButtonLink>
+        <div className="grid grid-cols-3 gap-2 rounded-[24px] bg-[#FFF8E8]/54 p-2">
+          <ButtonLink to="review" params={{ id: trip.id }} variant="secondary" icon={Calculator} className="min-h-12 px-2 py-2 text-sm">结算</ButtonLink>
+          <ButtonLink to="budget" params={{ id: trip.id }} variant="secondary" icon={Wallet} className="min-h-12 px-2 py-2 text-sm">预算</ButtonLink>
+          <ButtonLink to="manage" variant="ghost" icon={ArrowLeft} className="min-h-12 px-2 py-2 text-sm">管理</ButtonLink>
         </div>
       </section>
       {isAlert ? (
@@ -1048,12 +1050,12 @@ function DetailPage({ id, room }) {
           </p>
         </Panel>
       ) : null}
-      <Panel className="space-y-4">
+      <Panel className="info-card space-y-4">
         <SectionHead eyebrow="已记录" title="最近支出" />
         <ExpenseList trip={trip} onDelete={removeExpense} />
         <Message message={message} />
       </Panel>
-      <Panel className="space-y-4">
+      <Panel className="info-card space-y-4">
         <SectionHead eyebrow="净额" title="成员净额" badge="实时" />
         <LedgerView trip={trip} />
       </Panel>
@@ -1193,7 +1195,7 @@ function CollabStartCard({ trip, onStart }) {
   }
 
   return (
-    <Panel className="space-y-4">
+    <Panel className="guide-card space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <Eyebrow>多人协作</Eyebrow>
@@ -1213,7 +1215,7 @@ function CollabStartCard({ trip, onStart }) {
 
 function CollabStatusBar({ roomCode, members, onInvite }) {
   return (
-    <section className="rounded-3xl border border-line bg-[radial-gradient(circle_at_90%_8%,rgba(196,226,224,0.42),transparent_30%),rgba(255,250,240,0.84)] p-4 shadow-[0_12px_26px_rgba(91,57,32,0.08),inset_0_1px_0_rgba(255,255,255,0.74)] backdrop-blur">
+    <section className="automation-card rounded-3xl p-4 backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -1424,7 +1426,7 @@ function ExpensePage({ id }) {
           <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "expense" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("expense")}>支出</button>
           <button className={classNames("rounded-2xl px-4 py-3 text-sm font-extrabold transition-all duration-200 active:scale-[0.97]", entryType === "transfer" ? "bg-paper text-ink ring-1 ring-line/60" : "text-muted")} type="button" onClick={() => setEntryType("transfer")}>还款</button>
         </div>
-        <div className="rounded-3xl border border-line/70 bg-[rgba(255,250,240,0.66)] p-4">
+        <div className="automation-card rounded-3xl p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <Eyebrow>AI 识别</Eyebrow>
@@ -1450,7 +1452,7 @@ function ExpensePage({ id }) {
           />
           <Message message={receiptMessage} />
           {receiptDraft ? (
-            <div className="mt-3 grid gap-2 rounded-2xl bg-white/45 p-3 text-sm font-bold text-muted">
+            <div className="mt-3 grid gap-2 rounded-2xl bg-white/50 p-3 text-sm font-bold text-muted">
               <span>金额：{receiptDraft.amount > 0 ? formatCurrency(receiptDraft.amount) : "待确认"}</span>
               <span>分类：{receiptDraft.category}</span>
               <span>备注：{receiptDraft.note || receiptDraft.merchant || "待确认"}</span>
@@ -1559,7 +1561,7 @@ function ExpensePage({ id }) {
 
 function DecisionCard({ prompt, setPrompt, reply, onAsk, isLoading = false }) {
   return (
-    <details className="surface-card group rounded-3xl p-3">
+    <details className="guide-card group rounded-3xl p-3">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-1 py-1 text-sm font-extrabold text-ink transition-all active:scale-[0.98]">
         <span>水豚拍板</span>
         <span className="type-caption normal-case text-muted group-open:hidden">可选</span>
@@ -1568,7 +1570,7 @@ function DecisionCard({ prompt, setPrompt, reply, onAsk, isLoading = false }) {
       <div className="mt-3 space-y-3">
       <div className="flex flex-wrap gap-2">
         {DECISION_TAGS.map((tag) => (
-          <button className="rounded-full bg-card px-2 py-1.5 text-xs font-extrabold text-ink transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50" type="button" key={tag} disabled={isLoading} onClick={() => setPrompt(tag)}>
+          <button className="rounded-full bg-[#FFF8E8] px-2 py-1.5 text-xs font-extrabold text-ink ring-1 ring-[#D07A36]/12 transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50" type="button" key={tag} disabled={isLoading} onClick={() => setPrompt(tag)}>
             {tag}
           </button>
         ))}
@@ -1617,7 +1619,7 @@ function BudgetPage({ id }) {
       <Topbar title="加预算" subtitle={getTripTitle(trip)} markVariant="budget" markSize="sm">
         <ButtonLink to="detail" params={{ id: trip.id }} variant="ghost" icon={ArrowLeft}>返回</ButtonLink>
       </Topbar>
-      <Panel>
+      <Panel className="ledger-card">
         <form className="space-y-5" onSubmit={submit}>
           <div>
             <Eyebrow>预算</Eyebrow>
@@ -1780,7 +1782,7 @@ function TripSummaryView({ trip, onClose }) {
   }, []);
 
   return (
-    <motion.section className="fixed inset-0 z-50 bg-[linear-gradient(180deg,#FFF8EA_0%,#FDFBF7_46%,#F5E5D0_100%)] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
+    <motion.section className="fixed inset-0 z-50 bg-[linear-gradient(180deg,#DDEFF2_0%,#FFF8EA_44%,#F5DDBA_100%)] text-ink" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.42, ease: "easeOut" }}>
       <header className="fixed inset-x-0 top-0 z-10 border-b border-line/60 bg-[#FFF8EA]/92 px-5 pb-3 pt-[calc(env(safe-area-inset-top)+10px)] backdrop-blur">
         <div className="mx-auto flex max-w-[430px] items-center justify-between gap-3">
           <button className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-2xl border border-[#8F7058]/45 bg-[rgba(255,250,240,0.82)] px-3 text-sm font-extrabold text-ink shadow-sm transition-all duration-200 active:scale-[0.97]" type="button" onClick={onClose} aria-label="返回上一页">
@@ -1797,7 +1799,7 @@ function TripSummaryView({ trip, onClose }) {
 
       <div className="h-full overflow-y-auto px-5 pb-[calc(env(safe-area-inset-bottom)+42px)] pt-[calc(env(safe-area-inset-top)+112px)]">
         <div className="mx-auto max-w-[430px] space-y-6">
-          <article className="ledger-paper inner-warm-card animate-fade-in rounded-[32px] p-6 text-ink">
+          <article className="ledger-paper memory-card animate-fade-in rounded-[32px] p-6 text-ink">
             <div className="grid grid-cols-2 gap-5">
               <div>
                 <span className="text-xs font-semibold tracking-[0.22em] text-accentDark">总耗时</span>
@@ -1807,7 +1809,7 @@ function TripSummaryView({ trip, onClose }) {
                 <span className="text-xs font-semibold tracking-[0.22em] text-accentDark">总花费</span>
                 <strong className="mt-2 block text-3xl text-primaryDeep"><MoneyText value={formatCurrency(getTripTotalSpent(trip))} animate /></strong>
               </div>
-              <div className="inner-warm-card col-span-2 rounded-3xl p-4">
+              <div className="info-card col-span-2 rounded-3xl p-4">
                 <span className="text-xs font-semibold tracking-[0.22em] text-muted">核心足迹</span>
                 <p className="mt-2 text-sm leading-relaxed text-stone-700">📍 {footprints.join(" ➔ ")}</p>
               </div>
@@ -1839,7 +1841,7 @@ function MemoryHighlights({ trip, topExpense, topCategory, footprints }) {
   return (
     <section className="grid grid-cols-2 gap-3">
       {items.map(([label, value]) => (
-        <article className="surface-card rounded-3xl p-4 backdrop-blur" key={label}>
+        <article className="memory-card rounded-3xl p-4 backdrop-blur" key={label}>
           <p className="type-caption normal-case">{label}</p>
           <h3 className="mt-2 line-clamp-2 text-base font-extrabold leading-snug text-ink">{value}</h3>
         </article>
@@ -1853,7 +1855,7 @@ function CategoryDonut({ totals, total }) {
   let offset = 0;
   if (!totals.length || total <= 0) {
     return (
-      <article className="surface-card relative flex min-h-[98px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
+      <article className="memory-card relative flex min-h-[98px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
         <img className="pointer-events-none absolute -right-8 -bottom-10 z-0 h-36 w-36 opacity-[0.055]" src={heroCapybara} alt="" aria-hidden="true" />
         <span className="relative z-10">还没有可用于生成占比图的支出。</span>
       </article>
@@ -1861,7 +1863,7 @@ function CategoryDonut({ totals, total }) {
   }
 
   return (
-    <article className="surface-card animate-fade-in rounded-3xl p-5">
+    <article className="memory-card animate-fade-in rounded-3xl p-5">
       <div className="flex items-center justify-between gap-4">
         <div>
           <Eyebrow>占比</Eyebrow>
@@ -1914,7 +1916,7 @@ function CategoryDonut({ totals, total }) {
 function Timeline({ expenses, dailyTotals }) {
   if (!expenses.length) {
     return (
-      <div className="surface-card relative flex min-h-[108px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
+      <div className="memory-card relative flex min-h-[108px] items-center overflow-hidden animate-fade-in rounded-3xl p-5 type-body">
         <img className="pointer-events-none absolute -right-8 -bottom-10 z-0 h-36 w-36 opacity-[0.055]" src={heroCapybara} alt="" aria-hidden="true" />
         <span className="relative z-10">还没有可生成回忆的核心支出。</span>
       </div>
@@ -1937,7 +1939,7 @@ function Timeline({ expenses, dailyTotals }) {
           {group.expenses.map((expense, index) => (
             <article className="relative animate-fade-in" style={{ animationDelay: `${(groupIndex + index) * 55}ms` }} key={expense.id}>
               <span className="absolute -left-[37px] top-5 h-3 w-3 rounded-full border-2 border-[#FDFBF7] bg-amber-500 shadow-sm" aria-hidden="true" />
-              <div className="inner-warm-card rounded-3xl p-5">
+              <div className="memory-card rounded-3xl p-5">
                 <p className="type-caption normal-case">{getTimelineTime(expense)}</p>
                 <h3 className="mt-1 type-h3">{getExpenseLabel(expense)}</h3>
                 <p className="mt-2 type-body">花费: <MoneyText value={formatCurrency(expense.amount)} /></p>
@@ -1972,17 +1974,17 @@ function ReviewPage({ id, summary = false }) {
           <span className="type-body text-sm">成员：{trip.people.join("、") || "-"}</span>
         </div>
       </section>
-      <Panel className="space-y-4">
+      <Panel className="ledger-card space-y-4">
         <SectionHead eyebrow="转账" title="转账路径" />
         {trip.mode === "shared" && sharedResult ? <SharedSettlement result={sharedResult} /> : null}
         {trip.mode === "parent" && parentResult ? <ParentSettlement trip={trip} result={parentResult} /> : null}
       </Panel>
       <ButtonLink to="detail" params={{ id: trip.id }} variant="secondary" icon={ReceiptText} className="w-full py-4">继续记账</ButtonLink>
-      <Panel className="space-y-4">
+      <Panel className="info-card space-y-4">
         <SectionHead eyebrow="分类" title="钱花在哪" />
         <CategoryShareList trip={trip} />
       </Panel>
-      <Panel className="space-y-4">
+      <Panel className="info-card space-y-4">
         <SectionHead eyebrow="明细" title="支出记录" />
         <ExpenseList trip={trip} />
       </Panel>
@@ -1998,7 +2000,7 @@ function CategoryShareList({ trip }) {
   const totals = getCategoryTotals(trip);
   if (!totals.length) {
     return (
-      <div className="surface-card relative overflow-hidden rounded-3xl p-4 type-body">
+      <div className="info-card relative overflow-hidden rounded-3xl p-4 type-body">
         <EmptyWatermark />
         <span className="relative z-10">还没有支出记录。</span>
       </div>
@@ -2007,7 +2009,7 @@ function CategoryShareList({ trip }) {
   return (
     <div className="space-y-3">
       {totals.map((item) => (
-        <article className="surface-card rounded-3xl p-4" key={item.category}>
+        <article className="info-card rounded-3xl p-4" key={item.category}>
           <div className="flex items-center justify-between gap-3 text-sm">
             <strong className="type-h3 text-base">{item.category}</strong>
             <span><MoneyText value={formatCurrency(item.amount)} /> · {item.percent}%</span>
@@ -2026,7 +2028,7 @@ function ParentSettlement({ trip, result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {transferRows.length ? transferRows.map((row) => (
-          <article className="ledger-paper inner-warm-card relative overflow-hidden rounded-[28px] p-5 text-ink" key={`${row.from}-${row.to}-${row.amount}`}>
+          <article className="ledger-paper ledger-card relative overflow-hidden rounded-[28px] p-5 text-ink" key={`${row.from}-${row.to}-${row.amount}`}>
             <div className="absolute inset-y-0 right-0 w-1.5 bg-primaryDeep" aria-hidden="true" />
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
@@ -2037,13 +2039,13 @@ function ParentSettlement({ trip, result }) {
             </div>
           </article>
         )) : (
-          <div className="surface-card relative overflow-hidden rounded-3xl p-5 type-body">
+          <div className="info-card relative overflow-hidden rounded-3xl p-5 type-body">
             <EmptyWatermark />
             <span className="relative z-10">当前已平账，无需额外转账。</span>
           </div>
         )}
       </div>
-      <article className="surface-card rounded-3xl p-4 backdrop-blur">
+      <article className="info-card rounded-3xl p-4 backdrop-blur">
         <div className="flex items-start justify-between gap-3">
           <div>
             <Badge tone={result.mode === "extra" ? "alert" : "default"}>{result.mode === "extra" ? "补款" : "返还"}</Badge>
@@ -2062,7 +2064,7 @@ function SharedSettlement({ result }) {
     <div className="space-y-4">
       <div className="space-y-3">
         {result.transfers.length ? result.transfers.map((transfer) => (
-          <article className="ledger-paper inner-warm-card relative overflow-hidden rounded-[28px] p-5 text-ink" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
+          <article className="ledger-paper ledger-card relative overflow-hidden rounded-[28px] p-5 text-ink" key={`${transfer.from}-${transfer.to}-${transfer.amount}`}>
             <div className="absolute inset-y-0 right-0 w-1.5 bg-primaryDeep" aria-hidden="true" />
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
@@ -2073,7 +2075,7 @@ function SharedSettlement({ result }) {
             </div>
           </article>
         )) : (
-          <div className="surface-card relative overflow-hidden rounded-3xl p-5 type-body">
+          <div className="info-card relative overflow-hidden rounded-3xl p-5 type-body">
             <EmptyWatermark />
             <span className="relative z-10">当前已平账，无需额外转账。</span>
           </div>
@@ -2083,7 +2085,7 @@ function SharedSettlement({ result }) {
         <h3 className="mb-3 type-h3 text-base">成员净额</h3>
         <div className="grid grid-cols-3 gap-2">
           {netRows.map(([name, amount]) => (
-            <article className="surface-card rounded-2xl p-3" key={name}>
+            <article className={classNames("rounded-2xl p-3", netCardClass(amount))} key={name}>
               <strong className="block truncate text-sm font-extrabold text-ink">{name}</strong>
               <p className="mt-1 type-caption normal-case">{amount > 0 ? "应收" : amount < 0 ? "应付" : "平账"}</p>
               <p className={classNames("mt-1 text-sm leading-none", amount < 0 ? "text-rose-600" : "text-ink")}>{amount > 0 ? "+" : ""}<MoneyText value={formatCurrency(amount)} /></p>
@@ -2127,7 +2129,7 @@ function CollaboratePage({ room }) {
         <h1 className="type-h1">加入同行者的行程</h1>
         <p className="type-body">输入同行者分享的 6 位房间码，即可在当前浏览器环境内同步这趟行程。</p>
       </section>
-      <Panel>
+      <Panel className="info-card">
         <form className="space-y-5" onSubmit={submit}>
           <Field label="房间码">
             <input

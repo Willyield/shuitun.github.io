@@ -6,7 +6,7 @@ export default {
       colors: {
         shell: "#FFF7EA",
         paper: "#FFFAF0",
-        paperDeep: "#F5E5D0",
+        paperDeep: "#F5DDBA",
         card: "#F6E0CF",
         warmCard: "#FFF8E8",
         warmCardDeep: "#FFDFA0",
@@ -21,14 +21,19 @@ export default {
         danger: "#E11D48",
         sand: "#E9CDAF",
         leaf: "#6C8B57",
-        sky: "#D9EEF2"
+        sky: "#DDEFF2",
+        apricot: "#F7D8AE",
+        orange: "#D07A36",
+        mint: "#DCEBCB",
+        ocean: "#C4E2E0"
       },
       boxShadow: {
         soft: "0 14px 36px rgba(75, 47, 26, 0.1)",
         float: "0 20px 55px rgba(217, 119, 54, 0.2)",
         "capybara-warm": "0 8px 30px rgba(229, 181, 92, 0.1)",
-        ledger: "0 16px 34px rgba(90, 50, 31, 0.22)",
-        button: "0 12px 24px rgba(90, 50, 31, 0.24)"
+        ledger: "0 18px 34px rgba(156, 103, 47, 0.16)",
+        button: "0 12px 24px rgba(50, 29, 19, 0.24)",
+        airy: "0 22px 44px rgba(91, 57, 32, 0.12)"
       },
       borderRadius: {
         "3xl": "24px",
